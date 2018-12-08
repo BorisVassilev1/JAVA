@@ -1,0 +1,139 @@
+END
+loader-ac3d.mf
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/loader-ac3d.mf
+END
+java3d-all.mf
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/java3d-all.mf
+END
+inputdevice.mf
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/inputdevice.mf
+END
+geom-spline.mf
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/geom-spline.mf
+END
+geom-hanim.mf
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/geom-hanim.mf
+END
+geom-spring.mf
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/geom-spring.mf
+END
+geom-particle.mf
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/geom-particle.mf
+END
+geom-terrain.mf
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/geom-terrain.mf
+END
+loader-core.mf
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/loader-core.mf
+END
+loader-3ds.mf
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/loader-3ds.mf
+END
+org.j3d.core.mf
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/org.j3d.core.mf
+END
+loader-vterrain.mf
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/loader-vterrain.mf
+END
+navigation.mf
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/navigation.mf
+END
+texture.mf
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/texture.mf
+END
+terrain.mf
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/terrain.mf
+END
+loader-stl.mf
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/loader-stl.mf
+END
+java3d.mf
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/java3d.mf
+END
+elumens.mf
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/elumens.mf
+END
+all.mf
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/all.mf
+END
+loader-dem.mf
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/loader-dem.mf
+END
+loader-c3d.mf
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/loader-c3d.mf
+END
+geom-core.mf
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/geom-core.mf
+END
+util.mf
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/code/!svn/ver/791/branches/V_1_1_0/make/manifest/util.mf
+END

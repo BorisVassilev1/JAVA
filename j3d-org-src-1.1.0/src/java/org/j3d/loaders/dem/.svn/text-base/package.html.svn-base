@@ -1,0 +1,11 @@
+<HTML>
+<BODY>
+Class for parsing and loading USGS Digital Elevation Model (DEM) files.
+<P>
+
+There are a number of variations on the DEM file format. This code only handles
+the USGS format, not SDTS or any other variant.
+<P>
+
+</BODY>
+</HTML>

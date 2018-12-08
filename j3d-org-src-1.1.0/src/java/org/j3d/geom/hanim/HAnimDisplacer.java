@@ -1,0 +1,191 @@
+/*****************************************************************************
+ *                        Yumtech, Inc Copyright (c) 2004-
+ *                               Java Source
+ *
+ * This source is licensed under the GNU LGPL v2.1
+ * Please read http://www.gnu.org/copyleft/lgpl.html for more information
+ *
+ ****************************************************************************/
+
+package org.j3d.geom.hanim;
+
+// External imports
+// None
+
+// Local imports
+import org.j3d.util.I18nManager;
+
+/**
+ * Representation of a H-Anim Displacer object.
+ * <p>
+ *
+ * The joint object is defined by
+ * <a href="http://h-anim.org/Specifications/H-Anim1.1/">6.5 Displacer</a>.
+ * <p>
+ *
+ * <b>Internationalisation Resource Names</b>
+ * <p>
+ * <ul>
+ * <li>minArraySizeSizeMsg: Generic error message when the provided incoming
+ *     array for setting a value is not big enough. </li>
+ * </ul>
+ *
+ * @author Justin Couch
+ * @version $Revision: 1.5 $
+ */
+public class HAnimDisplacer extends HAnimObject
+{
+    /** Message for the array size not being long enough */
+    private static final String MIN_ARRAY_SIZE_PROP =
+        "org.j3d.geom.hanim.HAnimDisplacer.minArraySizeMsg";
+
+    /** The current coordinates of the segment */
+    private int[] coordIndex;
+
+    /** The number of items in the coordinate list (raw number, not * 3) */
+    private int numCoordIndex;
+
+    /** The current displacements of the displacer */
+    private float[] displacements;
+
+    /** The number of items in the displacement list */
+    private int numDisplacements;
+
+    /** The uniform weight to apply to all these displacements */
+    private float weight;
+
+    /**
+     * Construct a default instance of the displacer.
+     */
+    public HAnimDisplacer()
+    {
+        weight = 1;
+    }
+
+    /**
+     * Get the current value of the weight to be applied to the displacements.
+     *
+     * @return A non-negative value
+     */
+    public float getWeight()
+    {
+        return weight;
+    }
+
+    /**
+     * Set a new value for the weight for the displacements. If no weight value
+     * is to be used, then a value of 1 should be set (the default).
+     *
+     * @param val The new weight value to use
+     */
+    public void setWeight(float val)
+    {
+        weight = val;
+    }
+
+    /**
+     * Get the number of elements in the skinDisplacements field, and by
+     * association skinCoordWeight (if any weights have been set).
+     *
+     * @return The number of value kept in the skin coordinate index
+     */
+    public int numDisplacements()
+    {
+        return numDisplacements;
+    }
+
+    /**
+     * Get the current value of the skinDisplacements. If no weights are set, the
+     * array is left unchanged.
+     *
+     * @param val An array of at least length of numCoord() to copy
+     *   the values to
+     */
+    public void getDisplacements(float[] val)
+    {
+        System.arraycopy(displacements, 0, val, 0, numDisplacements);
+    }
+
+    /**
+     * Set a new value for the skinDisplacements of this joint. If the array is null or
+     * not long enough an exception is generated. The array must be at least
+     * as long as the numValid field value.
+     *
+     * @param val The new skinDisplacements value to use
+     * @param numValid The number of valid values to read from the index list
+     * @throws IllegalArgumentException The array is null or not long enough.
+     */
+    public void setDisplacements(float[] val, int numValid)
+    {
+        if(val == null || val.length < numValid)
+        {
+            I18nManager intl_mgr = I18nManager.getManager();
+            String msg = intl_mgr.getString(MIN_ARRAY_SIZE_PROP) + "displacements";
+
+            throw new IllegalArgumentException(msg);
+        }
+
+        System.arraycopy(val, 0, displacements, 0, numValid);
+        numDisplacements = numValid;
+    }
+
+    /**
+     * Get the number of elements in the skinCoordIndex field, and by
+     * association skinCoordWeight (if any weights have been set).
+     *
+     * @return The number of value kept in the skin coordinate index
+     */
+    public int numCoordIndex()
+    {
+        return numCoordIndex;
+    }
+
+    /**
+     * Get the current value of the skinCoordIndex. If no weights are set, the
+     * array is left unchanged.
+     *
+     * @param val An array of at least length of numCoord() to copy
+     *   the values to
+     */
+    public void getCoordIndex(float[] val)
+    {
+        System.arraycopy(coordIndex, 0, val, 0, numCoordIndex);
+    }
+
+    /**
+     * Set a new value for the skinCoordIndex of this joint. If the array is null or
+     * not long enough an exception is generated. The array must be at least
+     * as long as the numValid field value.
+     *
+     * @param val The new skinCoordIndex value to use
+     * @param numValid The number of valid values to read from the index list
+     * @throws IllegalArgumentException The array is null or not long enough.
+     */
+    public void setCoordIndex(int[] val, int numValid)
+    {
+        if(val == null || val.length < numValid)
+        {
+            I18nManager intl_mgr = I18nManager.getManager();
+
+            String msg = intl_mgr.getString(MIN_ARRAY_SIZE_PROP) + "coordIndex";
+            throw new IllegalArgumentException(msg);
+        }
+
+        if((coordIndex == null) || (coordIndex.length < numValid))
+        {
+            coordIndex = new int[numValid];
+
+            // resize the displacements list while we're at it just to avoid
+            // issues with a user hitting two different list sizes.
+            float[] tmp = new float[numValid];
+
+            if(displacements != null)
+                System.arraycopy(displacements, 0, tmp, 0, numCoordIndex);
+
+            displacements = tmp;
+        }
+
+        System.arraycopy(val, 0, coordIndex, 0, numValid);
+        numCoordIndex = numValid;
+    }
+}

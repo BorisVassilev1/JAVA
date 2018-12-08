@@ -1,0 +1,34 @@
+package edu.wkashti.sorting;
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class SelectionSort {
+	public static void main(String[] args) {
+		Scanner console = new Scanner(System.in);
+		int n = Integer.parseInt(console.nextLine());
+		int[] nums = new int[n];
+		for (int i = 0; i < n; i++) {
+			nums[i] = Integer.parseInt(console.nextLine());
+		}
+		int i = 0;
+		for (i = 0; i < n - 1; i++) {
+			int max = Integer.MIN_VALUE;
+			int maxIndex = 0;
+			for (int j = i; j <= n - 1; j++) {
+				if (nums[j] > max) {
+					max = nums[j];
+					maxIndex = j;
+				}
+			}
+			for (int j = maxIndex - 1; j > i - 1; j--) {
+				nums[j + 1] = nums[j];
+
+			}
+			nums[i] = max;
+		}
+		for (i = 0; i < n; i++) {
+			System.out.print(nums[i] + " ");
+		}
+	}
+}

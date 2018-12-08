@@ -1,0 +1,18 @@
+<HTML>
+<BODY>
+Class for parsing and loading file formats from the Virtual Terrain Project
+(VTP) file formats.
+<P>
+
+The VTP project homepage is 
+<a href="http://www.vterrain.org">http://www.vterrain.org</a>.
+
+<P>
+
+<H3>Acknowledgements</H3>
+
+The code in this package is based on the original work by Paul Byrne of
+Sun Microsystems.
+
+</BODY>
+</HTML>

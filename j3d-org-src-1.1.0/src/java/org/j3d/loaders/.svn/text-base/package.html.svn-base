@@ -1,0 +1,11 @@
+<HTML>
+<BODY>
+General classes usable across multiple loader instances.
+<P>
+
+The code in this package is useful for many other tasks within the codebase.
+Currently there is a lot of integration with the terrain rendering code because
+loaders are usually used as the source data for terrain rendering.
+
+</BODY>
+</HTML>
