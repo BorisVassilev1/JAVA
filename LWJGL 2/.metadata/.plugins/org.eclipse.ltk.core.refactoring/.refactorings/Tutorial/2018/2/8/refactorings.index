@@ -1,0 +1,13 @@
+1519121077315	Rename method 'moveForward'
+1519200998987	Rename type 'Cube'
+1519367827763	Delete element
+1519368097444	Rename type 'Camera'
+1519368138395	Rename type 'Camera1'
+1519368153256	Rename type 'Draw'
+1519368164557	Rename type 'Draw1'
+1519373120885	Rename method 'DrawCube'
+1519373272738	Rename method 'DrawTerrain'
+1519373283777	Rename method 'GenerateTerrainArray'
+1519373292127	Rename method 'HandleMouse'
+1519479955122	Rename type 'TerrainGen'
+1519482149158	Delete element

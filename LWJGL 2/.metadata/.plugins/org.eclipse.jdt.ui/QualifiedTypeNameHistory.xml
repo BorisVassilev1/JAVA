@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="org.lwjgl.input.Mouse"/>
+<fullyQualifiedTypeName name="org.newdawn.slick.opengl.Texture"/>
+<fullyQualifiedTypeName name="edu.tutorial.application1.Draw"/>
+<fullyQualifiedTypeName name="java.awt.Cursor"/>
+<fullyQualifiedTypeName name="edu.tutorial.application1.Camera"/>
+<fullyQualifiedTypeName name="edu.tutorial.application1.SimplexNoise"/>
+<fullyQualifiedTypeName name="edu.tutorial.application1.TerrainGen"/>
+<fullyQualifiedTypeName name="java.lang.NullPointerException"/>
+<fullyQualifiedTypeName name="java.lang.ArrayIndexOutOfBoundsException"/>
+<fullyQualifiedTypeName name="org.lwjgl.input.Keyboard"/>
+<fullyQualifiedTypeName name="javax.sound.sampled.LineUnavailableException"/>
+<fullyQualifiedTypeName name="javax.sound.sampled.AudioFormat"/>
+<fullyQualifiedTypeName name="javax.sound.sampled.SourceDataLine"/>
+<fullyQualifiedTypeName name="javax.sound.sampled.AudioSystem"/>
+<fullyQualifiedTypeName name="java.awt.event.KeyListener"/>
+<fullyQualifiedTypeName name="java.awt.DisplayMode"/>
+<fullyQualifiedTypeName name="org.lwjgl.opengl.DisplayMode"/>
+</qualifiedTypeNameHistroy>

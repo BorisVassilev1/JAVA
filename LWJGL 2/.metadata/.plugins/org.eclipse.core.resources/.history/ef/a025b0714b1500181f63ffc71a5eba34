@@ -1,0 +1,10 @@
+package edu.tutorial.application1;
+
+public class Camera {
+	private float x;
+	private float y;
+	private float z;
+	private float rx;
+	private float ry;
+	private float rz;
+}

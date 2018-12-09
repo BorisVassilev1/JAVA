@@ -1,0 +1,4 @@
+#Mon Feb 19 10:14:33 EET 2018
+__DEFAULT__=false
+org.eclipse.help.ui.localSearch.master=true
+expression=getters and setters

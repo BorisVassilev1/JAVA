@@ -1,0 +1,109 @@
+package edu.tutorial.application1;
+
+import static org.lwjgl.opengl.GL11.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
+
+import edu.tutorial.vectors.Vector3;
+
+public class Main {
+	
+	public static Texture tex;
+	public static Camera cam;
+	public static boolean isEsc = false;
+	
+	
+	public static void main(String[] args) {
+		initDisplay();
+
+		gameLoop();
+		cleanUp();
+	}
+
+	public static void initDisplay() {
+		try {
+			//Display.setDisplayMode(new DisplayMode(2000, 800));
+			Display.setTitle("Game");
+			Display.setResizable(true);
+			Display.create();
+		} catch (LWJGLException e) {
+			// TODO Auto-generated catch block
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+		}
+	}
+
+	public static Texture loadTexture(String key) {
+		try {
+			return TextureLoader.getTexture("png", new FileInputStream(new File("res/" + key + ".png")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("problem loading the texture");
+		}
+		return null;
+	}
+
+	public static  void gameLoop() {
+		tex = loadTexture("grass_top");
+		cam = new Camera(70f, (float) Display.getWidth() / (float) Display.getHeight(), 0.3f, 1000f);
+		float i = 0;
+		
+		int terrainX = 128;
+		int terrainY = 20;
+		int terrainZ = 128;
+		
+		tex.setTextureFilter(GL_NEAREST);
+		
+		int[][][] terrain = Terrain.generateTerrainArray(terrainX, terrainZ, terrainY, 0.03f, (float)(Math.random() * 100.0));
+		ArrayList<Quad> quads= Terrain.calculateTerrainQuads(terrain, terrainX, terrainY, terrainZ);
+		
+		System.out.println(quads.size());
+		
+		long deltatime;
+		
+		long timeNow = System.nanoTime();
+		long timePrev = System.nanoTime();
+		
+		while (!Display.isCloseRequested()) {
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glLoadIdentity();
+			cam.useView();
+
+			Input.handleInput();
+			Input.handleMouse(isEsc);
+			
+			timeNow = System.nanoTime();
+			deltatime = timeNow - timePrev;
+			timePrev = System.nanoTime();
+			System.out.println(1000000000/deltatime);
+			
+			//terrain = Terrain.generateTerrainArray(terrainX, terrainZ, terrainY, 0.03, i/5);
+			//quads= Terrain.calculateTerrainQuads(terrain, terrainX, terrainY, terrainZ);
+			Terrain.draw(quads);
+			i += 0.03;
+			
+			Display.update();
+		}
+	}
+
+	public static void cleanUp() {
+		Display.destroy();
+	}
+}

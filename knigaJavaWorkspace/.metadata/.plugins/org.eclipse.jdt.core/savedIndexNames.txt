@@ -1,0 +1,20 @@
+INDEX VERSION 1.130+D:\Boby\programming\knigaJavaWorkspace\.metadata\.plugins\org.eclipse.jdt.core
+3514235659.index
+4135358433.index
+1157662699.index
+3262970362.index
+1583561181.index
+1633425275.index
+1733888374.index
+2690522977.index
+2228597084.index
+1993439603.index
+171245607.index
+1345868518.index
+2285427206.index
+3668104383.index
+2585005510.index
+696973720.index
+1059774200.index
+2872191748.index
+2841012467.index

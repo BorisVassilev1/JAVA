@@ -1,0 +1,150 @@
+package edu.tutorial.application1;
+
+import static org.lwjgl.opengl.GL11.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
+
+public class Main {
+
+	public static void main(String[] args) {
+		initDisplay();
+
+		gameLoop();
+		cleanUp();
+	}
+
+	public static void initDisplay() {
+		try {
+			Display.setDisplayMode(new DisplayMode(800, 600));
+			Display.setTitle("igri4ka");
+			Display.create();
+		} catch (LWJGLException e) {
+			// TODO Auto-generated catch block
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+		}
+	}
+
+	public static Texture loadTexture(String key) {
+		try {
+			return TextureLoader.getTexture("png", new FileInputStream(new File("res/" + key + ".png")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("problem loading the texture");
+		}
+		return null;
+	}
+
+	public static void gameLoop() {
+		Camera cam = new Camera(70f, (float) Display.getWidth() / (float) Display.getHeight(), 0.3f, 1000f);
+		float i = 0;
+
+		Texture tex = loadTexture("grass");
+
+		while (!Display.isCloseRequested()) {
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glLoadIdentity();
+			cam.useView();
+
+			if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+				cam.move(0.01f, 1);
+			}
+
+			if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+				cam.move(-0.01f, 1);
+			}
+
+			if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+				cam.move(0.01f, 0);
+			}
+
+			if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
+				cam.move(-0.01f, 0);
+			}
+
+			if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
+				cam.rotateY(-0.05f);
+			}
+
+			if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+				cam.rotateY(0.05f);
+			}
+
+			glPushMatrix();
+			{
+
+				glTranslatef(0, 0, -10);
+				glRotatef(i, 1, 1, 0);
+
+				tex.bind();
+
+				glBegin(GL_QUADS);
+				{
+					glColor3f(1, 1, 0);
+
+					glTexCoord2f(0, 0); glVertex3f(-1, -1, 1);
+					glTexCoord2f(0, 0.9); glVertex3f(-1, 1, 1);
+					glTexCoord2f(1, 1); glVertex3f(1, 1, 1);
+					glTexCoord2f(1, 0); glVertex3f(1, -1, 1);
+
+					glColor3f(1, -0, -0);
+
+					glTexCoord2f(0, 0); glVertex3f(-1, -1, -1);
+					glTexCoord2f(0, 1); glVertex3f(-1, 1, -1);
+					glTexCoord2f(1, 1); glVertex3f(1, 1, -1);
+					glTexCoord2f(1, 0); glVertex3f(1, -1, -1);
+
+					glColor3f(0, 1, 0);
+
+					glTexCoord2f(0, 0); glVertex3f(-1, -1, -1);
+					glTexCoord2f(0, 1); glVertex3f(-1, -1, 1);
+					glTexCoord2f(1, 1); glVertex3f(-1, 1, 1);
+					glTexCoord2f(1, 0); glVertex3f(-1, 1, -1);
+
+					glColor3f(1, 0, 1);
+
+					glTexCoord2f(0, 0); glVertex3f(1, -1, -1);
+					glTexCoord2f(0, 1); glVertex3f(1, -1, 1);
+					glTexCoord2f(1, 1); glVertex3f(1, 1, 1);
+					glTexCoord2f(1, 0); glVertex3f(1, 1, -1);
+
+					glColor3f(0, 0, 1);
+
+					glTexCoord2f(0, 0); glVertex3f(-1, -1, -1);
+					glTexCoord2f(0, 1); glVertex3f(1, -1, -1);
+					glTexCoord2f(1, 1); glVertex3f(1, -1, 1);
+					glTexCoord2f(1, 0); glVertex3f(-1, -1, 1);
+
+					glColor3f(0, 1, 1);
+
+					glTexCoord2f(0, 0); glVertex3f(-1, 1, -1);
+					glTexCoord2f(0, 1); glVertex3f(1, 1, -1);
+					glTexCoord2f(1, 1); glVertex3f(1, 1, 1);
+					glTexCoord2f(1, 0); glVertex3f(-1, 1, 1);
+
+				}
+				glEnd();
+			}
+			glPopMatrix();
+
+			i += 0.03;
+
+			Display.update();
+		}
+	}
+
+	public static void cleanUp() {
+		Display.destroy();
+	}
+}
