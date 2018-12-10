@@ -50,4 +50,14 @@ public class Item {
 	public void setStackSize(int stackSize) {
 		this.stackSize = stackSize;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Item)
+		{
+			Item i = (Item) obj;
+			return this.id == i.id && this.name.equals(i.name) && this.stackSize == i.stackSize && this.weight == i.weight;
+		}
+		return false;
+	}
 }

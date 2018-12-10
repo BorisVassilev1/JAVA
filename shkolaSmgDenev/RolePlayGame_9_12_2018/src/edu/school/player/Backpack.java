@@ -1,5 +1,7 @@
 package edu.school.player;
 
+import java.util.ArrayList;
+
 import edu.school.items.Artifact;
 import edu.school.items.Item;
 import edu.school.items.ItemStack;
@@ -97,6 +99,11 @@ public class Backpack {
 		}
 	}
 	
+	public int addItems(ItemStack is)
+	{
+		return addItems(is.getItem(), is.getCount());
+	}
+	
 	public void removeArtifact(Artifact toRemove)
 	{
 		for(int i = 0; i < slotsCount; i ++)
@@ -124,6 +131,20 @@ public class Backpack {
 				
 			}
 		}
+	}
+	
+	public ItemStack[] search(String key)
+	{
+		ArrayList<ItemStack> toReturn = new ArrayList<>();
+		for(ItemStack is : contents)
+		{
+			String name = is.getItem().getName();
+			if(name.contains(key))
+			{
+				toReturn.add(is);
+			}
+		}
+		return (ItemStack[]) toReturn.toArray();
 	}
 	
 	@Override

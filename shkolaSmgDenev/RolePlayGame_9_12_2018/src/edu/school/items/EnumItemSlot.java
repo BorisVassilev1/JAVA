@@ -17,10 +17,6 @@ public enum EnumItemSlot {
 	public int getId() {
 		return id;
 	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
 	
 	@Override
 	public String toString() {

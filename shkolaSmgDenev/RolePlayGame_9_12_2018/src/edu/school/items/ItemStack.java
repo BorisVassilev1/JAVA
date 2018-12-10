@@ -51,7 +51,8 @@ public class ItemStack {
 	public boolean equals(Object obj) {
 		if(obj instanceof ItemStack)
 		{
-			return this.hashCode() == obj.hashCode();
+			ItemStack stack = (ItemStack) obj;
+			return this.count == stack.count && this.item.equals(stack.getItem());
 		}
 		return false;
 	}
