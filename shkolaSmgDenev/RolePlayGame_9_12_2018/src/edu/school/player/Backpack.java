@@ -83,7 +83,7 @@ public class Backpack {
 						//continue;
 					}
 				}
-				else if(contents[i].getItem().getId() == item.getId() && !contents[i].isFull())
+				else if(contents[i].getItem().equals(item) && !contents[i].isFull())
 				{
 					int excess = contents[i].addItems(amt);
 					weight += item.getWeight() * (amt - excess); 
@@ -152,9 +152,12 @@ public class Backpack {
 		String toReturn = "{" + "MaxWeight: " + maxWeight + ", Slots: " + slotsCount + ", Contents: [";
 		for(int i = 0; i < slotsCount; i++)
 		{
-			toReturn += "Slot" + i + ": " + contents[i].toString();
-			if(i == slotsCount - 1)
-			toReturn += ", ";
+			if(contents[i] != null)
+			{
+				toReturn += "Slot" + i + ": " + contents[i].toString();
+				if(i != slotsCount - 1)
+					toReturn += ", ";
+			}
 		}
 		toReturn += "]}";
 		return toReturn;

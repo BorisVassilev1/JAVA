@@ -2,10 +2,10 @@ package edu.school.items;
 
 public class Item {
 	
-	private String name;
-	private float weight;
-	private int stackSize;
-	private int id;
+	protected String name;
+	protected float weight;
+	protected int stackSize;
+	protected int id;
 	
 	public Item(int id, String name, float weight, int stackSize) {
 		this.name = name;

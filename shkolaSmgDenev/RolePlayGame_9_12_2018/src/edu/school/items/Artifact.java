@@ -2,7 +2,6 @@ package edu.school.items;
 
 public class Artifact extends Item{
 	
-	private String name;
 	private EnumItemSlot itemSlot;
 	private int attack;
 	private int defence;
@@ -50,8 +49,8 @@ public class Artifact extends Item{
 	
 	@Override
 	public String toString() {
-		return "{" + "Name: " + this.name + ", Attack: " + this.attack + ", Defence: " + this.defence + ", Weight: " + this.getWeight() +
-				", MinLevel"  + this.minLevel + ", ItemSlot: " + this.itemSlot.toString() + ", StackSize: " + this.getStackSize() + "}";
+		return "{" + "Name: " + this.name + ", Attack: " + this.attack + ", Defence: " + this.defence + ", Weight: " + this.weight +
+				", MinLevel"  + this.minLevel + ", ItemSlot: " + this.itemSlot.toString() + ", StackSize: " + this.stackSize + "}";
 	}
 	
 }

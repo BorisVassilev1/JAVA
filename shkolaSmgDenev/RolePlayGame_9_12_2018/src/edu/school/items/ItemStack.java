@@ -12,7 +12,7 @@ public class ItemStack {
 	public int addItems(int amt)
 	{
 		count += amt;
-		int excess = count -item.getStackSize();
+		int excess = count - item.getStackSize();
 		if(excess <= 0)
 		{
 			return 0;
@@ -44,7 +44,7 @@ public class ItemStack {
 	
 	@Override
 	public String toString() {
-		return "{" + item.toString() + ", Count: " + this.count + "}";
+		return "{" + "Item: " + item.toString() + ", Count: " + this.count + "}";
 	}
 	
 	@Override
