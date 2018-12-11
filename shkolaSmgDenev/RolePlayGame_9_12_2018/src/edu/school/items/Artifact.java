@@ -53,4 +53,8 @@ public class Artifact extends Item{
 				", MinLevel"  + this.minLevel + ", ItemSlot: " + this.itemSlot.toString() + ", StackSize: " + this.stackSize + "}";
 	}
 	
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 }

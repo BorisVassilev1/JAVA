@@ -56,4 +56,9 @@ public class ItemStack {
 		}
 		return false;
 	}
+	
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return new ItemStack(this.item, this.count);
+	}
 }

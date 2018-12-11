@@ -8,7 +8,7 @@ import edu.school.player.Player;
 
 public class Main {
 	public static void main(String[] args) {
-		Player p = new Player("Pesho", 10, 10, 100);
+		Player p = new Player("Pesho", 10, 10, 1000);
 		Backpack bp = p.getBackpack();
 		
 		Item wood = new Item(0,"Wood", 1.5f, 64);

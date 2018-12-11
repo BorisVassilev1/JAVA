@@ -1,5 +1,8 @@
 package edu.school.player;
 
+import java.util.ArrayList;
+
+import edu.school.abilities.Ability;
 import edu.school.items.Artifact;
 import edu.school.items.EnumItemSlot;
 import edu.school.items.ItemStack;
@@ -20,7 +23,11 @@ public class Player {
 
 	private float attack;
 	private float defence;
-
+	
+	private ArrayList<Ability> effects;
+	
+	private ArrayList<Ability> learnedAbilities;
+	
 	public Player(String name, int baseAttack, int baseDefence, int maxHealth) {
 		this.name = name;
 		this.baseAttack = baseAttack;
@@ -29,7 +36,40 @@ public class Player {
 		this.atributes = new ItemStack[6];
 		this.backpack = new Backpack(10000, 10);
 		this.health = maxHealth;
+		this.effects = new ArrayList<Ability>();
+		this.learnedAbilities = new ArrayList<Ability>();
 		recalculateStats();
+	}
+	
+	public void dealDamage(float amt)
+	{
+		this.health -= amt;
+		if(health <= 0)
+		{
+			die();
+		}
+	}
+	
+	public void heal(float amt)
+	{
+		this.health += amt;
+		if(this.health >= this.maxHealth)
+		{
+			this.health = this.maxHealth;
+		}
+	}
+	
+	public void addEffect(Ability a)
+	{
+		this.effects.add(a);
+	}
+
+	public float getAttack() {
+		return attack;
+	}
+
+	public float getDefence() {
+		return defence;
 	}
 
 	private void recalculateStats() {
@@ -76,7 +116,7 @@ public class Player {
 	}
 
 	public ItemStack[] getAtributes() {
-		return atributes;
+		return atributes.clone();
 	}
 
 	public void setAtributes(ItemStack[] atributes) {
@@ -110,6 +150,8 @@ public class Player {
 			recalculateStats();
 			return;
 		}
+		if(this.backpack.getWeight() + curr.getItem().getWeight() > this.backpack.getCarryWeight())
+			return;
 		this.backpack.addItems(curr);
 		this.atributes[slot.getId()] = new ItemStack(a, 1);
 		recalculateStats();
@@ -163,5 +205,18 @@ public class Player {
 				+ ", BaseDefence: " + this.baseDefence + ", MaxHealth: " + this.maxHealth + ", Health: " + this.health
 				+ ", Attack:" + this.attack + ", Defence: " + this.defence + "}";
 
+	}
+
+	public ArrayList<Ability> getEffects() {
+		return (ArrayList<Ability>) effects.clone();
+	}
+
+	public ArrayList<Ability> getLearnedAbilities() {
+		return (ArrayList<Ability>) learnedAbilities.clone();
+	}
+	
+	public void die()
+	{
+		System.out.println(this.name  + " has died! :D");
 	}
 }

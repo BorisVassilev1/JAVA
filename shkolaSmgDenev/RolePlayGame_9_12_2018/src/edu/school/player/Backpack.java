@@ -13,6 +13,14 @@ public class Backpack {
 	private ItemStack contents[];
 	private int weight;
 	
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+
 	public Backpack(int carryWeight, int slotsCount) {
 		this.maxWeight = carryWeight;
 		this.slotsCount = slotsCount;
@@ -29,7 +37,7 @@ public class Backpack {
 	}
 
 	public ItemStack[] getContents() {
-		return contents;
+		return contents.clone();
 	}
 
 	public void setContents(ItemStack[] contents) {
@@ -122,15 +130,17 @@ public class Backpack {
 		return a;
 	}
 	
-	public void removeItem(ItemStack stack)
+	public boolean removeItem(ItemStack stack)
 	{
 		for(int i = 0; i < slotsCount; i ++)
 		{
 			if(contents[i].equals(stack))
 			{
-				
+				this.contents[i] = null;
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	public ItemStack[] search(String key)
@@ -155,8 +165,7 @@ public class Backpack {
 			if(contents[i] != null)
 			{
 				toReturn += "Slot" + i + ": " + contents[i].toString();
-				if(i != slotsCount - 1)
-					toReturn += ", ";
+				toReturn += ", ";
 			}
 		}
 		toReturn += "]}";
