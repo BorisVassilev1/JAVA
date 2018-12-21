@@ -1,8 +1,10 @@
 package edu.school.player;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import edu.school.abilities.Ability;
+import edu.school.abilities.AbilityEffect;
 import edu.school.items.Artifact;
 import edu.school.items.EnumItemSlot;
 import edu.school.items.ItemStack;
@@ -24,7 +26,7 @@ public class Player {
 	private float attack;
 	private float defence;
 	
-	private ArrayList<Ability> effects;
+	private ArrayList<AbilityEffect> effects;
 	
 	private ArrayList<Ability> learnedAbilities;
 	
@@ -36,7 +38,7 @@ public class Player {
 		this.atributes = new ItemStack[6];
 		this.backpack = new Backpack(10000, 10);
 		this.health = maxHealth;
-		this.effects = new ArrayList<Ability>();
+		this.effects = new ArrayList<AbilityEffect>();
 		this.learnedAbilities = new ArrayList<Ability>();
 		recalculateStats();
 	}
@@ -48,6 +50,8 @@ public class Player {
 		{
 			die();
 		}
+		effects = new ArrayList<AbilityEffect>();
+		recalculateStats();
 	}
 	
 	public void heal(float amt)
@@ -59,9 +63,41 @@ public class Player {
 		}
 	}
 	
-	public void addEffect(Ability a)
+	public void addEffect(AbilityEffect a)
 	{
 		this.effects.add(a);
+		recalculateStats();
+	}
+	
+	public void learnAbility(Ability a)
+	{
+		if(!learnedAbilities.contains(a))
+		{
+			learnedAbilities.add(a);
+		}
+	}
+	
+	public void attack(Player p)
+	{
+		p.dealDamage(this.attack);
+	}
+	
+	public void castAbility(Ability a, Player p)
+	{
+		a.cast(this, p);
+	}
+	public void castRandomAbility(Player p)
+	{
+		int index = (int) (Math.random() * learnedAbilities.size());
+		learnedAbilities.get(index).cast(this, p);
+	}
+	
+	public void setAttack(float attack) {
+		this.attack = attack;
+	}
+
+	public void setDefence(float defence) {
+		this.defence = defence;
 	}
 
 	public float getAttack() {
@@ -80,6 +116,9 @@ public class Player {
 				this.attack += ((Artifact) i.getItem()).getAttack();
 				this.defence += ((Artifact) i.getItem()).getDefence();
 			}
+		}
+		for (AbilityEffect af : effects) {
+			af.getAbility().applyEffect(this, af.getSource());
 		}
 	}
 
@@ -207,10 +246,12 @@ public class Player {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public ArrayList<Ability> getEffects() {
 		return (ArrayList<Ability>) effects.clone();
 	}
 
+	@SuppressWarnings("unchecked")
 	public ArrayList<Ability> getLearnedAbilities() {
 		return (ArrayList<Ability>) learnedAbilities.clone();
 	}

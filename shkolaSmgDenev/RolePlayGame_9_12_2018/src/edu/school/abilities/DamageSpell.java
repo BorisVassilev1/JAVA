@@ -11,8 +11,7 @@ public class DamageSpell implements Ability {
 	}
 
 	@Override
-	public void addEffect(Player p) {
-		// TODO Auto-generated method stub
+	public void applyEffect(Player p, Player source) {
 		
 	}
 

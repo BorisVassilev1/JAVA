@@ -11,7 +11,7 @@ public class HealingSpell implements Ability {
 	}
 
 	@Override
-	public void addEffect(Player p) {
+	public void applyEffect(Player p, Player source) {
 		
 	}
 

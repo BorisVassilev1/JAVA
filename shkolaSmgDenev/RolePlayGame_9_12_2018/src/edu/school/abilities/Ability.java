@@ -8,5 +8,5 @@ public interface Ability {
 	
 	void cast(Player caster, Player target);
 	
-	void addEffect(Player p);
+	void applyEffect(Player p, Player source);
 }
