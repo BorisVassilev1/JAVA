@@ -69,6 +69,11 @@ public class App
 			// TODO Auto-generated catch block
 			Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, e);
 		}
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
 	}
 
 //	public static Texture loadTexture(String key) {
@@ -103,17 +108,20 @@ public class App
 			
 			glBegin(GL_QUADS);
 			{
+				glColor3f(1, 1, 1);
 				glVertex2f(-0.5f, -0.5f);
 				glVertex2f(-0.5f, 0.5f);
 				glVertex2f(0.5f,  0.5f);
 				glVertex2f(0.5f, -0.5f);
 			}
+			glEnd();
 			Display.update();
 		}
 	}
 
 	public static void cleanUp() {
 		Display.destroy();
+		System.exit(1);
 	}
 
 }
