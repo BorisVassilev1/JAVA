@@ -1,4 +1,5 @@
-package basic;
+package socketio.test2;
+
 /*
  * socket.io-java-client Test.java
  *
