@@ -6,10 +6,14 @@ import static org.lwjgl.opengl.GL11.*;
 //import java.io.FileInputStream;
 //import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 //import org.newdawn.slick.opengl.Texture;
 //import org.newdawn.slick.opengl.TextureLoader;
@@ -25,8 +29,10 @@ import io.socket.emitter.Emitter;
  */
 public class App 
 {
+	public static float zoom = 1;
 	public static void main( String[] args ) throws URISyntaxException
     {
+		NativeLoader.loadNatives("lib/natives-win");
         //System.out.println( "Hello World!" );
     	final Socket socket = IO.socket("http://localhost:3000");
     	socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
@@ -61,7 +67,7 @@ public class App
 	
 	public static void initDisplay() {
 		try {
-			 Display.setDisplayMode(new DisplayMode(1000, 800));
+			Display.setDisplayMode(new DisplayMode(800, 600));
 			Display.setTitle("Game");
 			Display.setResizable(true);
 			Display.create();
@@ -89,33 +95,54 @@ public class App
 
 	public static void gameLoop() {
 
-		long deltatime;
-
-		long timeNow = System.nanoTime();
-		long timePrev = System.nanoTime();
+		Time.initTime();
 		
 		glEnable(GL_TEXTURE_2D);
 		
+		Player player = new Player(100f,100f, 30f, "saudiskd");
+		
+		try {
+			Mouse.create();
+		} catch (LWJGLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		while (!Display.isCloseRequested()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glLoadIdentity();
 
-			timeNow = System.nanoTime();
-			deltatime = timeNow - timePrev;
-			timePrev = System.nanoTime();
-
-			//System.out.println(1000000000 / deltatime);
+			int width = Display.getWidth();
+			int height = Display.getHeight();
 			
-			glBegin(GL_QUADS);
+			Time.updateTime();
+			if(Display.wasResized())
 			{
-				glColor3f(1, 1, 1);
-				glVertex2f(-0.5f, -0.5f);
-				glVertex2f(-0.5f, 0.5f);
-				glVertex2f(0.5f,  0.5f);
-				glVertex2f(0.5f, -0.5f);
+				glViewport(0, 0, width, height); 
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				glOrtho(0, width, 0, height, -1, 1);
 			}
-			glEnd();
+			if(Time.deltaTimeI > 1000000000 / 60)
+			{
+				//System.out.println("FPS: " + 1000000000 / Time.deltaTimeI);
+			}
+			int Dwheel = Mouse.getDWheel();
+			if(Dwheel < 0)
+			{
+				zoom *= 1.25f ;
+			}
+			else if(Dwheel > 0)
+			{
+				zoom *= 0.8f ;
+			}
+			glScalef(zoom, zoom, 1);
+			
+			player.Input();
+			player.draw();
+			
 			Display.update();
+			
+			Display.sync(120);
 		}
 	}
 
