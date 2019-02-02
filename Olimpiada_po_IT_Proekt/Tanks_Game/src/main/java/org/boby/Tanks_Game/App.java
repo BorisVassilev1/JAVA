@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Vector2f;
 
+import org.json.JSONObject;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -30,35 +31,35 @@ import io.socket.emitter.Emitter;
 public class App 
 {
 	public static float zoom = 1;
+	public static Player[] players;
 	public static void main( String[] args ) throws URISyntaxException
     {
 		NativeLoader.loadNatives("lib/natives-win");
         //System.out.println( "Hello World!" );
     	final Socket socket = IO.socket("http://localhost:3000");
     	socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-
-    	  public void call(Object... args) {
-    	    socket.emit("foo", "hi");
-    	    System.out.println("connection: " + socket.id());
-    	    //socket.disconnect();
-    	  }
-
-    	}).on("event", new Emitter.Listener() {
-    	  public void call(Object... args) {
-    		  System.out.println("recieved a message from the server: ");
-    		  for (Object object : args) {
-				System.out.println(object);
-			}
-    	  }
-    	  
-
-    	}).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-
-    	  public void call(Object... args) {
-    		  System.out.println("disconnected: " + socket.id());
-    	  }
-
-    	});
+    		public void call(Object... args) {
+    		//socket.emit("foo", "hi");
+    		System.out.println("connection: " + socket.id());
+    		//socket.disconnect();
+    	  }});
+    	socket.on("event", new Emitter.Listener() {
+    		public void call(Object... args) {
+    			//System.out.println("recieved a message from the server: ");
+    			//for (Object object : args) {
+    				//System.out.println(object);
+    			//}
+    	}});
+    	socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+    		public void call(Object... args) {
+    			System.out.println("disconnected: " + socket.id());
+    	}});
+    	socket.on("init", new Emitter.Listener() {
+			public void call(Object... args) {
+				//System.out.println(args[0].);
+				JSONObject a = new JSONObject(args[0]);
+				System.out.println(a);
+		}});
     	socket.connect();
     	initDisplay();
     	gameLoop();
