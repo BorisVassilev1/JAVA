@@ -6,12 +6,14 @@ import static org.lwjgl.opengl.GL11.*;
 //import java.io.FileInputStream;
 //import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.concurrent.TimeUnit;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.vecmath.Vector2f;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
@@ -32,6 +34,7 @@ public class App
 {
 	public static float zoom = 1;
 	public static Player[] players;
+	public static int myID = 0;
 	public static void main( String[] args ) throws URISyntaxException
     {
 		NativeLoader.loadNatives("lib/natives-win");
@@ -43,22 +46,83 @@ public class App
     		System.out.println("connection: " + socket.id());
     		//socket.disconnect();
     	  }});
-    	socket.on("event", new Emitter.Listener() {
-    		public void call(Object... args) {
-    			//System.out.println("recieved a message from the server: ");
-    			//for (Object object : args) {
-    				//System.out.println(object);
-    			//}
-    	}});
     	socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
     		public void call(Object... args) {
     			System.out.println("disconnected: " + socket.id());
     	}});
     	socket.on("init", new Emitter.Listener() {
 			public void call(Object... args) {
-				//System.out.println(args[0].);
-				JSONObject a = new JSONObject(args[0]);
-				System.out.println(a);
+				System.out.println("recieving the initializing packet!");
+				JSONObject a = (JSONObject)args[0];
+				//System.out.println(a);
+				JSONArray array = null;
+				try {
+					array  = a.getJSONArray("players");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println(array.toString());
+				players = new Player[array.length()];
+				for(int i = 0; i< array.length(); i ++)
+				{
+					try {
+						players[i] = new Player(array.getJSONObject(i).getInt("X"), 
+								array.getJSONObject(i).getInt("Y"),30f, "sadiu");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+		}});
+    	socket.on("new player", new Emitter.Listener() {
+    		@Override
+    		public void call(Object... args) {
+    			System.out.println("recieved a packet with a new Player!");
+    			JSONObject a = (JSONObject)args[0];
+    			int id = 0;
+    			try {
+					id = a.getInt("ID");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    			if(id > players.length)
+    			{
+    				System.out.println("Resizing the players array!");
+    				Player[] newPlayers = new Player[id];
+    				for(int i = 0; i < players.length; i ++)
+    				{
+    					newPlayers[i] = players[i];
+    				}
+    				players = newPlayers;
+    			}
+    			try {
+					players[id] = new Player(a.getJSONObject("newPlayer").getInt("X"), 
+							a.getJSONObject("newPlayer").getInt("Y"),30f, "sadiu");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    	}});
+    	socket.on("move", new Emitter.Listener() {
+			
+			@Override
+			public void call(Object... args) {
+				JSONObject a = (JSONObject)args[0];
+    			int id = 0;
+    			try {
+					id = a.getInt("ID");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					players[id].setPos((float) a.getDouble("X"), (float) a.getDouble("Y"));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}});
     	socket.connect();
     	initDisplay();
@@ -100,8 +164,6 @@ public class App
 		
 		glEnable(GL_TEXTURE_2D);
 		
-		Player player = new Player(100f,100f, 30f, "saudiskd");
-		
 		try {
 			Mouse.create();
 		} catch (LWJGLException e) {
@@ -138,8 +200,11 @@ public class App
 			}
 			glScalef(zoom, zoom, 1);
 			
-			player.Input();
-			player.draw();
+			players[myID].Input();
+			for(int i = 0; i < players.length; i ++)
+			{
+				players[i].draw();
+			}
 			
 			Display.update();
 			

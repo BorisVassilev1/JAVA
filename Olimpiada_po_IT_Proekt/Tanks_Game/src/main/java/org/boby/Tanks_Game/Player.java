@@ -59,4 +59,15 @@ public class Player {
 			pos.x += 1000 * Time.deltaTime;
 		}
 	}
+	
+	public void setPos(float x, float y)
+	{
+		this.pos.x = x;
+		this.pos.y = y;
+	}
+	
+	@Override
+	public String toString() {
+		return "{\"X\":" + this.pos.x + ", \"Y\":" + this.pos.y + ", \"ID\"" + this.UUID + "}";
+	}
 }
