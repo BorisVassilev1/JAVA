@@ -35,11 +35,12 @@ public class App
 	public static float zoom = 1;
 	public static Player[] players;
 	public static int myID = 0;
+	public static Socket socket;
 	public static void main( String[] args ) throws URISyntaxException
     {
 		NativeLoader.loadNatives("lib/natives-win");
         //System.out.println( "Hello World!" );
-    	final Socket socket = IO.socket("http://localhost:3000");
+    	socket = IO.socket("http://localhost:3000");
     	socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
     		public void call(Object... args) {
     		//socket.emit("foo", "hi");
@@ -55,6 +56,12 @@ public class App
 				System.out.println("recieving the initializing packet!");
 				JSONObject a = (JSONObject)args[0];
 				//System.out.println(a);
+				try {
+					myID = a.getInt("ID");
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				JSONArray array = null;
 				try {
 					array  = a.getJSONArray("players");
@@ -87,10 +94,10 @@ public class App
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-    			if(id > players.length)
+    			if(id > players.length - 1)
     			{
     				System.out.println("Resizing the players array!");
-    				Player[] newPlayers = new Player[id];
+    				Player[] newPlayers = new Player[id + 1];
     				for(int i = 0; i < players.length; i ++)
     				{
     					newPlayers[i] = players[i];
@@ -100,8 +107,9 @@ public class App
     			try {
 					players[id] = new Player(a.getJSONObject("newPlayer").getInt("X"), 
 							a.getJSONObject("newPlayer").getInt("Y"),30f, "sadiu");
+					players[id].setDestination(a.getJSONObject("newPlayer").getInt("destX"), 
+							a.getJSONObject("newPlayer").getInt("destY"));
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
     	}});
@@ -114,15 +122,24 @@ public class App
     			try {
 					id = a.getInt("ID");
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				try {
+					//players[id].setDir((float) a.getDouble("dirX"), (float) a.getDouble("dirY"));
 					players[id].setPos((float) a.getDouble("X"), (float) a.getDouble("Y"));
+					players[id].setMoving(a.getBoolean("isMoving"));
+					players[id].setDestination((float) a.getDouble("destX"), (float) a.getDouble("destY"));
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+		}});
+    	socket.on("player disconnected", new Emitter.Listener() {
+			
+			@Override
+			public void call(Object... args) {
+				int id = (Integer)args[0];
+				players[id] = null;
+				
 		}});
     	socket.connect();
     	initDisplay();
@@ -170,20 +187,29 @@ public class App
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		int width = Display.getWidth();
+		int height = Display.getHeight();
+		
+		glViewport(0, 0, width, height); 
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0, width, 0, height, -1, 1);
+		glTranslated(width/2f, height/2f, 0);
+		
 		while (!Display.isCloseRequested()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glLoadIdentity();
-
-			int width = Display.getWidth();
-			int height = Display.getHeight();
 			
 			Time.updateTime();
 			if(Display.wasResized())
 			{
+				width = Display.getWidth();
+				height = Display.getHeight();
 				glViewport(0, 0, width, height); 
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
 				glOrtho(0, width, 0, height, -1, 1);
+				glTranslated(width/2f, height/2f, 0);
 			}
 			if(Time.deltaTimeI > 1000000000 / 60)
 			{
@@ -203,7 +229,11 @@ public class App
 			players[myID].Input();
 			for(int i = 0; i < players.length; i ++)
 			{
-				players[i].draw();
+				if(players[i] != null)
+				{
+					players[i].update();
+					players[i].draw();
+				}
 			}
 			
 			Display.update();
