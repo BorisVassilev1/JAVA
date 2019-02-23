@@ -54,6 +54,13 @@ public class App
 			public void call(Object... args) {
 				System.out.println("recieving the initializing packet!");
 				JSONObject a = (JSONObject)args[0];
+				try {
+					myID = a.getInt("ID");
+					System.out.println(myID);
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				//System.out.println(a);
 				JSONArray array = null;
 				try {
