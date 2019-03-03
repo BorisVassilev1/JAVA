@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class NativeLoader
 {
- public static void loadNatives(String nativepath)
+ public static void loadNatives(String nativepath)//natives на lwjgl библиотеката се налага да бъдат добавени, тъй като 
  {
      try
      {  

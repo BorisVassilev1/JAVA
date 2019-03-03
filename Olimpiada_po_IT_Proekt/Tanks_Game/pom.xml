@@ -131,7 +131,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>org.boby.Tanks_Game.App</mainClass>
+							<mainClass>org.boby.Tanks_Game.launcher.Main</mainClass>
 						</manifest>
 						<manifestEntries>
 							<Class-Path>.</Class-Path>

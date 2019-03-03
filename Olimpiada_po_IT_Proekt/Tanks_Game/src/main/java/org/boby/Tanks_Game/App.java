@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Vector2f;
 
+import org.boby.Tanks_Game.launcher.Main;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,22 +26,36 @@ import org.lwjgl.opengl.DisplayMode;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import io.socket.emitter.Emitter.Listener;
 
 /**
  * Hello world!
  *
  */
-public class App 
+public class App implements Runnable
 {
-	public static float zoom = 1;
-	public static Player[] players;
-	public static int myID = 0;
-	public static Socket socket;
-	public static void main( String[] args ) throws URISyntaxException
+	public float zoom = 1;
+	public Player[] players;
+	public int myID = 0;
+	public Socket socket;
+	
+	@Override
+	public void run() {//run the game
+		initSockets();
+		initDisplay();
+    	gameLoop();
+    	cleanUp();
+	}
+	
+	public void initSockets()
     {
-		NativeLoader.loadNatives("lib/natives-win");
         //System.out.println( "Hello World!" );
-    	socket = IO.socket("http://localhost:3000");
+    	try {
+			socket = IO.socket("http://localhost:3000");
+		} catch (URISyntaxException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
     	socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
     		public void call(Object... args) {
     		//socket.emit("foo", "hi");
@@ -57,7 +72,7 @@ public class App
 				JSONObject a = (JSONObject)args[0];
 				try {
 					myID = a.getInt("ID");
-					System.out.println(myID);
+					System.out.println("my ID is: " + myID);
 				} catch (JSONException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -76,7 +91,6 @@ public class App
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println(array.toString());
 				players = new Player[array.length()];
 				for(int i = 0; i< array.length(); i ++)
 				{
@@ -112,6 +126,7 @@ public class App
     				players = newPlayers;
     			}
     			try {
+    				System.out.println(a.getJSONObject("newPlayer"));
 					players[id] = new Player(a.getJSONObject("newPlayer").getInt("X"), 
 							a.getJSONObject("newPlayer").getInt("Y"),30f, "sadiu");
 					players[id].setDestination(a.getJSONObject("newPlayer").getInt("destX"), 
@@ -145,13 +160,34 @@ public class App
 			@Override
 			public void call(Object... args) {
 				int id = (Integer)args[0];
+				System.out.println("player with id: " + id + " has disconnected!");
 				players[id] = null;
 				
 		}});
     	socket.connect();
-    	initDisplay();
-    	gameLoop();
-    	cleanUp();
+    	System.out.println("trying to connect...");
+    	System.out.println("if it is taking too long, your internet connection may be interrupted! "
+    			+ "\nUse Ctrl + c to terminate the process. Chack your connection and try again.");
+    	long time0 = System.nanoTime();
+//    	try {
+//			Thread.sleep(2000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+    	
+    	while(!socket.connected())
+    	{
+    		
+    	}
+    	if(!socket.connected())
+    	{
+    		System.out.println("failed to connect!!");
+    		System.exit(0);
+    	}
+    	else {
+    		System.out.println("connected successfully");
+    	}
     }
 	
 	public static void initDisplay() {
@@ -182,8 +218,7 @@ public class App
 //		return null;
 //	}
 
-	public static void gameLoop() {
-
+	public void gameLoop() {
 		Time.initTime();
 		
 		glEnable(GL_TEXTURE_2D);
@@ -249,9 +284,13 @@ public class App
 		}
 	}
 
-	public static void cleanUp() {
+	public void cleanUp() {
 		Display.destroy();
-		System.exit(1);
+		//System.exit(1);
+		Main.setStartButtonVisibility(true);// не трябва да можем да поснем играта 2 пъти от единствена инстанция на launcher-прозореца.
+		socket.disconnect();// ако затворим прозореца с играта, трябва да спре да се комуникира през сокета, тъй като ако ко затворим и започнем играта отново, ще има дублиане на връзки със сървъра.
 	}
+
+	
 
 }
