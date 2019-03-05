@@ -117,13 +117,16 @@ basicio.sockets.on('connection', (socket) => {
             var currentGame = new Game("game_" + numberOfGamesPlaying);
             havePlayersAcceptedCurrentGame.fill(false);
             havePlayersResponded.fill(false);
+            console.log(havePlayersResponded);
+            console.log(havePlayersAcceptedCurrentGame);
             console.log("attempting to start a game");
             for(var i = 0; i < numberOfPlayersPerGame; i ++)
             {
                 var some_socket = basicio.sockets.connected[MatchQueue[i]];
                 currentGame.playersPreviousConnectionIds.push(MatchQueue[i]);
                 //some_socket.join("game_" + numberOfGamesPlaying);
-                some_socket.emit("Match Found", () => {
+                console.log("MatchQueue[" + i + "] = " + MatchQueue[i])
+                some_socket.emit("Match Found", i, (i) => {
                     console.log("a player has accepted match: " + currentGame.name);
                     //console.log(fn);
                     havePlayersAcceptedCurrentGame[i] = true;
@@ -145,6 +148,8 @@ basicio.sockets.on('connection', (socket) => {
                     }
                     if(isGameReady)
                     {
+                        console.log(havePlayersResponded);
+                        console.log(havePlayersAcceptedCurrentGame);
                         games.push(currentGame);
                         console.log("starting the game...");
                         //fn("game is starting");
