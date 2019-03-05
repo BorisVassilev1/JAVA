@@ -98,7 +98,7 @@ public class Player {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Main.app.socket.emit("move", obj);//изпращане на пакет със информацията
+			Main.gameSocket.emit("move", obj);//изпращане на пакет със информацията
 		}
 	}
 	

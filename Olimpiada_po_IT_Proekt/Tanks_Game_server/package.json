@@ -1,0 +1,9 @@
+{
+  "name": "socket_sending_and_recieving_packages",
+  "version": "0.0.1",
+  "description": "a server for testing a java socketio app",
+  "dependencies": {
+    "express": "^4.16.4",
+    "socket.io": "^2.2.0"
+  }
+}

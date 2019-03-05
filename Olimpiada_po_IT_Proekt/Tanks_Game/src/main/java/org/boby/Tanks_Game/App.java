@@ -10,7 +10,6 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.vecmath.Vector2f;
 
 import org.boby.Tanks_Game.launcher.Main;
 import org.json.JSONArray;
@@ -23,10 +22,10 @@ import org.lwjgl.opengl.Display;
 //import org.newdawn.slick.opengl.TextureLoader;
 import org.lwjgl.opengl.DisplayMode;
 
+import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
-import io.socket.emitter.Emitter.Listener;
 
 /**
  * Hello world!
@@ -37,11 +36,10 @@ public class App implements Runnable
 	public float zoom = 1;
 	public Player[] players;
 	public int myID = 0;
-	public Socket socket;
+	//public Socket socket;
 	
 	@Override
 	public void run() {//run the game
-		initSockets();
 		initDisplay();
     	gameLoop();
     	cleanUp();
@@ -51,59 +49,62 @@ public class App implements Runnable
     {
         //System.out.println( "Hello World!" );
     	try {
-			socket = IO.socket("http://localhost:3000");
+			Main.gameSocket = IO.socket("http://localhost:3000");
 		} catch (URISyntaxException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-    	socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+    	Main.gameSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
     		public void call(Object... args) {
-    		//socket.emit("foo", "hi");
-    		System.out.println("connection: " + socket.id());
-    		//socket.disconnect();
-    	  }});
-    	socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-    		public void call(Object... args) {
-    			System.out.println("disconnected: " + socket.id());
-    	}});
-    	socket.on("init", new Emitter.Listener() {
-			public void call(Object... args) {
-				System.out.println("recieving the initializing packet!");
-				JSONObject a = (JSONObject)args[0];
-				try {
-					myID = a.getInt("ID");
-					System.out.println("my ID is: " + myID);
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				//System.out.println(a);
-				try {
-					myID = a.getInt("ID");
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				JSONArray array = null;
-				try {
-					array  = a.getJSONArray("players");
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				players = new Player[array.length()];
-				for(int i = 0; i< array.length(); i ++)
-				{
+    		System.out.println("connection: " + Main.gameSocket.id());
+    		Main.gameSocket.emit("getinit", null, new Ack() {
+				
+				@Override
+				public void call(Object... args) {
+					System.out.println("recieving the initializing packet!");
+					JSONObject a = (JSONObject)args[0];
 					try {
-						players[i] = new Player(array.getJSONObject(i).getInt("X"), 
-								array.getJSONObject(i).getInt("Y"),30f, "sadiu");
+						myID = a.getInt("ID");
+						System.out.println("my ID is: " + myID);
+					} catch (JSONException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					//System.out.println(a);
+					try {
+						myID = a.getInt("ID");
+					} catch (JSONException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					JSONArray array = null;
+					try {
+						array  = a.getJSONArray("players");
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}
-		}});
-    	socket.on("new player", new Emitter.Listener() {
+					players = new Player[array.length()];
+					for(int i = 0; i< array.length(); i ++)
+					{
+						try {
+							players[i] = new Player(array.getJSONObject(i).getInt("X"), 
+									array.getJSONObject(i).getInt("Y"),30f, "sadiu");
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					//Main.gameThread.start();
+					Main.startGame();
+			}});
+    	}});
+    	Main.gameSocket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+    		public void call(Object... args) {
+    			System.out.println("disconnected!");
+    	}});
+		
+    	Main.gameSocket.on("new player", new Emitter.Listener() {
     		@Override
     		public void call(Object... args) {
     			System.out.println("recieved a packet with a new Player!");
@@ -135,7 +136,7 @@ public class App implements Runnable
 					e.printStackTrace();
 				}
     	}});
-    	socket.on("move", new Emitter.Listener() {
+    	Main.gameSocket.on("move", new Emitter.Listener() {
 			
 			@Override
 			public void call(Object... args) {
@@ -155,7 +156,7 @@ public class App implements Runnable
 					e.printStackTrace();
 				}
 		}});
-    	socket.on("player disconnected", new Emitter.Listener() {
+    	Main.gameSocket.on("player disconnected", new Emitter.Listener() {
 			
 			@Override
 			public void call(Object... args) {
@@ -164,11 +165,8 @@ public class App implements Runnable
 				players[id] = null;
 				
 		}});
-    	socket.connect();
-    	System.out.println("trying to connect...");
-    	System.out.println("if it is taking too long, your internet connection may be interrupted! "
-    			+ "\nUse Ctrl + c to terminate the process. Chack your connection and try again.");
-    	long time0 = System.nanoTime();
+
+    	//long time0 = System.nanoTime();
 //    	try {
 //			Thread.sleep(2000);
 //		} catch (InterruptedException e) {
@@ -176,18 +174,14 @@ public class App implements Runnable
 //			e.printStackTrace();
 //		}
     	
-    	while(!socket.connected())
-    	{
-    		
-    	}
-    	if(!socket.connected())
-    	{
-    		System.out.println("failed to connect!!");
-    		System.exit(0);
-    	}
-    	else {
-    		System.out.println("connected successfully");
-    	}
+//    	if(!Main.socket.connected())
+//    	{
+//    		System.out.println("failed to connect!!");
+//    		System.exit(0);
+//    	}
+//    	else {
+//    		System.out.println("connected successfully");
+//    	}
     }
 	
 	public static void initDisplay() {
@@ -287,8 +281,8 @@ public class App implements Runnable
 	public void cleanUp() {
 		Display.destroy();
 		//System.exit(1);
-		Main.setStartButtonVisibility(true);// не трябва да можем да поснем играта 2 пъти от единствена инстанция на launcher-прозореца.
-		socket.disconnect();// ако затворим прозореца с играта, трябва да спре да се комуникира през сокета, тъй като ако ко затворим и започнем играта отново, ще има дублиане на връзки със сървъра.
+		Main.setStartButtonVisibility(true);
+		Main.gameSocket.disconnect();// ако затворим прозореца с играта, трябва да спре да се комуникира през сокета, тъй като ако ко затворим и започнем играта отново, ще има дублиане на връзки със сървъра.
 	}
 
 	
