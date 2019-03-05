@@ -104,14 +104,15 @@ public class Main {// това е launcher-а на играта
 				});
 				btnAccept.setBounds(167, 111, 89, 23);
 				frame.getContentPane().add(btnAccept);
-				btnAccept.setEnabled(true);
+				//btnAccept.setEnabled(true);
 				
 				lblMatchFound = new JLabel("Match found!");
 				lblMatchFound.setFont(new Font("Tahoma", Font.PLAIN, 16));
 				lblMatchFound.setBounds(167, 76, 98, 24);
 				frame.getContentPane().add(lblMatchFound);
-				lblMatchFound.setEnabled(true);
+				//lblMatchFound.setEnabled(true);
 				System.out.println("created the buttons on the screen!");
+				frame.getContentPane().update(frame.getContentPane().getGraphics());
 				
 		}});
 		
