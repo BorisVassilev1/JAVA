@@ -80,23 +80,17 @@ public class Main {// това е launcher-а на играта
 		
 		socket.on("Match Found", new Emitter.Listener() {
 			@Override
-			public void call(Object... args) {
+			public void call(final Object... args) {
 				//TODO: start the client for the found game
 				System.out.println("the server has found a game for you!");
 				final Ack ack = (Ack) args[args.length - 1];
+				int i = (Integer) args[0];
 				
 				btnAccept = new JButton("Accept");
 				btnAccept.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						System.out.println("You have accepted the match");
-						ack.call(new Ack() {
-							
-							@Override
-							public void call(Object... args) {
-								System.out.println(args[0]);
-								
-							}
-						});
+						ack.call(args[0]);
 						btnAccept.removeActionListener(this);
 						btnAccept.setEnabled(false);
 						lblMatchFound.setEnabled(false);
