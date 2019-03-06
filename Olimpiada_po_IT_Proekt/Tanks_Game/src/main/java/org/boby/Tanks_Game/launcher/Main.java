@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 
 import org.boby.Tanks_Game.App;
 import org.boby.Tanks_Game.NativeLoader;
+import org.boby.Tanks_Game.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,10 +30,14 @@ public class Main {// това е launcher-а на играта
 	public static JButton btnFindMatch;
 	private static JButton btnPlay;
 	private static JButton btnAccept;
+	private static JButton btnDecline;
+	private static JButton btnExitQueue;
 	private static JLabel lblMatchFound;
+	private static JLabel lblWaiting;
 	public static Socket gameSocket;
 	public static Socket socket;
 	private static boolean isPlaying = false;
+	private static boolean isInQueue = false;
 	/**
 	 * Launch the application.
 	 */
@@ -65,6 +70,7 @@ public class Main {// това е launcher-а на играта
 	private void initialize() {
 		try {
 			socket = IO.socket("http://localhost:3001");
+			gameSocket = IO.socket("https://localhost:3000");
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -84,26 +90,59 @@ public class Main {// това е launcher-а на играта
 				//TODO: start the client for the found game
 				System.out.println("the server has found a game for you!");
 				final Ack ack = (Ack) args[args.length - 1];
+				final Utils.HappeningContainer happCont = new Utils.HappeningContainer();
 				int i = (Integer) args[0];
 				
+				new java.util.Timer().schedule( 
+				        new java.util.TimerTask() {
+				            @Override
+				            public void run() {
+				            	if(!happCont.hasHappened())
+				            	{
+					            	btnFindMatch.setEnabled(true);
+									btnExitQueue.setEnabled(false);
+									btnAccept.setVisible(false);
+									btnDecline.setVisible(false);
+									ack.call(args[0], false);
+									socket.emit("Leave Queue");
+									isInQueue = false;
+				            	}
+				            }
+				        }, 
+				        5000 
+				);
 				btnAccept = new JButton("Accept");
 				btnAccept.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						System.out.println("You have accepted the match");
-						ack.call(args[0]);
-						btnAccept.removeActionListener(this);
+						ack.call(args[0], true);
+						happCont.happen();
+						btnDecline.setEnabled(false);
 						btnAccept.setEnabled(false);
-						lblMatchFound.setEnabled(false);
+						lblMatchFound.setVisible(false);
+						lblWaiting.setVisible(true);
 					}
 				});
 				btnAccept.setBounds(167, 111, 89, 23);
 				frame.getContentPane().add(btnAccept);
+				
+				btnDecline = new JButton("Decline");
+				btnDecline.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						System.out.println("You have accepted the match");
+						ack.call(args[0], false);
+						happCont.happen();
+						btnAccept.setEnabled(false);
+						btnDecline.setEnabled(false);
+						lblMatchFound.setVisible(false);
+						lblWaiting.setVisible(true);
+					}
+				});
+				btnDecline.setBounds(167, 85, 89, 23);
+				frame.getContentPane().add(btnDecline);
 				//btnAccept.setEnabled(true);
 				
-				lblMatchFound = new JLabel("Match found!");
-				lblMatchFound.setFont(new Font("Tahoma", Font.PLAIN, 16));
-				lblMatchFound.setBounds(167, 76, 98, 24);
-				frame.getContentPane().add(lblMatchFound);
+				
 				//lblMatchFound.setEnabled(true);
 				System.out.println("created the buttons on the screen!");
 				frame.getContentPane().update(frame.getContentPane().getGraphics());
@@ -114,7 +153,24 @@ public class Main {// това е launcher-а на играта
 			
 			@Override
 			public void call(Object... args) {
-				System.out.println("Game " + args[0]);
+				
+				lblWaiting.setVisible(false);
+				btnAccept.setVisible(false);
+				btnDecline.setVisible(false);
+				if((Boolean) args[0])
+				{
+					btnExitQueue.setEnabled(false);
+					btnExitQueue.setVisible(false);
+					System.out.println("Game start");
+					gameSocket.connect();
+					System.out.println("trying to connect...");
+			    	System.out.println("if it is taking too long, your internet connection may be interrupted! "
+			    			+ "\nUse Ctrl + c to terminate the process. Chack your connection and try again.");
+				}
+				else
+				{
+					System.out.println("Game fail");
+				}
 			}
 		});
 		
@@ -133,21 +189,21 @@ public class Main {// това е launcher-а на играта
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// искаме при затваряне на единия прозорец, да се затвори и другия.
 		frame.getContentPane().setLayout(null);
 		
-		btnPlay = new JButton("play!!");
-		btnPlay.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) 
-			{
-				//startGame();
-				gameSocket.connect();
-				System.out.println("trying to connect...");
-		    	System.out.println("if it is taking too long, your internet connection may be interrupted! "
-		    			+ "\nUse Ctrl + c to terminate the process. Chack your connection and try again.");
-			}
-		});
-		btnPlay.setBounds(12, 13, 97, 25);
-		frame.getContentPane().add(btnPlay);
+//		btnPlay = new JButton("play!!");
+//		btnPlay.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) 
+//			{
+//				//startGame();
+//				gameSocket.connect();
+//				System.out.println("trying to connect...");
+//		    	System.out.println("if it is taking too long, your internet connection may be interrupted! "
+//		    			+ "\nUse Ctrl + c to terminate the process. Chack your connection and try again.");
+//			}
+//		});
+//		btnPlay.setBounds(12, 13, 97, 25);
+//		frame.getContentPane().add(btnPlay);
 		
-		btnFindMatch = new JButton("find match");
+		btnFindMatch = new JButton("Find Match");
 		btnFindMatch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 //				JSONObject obj = new JSONObject();
@@ -163,17 +219,41 @@ public class Main {// това е launcher-а на играта
 //				}
 				socket.emit("Find Match");
 				btnFindMatch.setEnabled(false);
+				btnExitQueue.setVisible(true);
 			}
 		});
 		btnFindMatch.setBounds(157, 190, 108, 30);
 		frame.getContentPane().add(btnFindMatch);
 		
+		lblWaiting = new JLabel("Waiting for other players");
+		lblWaiting.setBounds(147, 60, 129, 30);
+		lblWaiting.setVisible(false);
+		frame.getContentPane().add(lblWaiting);
+
+		lblMatchFound = new JLabel("Match found!");
+		lblMatchFound.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lblMatchFound.setBounds(167, 76, 98, 24);
+		lblMatchFound.setVisible(false);
+		frame.getContentPane().add(lblMatchFound);
+		
+		btnExitQueue = new JButton("Exit");
+		btnExitQueue.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnFindMatch.setEnabled(true);
+				btnExitQueue.setEnabled(false);
+				socket.emit("Leave Queue");
+				isInQueue = false;
+			}
+		});
+		btnExitQueue.setBounds(167, 231, 89, 23);
+		btnExitQueue.setVisible(false);
+		frame.getContentPane().add(btnExitQueue);
 		
 	}
 	
 	public static void setStartButtonVisibility(boolean a)
 	{
-		btnPlay.setVisible(a);
+		//btnPlay.setVisible(a);
 	}
 	public static void startGame()
 	{

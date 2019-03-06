@@ -26,4 +26,21 @@ public class Utils {//накакви методчета, които ми тря�
 	{
 		return new Vector2f(a.x, a.y);
 	}
+	
+	public static class HappeningContainer{
+		
+		private boolean hasHappened;
+		public HappeningContainer()
+		{
+			hasHappened = false;
+		}
+		public void happen()
+		{
+			hasHappened = true;
+		}
+		public boolean hasHappened()
+		{
+			return hasHappened;
+		}
+	}
 }

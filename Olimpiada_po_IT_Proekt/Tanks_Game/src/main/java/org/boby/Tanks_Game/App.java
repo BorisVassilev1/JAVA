@@ -47,19 +47,12 @@ public class App implements Runnable
 	
 	public void initSockets()
     {
-        //System.out.println( "Hello World!" );
-    	try {
-			Main.gameSocket = IO.socket("http://localhost:3000");
-		} catch (URISyntaxException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
+        //System.out.println( "Hello World!" );s
     	Main.gameSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
     		public void call(Object... args) {
     		System.out.println("connection: " + Main.gameSocket.id());
-    		Main.gameSocket.emit("getinit", null, new Ack() {
-				
-				@Override
+    		System.out.println("sending my launcherID");
+    		Main.gameSocket.emit("LauncherID", Main.socket.id(), new Ack() {
 				public void call(Object... args) {
 					System.out.println("recieving the initializing packet!");
 					JSONObject a = (JSONObject)args[0];
@@ -85,7 +78,7 @@ public class App implements Runnable
 						e.printStackTrace();
 					}
 					players = new Player[array.length()];
-					for(int i = 0; i< array.length(); i ++)
+					for(int i = 0; i < array.length(); i ++)
 					{
 						try {
 							players[i] = new Player(array.getJSONObject(i).getInt("X"), 
@@ -99,6 +92,7 @@ public class App implements Runnable
 					Main.startGame();
 			}});
     	}});
+    	
     	Main.gameSocket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
     		public void call(Object... args) {
     			System.out.println("disconnected!");
@@ -162,7 +156,7 @@ public class App implements Runnable
 			public void call(Object... args) {
 				int id = (Integer)args[0];
 				System.out.println("player with id: " + id + " has disconnected!");
-				players[id] = null;
+				//players[id] = null;
 				
 		}});
 
@@ -247,6 +241,7 @@ public class App implements Runnable
 				glOrtho(0, width, 0, height, -1, 1);
 				glTranslated(width/2f, height/2f, 0);
 			}
+			glTranslatef(width/2, height/2, 0);
 			if(Time.deltaTimeI > 1000000000 / 60)
 			{
 				//System.out.println("FPS: " + 1000000000 / Time.deltaTimeI);

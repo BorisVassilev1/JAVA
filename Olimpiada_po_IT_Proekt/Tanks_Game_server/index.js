@@ -15,13 +15,12 @@ var basicio = basicsocket(basicserver);
 
 console.log("Server listening at port 3000");
 console.log("Server listening at port 3001");
-var players = [];
+//var players = [];
 
 class Player{
-    constructor(posX, posY, id) {
+    constructor(posX, posY) {
         this.X = posX;
         this.Y = posY;
-        this.ID = id;
         this.isMoving = true;
         this.destX = posX;
         this.destY = posY;
@@ -56,46 +55,55 @@ class Game{
 
 gameio.sockets.on('connection',(socket) =>{
     console.log("new connection: " + socket.id);
+    var myGameID;
+    var myGameName;
+    var myIDInGame;
     
     var ID;
-    socket.on("getinit", (fn) => {
-        console.log(fn);
-        ID = 0;
-        while(true)
+    socket.on("LauncherID", (id, fn) => {
+        for(var i = 0; i < games.length; i ++)
         {
-            if(players[ID] == undefined || players[ID] == null)
+            for(var j = 0; j < numberOfPlayersPerGame; j ++)
             {
-                break;   
+                if(games[i].playersPreviousConnectionIds[j] == id)
+                {
+                    console.log("this player is matched to game: " + games[i].name);
+                    socket.join(games[i].name);
+                    myGameID = i;
+                    myGameName = games[i].name;
+                    myIDInGame = j;
+                    return;
+                }
             }
-            ID ++;
         }
+        
         //var ID = socket.id;
-        var newPlayer = new Player(0,0,ID);
+        //var newPlayer = new Player(0,0);
         //newPlayer.destY = 0;
-        players[ID] = newPlayer;
-        var data = {players, ID};
+        var players = games[myGameID].players;
+        var data = {players, myIDInGame};
 //        socket.emit('init', data);
-        socket.broadcast.emit('new player',{ID, newPlayer});
-        console.log(newPlayer);
+        //socket.broadcast.emit('new player',data);
+        console.log("SENDING THE INIT PACKET")
         fn(data);
     });
     
     socket.on('move', (data) => {
         //console.log(data);
         //players[data.ID].setPos(data.X, data.Y);
-        players[data.ID].X = data.X;
-        players[data.ID].Y = data.Y;
+        games[myGameID].players[data.ID].X = data.X;
+        games[myGameID].players[data.ID].Y = data.Y;
         //players[data.ID].dirX = data.dirX;
         //players[data.ID].dirY = data.dirY;
-        players[data.ID].isMoving = data.isMoving;
-        players[data.ID].destX = data.destX;
-        players[data.ID].destY = data.destY;
-        socket.broadcast.emit('move', data);
+        games[myGameID].players[data.ID].isMoving = data.isMoving;
+        games[myGameID].players[data.ID].destX = data.destX;
+        games[myGameID].players[data.ID].destY = data.destY;
+        socket.broadcast.to(myGameName).emit('move', data);
     });
     
     socket.on('disconnect',() =>{
-        players[ID] = null;
-        socket.broadcast.emit('player disconnected', ID);
+        //players[ID] = null;
+        socket.broadcast.to(myGameName).emit('player disconnected', myIDInGame);
         console.log(socket.id + ' has disconnected');
     });
 });
@@ -115,23 +123,42 @@ basicio.sockets.on('connection', (socket) => {
             var havePlayersAcceptedCurrentGame = [numberOfPlayersPerGame];
             var havePlayersResponded = [numberOfPlayersPerGame];
             var currentGame = new Game("game_" + numberOfGamesPlaying);
-            havePlayersAcceptedCurrentGame.fill(false);
-            havePlayersResponded.fill(false);
-            console.log(havePlayersResponded);
-            console.log(havePlayersAcceptedCurrentGame);
+//            havePlayersAcceptedCurrentGame.fill(false, 0, numberOfPlayersPerGame);
+//            havePlayersResponded.fill(false, 0, numberOfPlayersPerGame);
+            for(var i = 0; i < numberOfPlayersPerGame; i ++)
+            {
+                havePlayersResponded[i] = false;
+            }
+            for(var i = 0; i < numberOfPlayersPerGame; i ++)
+            {
+                havePlayersAcceptedCurrentGame[i] = false;
+            }
+            //console.log(havePlayersResponded);
+            //console.log(havePlayersAcceptedCurrentGame);
+            
             console.log("attempting to start a game");
             for(var i = 0; i < numberOfPlayersPerGame; i ++)
             {
                 var some_socket = basicio.sockets.connected[MatchQueue[i]];
                 currentGame.playersPreviousConnectionIds.push(MatchQueue[i]);
                 //some_socket.join("game_" + numberOfGamesPlaying);
-                console.log("MatchQueue[" + i + "] = " + MatchQueue[i])
-                some_socket.emit("Match Found", i, (i) => {
-                    console.log("a player has accepted match: " + currentGame.name);
+                //console.log("MatchQueue[" + i + "] = " + MatchQueue[i])
+                some_socket.emit("Match Found", i, (i, reply) => {
+                    if(reply == false)
+                    {
+                        havePlayersAcceptedCurrentGame[i] = false;
+                        havePlayersResponded[i] = true;
+                        console.log("a player has declined match: " + currentGame.name);
+                    }
+                    else
+                    {
+                        havePlayersAcceptedCurrentGame[i] = true;
+                        havePlayersResponded[i] = true;
+                        console.log("a player has accepted match: " + currentGame.name);
+                    }
                     //console.log(fn);
-                    havePlayersAcceptedCurrentGame[i] = true;
-                    havePlayersResponded[i] = true;
-                    console.log(i);
+                    
+                    //console.log(i);
                     var isGameReady = true;
                     for(var j = 0; j < numberOfPlayersPerGame; j ++)
                     {
@@ -141,31 +168,34 @@ basicio.sockets.on('connection', (socket) => {
                         }
                         if(havePlayersResponded[j] == false)
                         {
-                            console.log(havePlayersResponded);
-                            console.log(havePlayersAcceptedCurrentGame);
                             return;
                         }
                     }
                     if(isGameReady)
                     {
-                        console.log(havePlayersResponded);
-                        console.log(havePlayersAcceptedCurrentGame);
+                        for(var k = 0; k < currentGame.playersPreviousConnectionIds.length; k ++)
+                        {
+                            currentGame.players[k] = new Player(0,0);
+                        }
                         games.push(currentGame);
                         console.log("starting the game...");
                         //fn("game is starting");
-                        for(var p = 0; p < currentGame.players.length; p ++)
+                        for(var p = 0; p < currentGame.playersPreviousConnectionIds.length; p ++)
                         {
-                            var currentClientsSocket = basicio.sockets.connected[currentGame.players[p]];
-                            currentClientsSocket.emit("Game", "start");
+                            var currentClientsSocket = basicio.sockets.connected[currentGame.playersPreviousConnectionIds[p]];
+                            currentClientsSocket.emit("Game", true);
+                            //MatchQueue.splice(MatchQueue.indexOf(currentGame.players[i], 1));
                         }
                     }
                     else{
                         console.log("some players declined");
                         //fn("fail");
-                        for(var p = 0; p < currentGame.players.length; p ++)
+                         console.log("failed to create a game.returning the players to the queue.")
+                        for(var p = 0; p < currentGame.playersPreviousConnectionIds.length; p ++)
                         {
-                            var currentClientsSocket = basicio.sockets.connected[currentGame.players[p]];
-                            currentClientsSocket.emit("Game", "fail");
+                            var currentClientsSocket = basicio.sockets.connected[currentGame.playersPreviousConnectionIds[p]];
+                            currentClientsSocket.emit("Game", false);
+                            MatchQueue.push(currentClientsSocket.id);
                         }
                     }
                 });
@@ -175,6 +205,12 @@ basicio.sockets.on('connection', (socket) => {
             MatchQueue.splice(0, numberOfPlayersPerGame);
         }
     });
+    
+    socket.on("Leave Queue", () => {
+        MatchQueue.splice(MatchQueue.indexOf(socket.id),1);
+        console.log(socket.id + " has left the queue")
+    });
+     
     socket.on('dissconnect', () => {
         MatchQueue.splice(MatchQueue.indexOf(socket.id),1);
         console.log(socket.id + "'s launcher has disconnected!")
