@@ -6,7 +6,7 @@ import static org.lwjgl.opengl.GL11.*;
 //import java.io.FileInputStream;
 //import java.io.IOException;
 import java.net.URISyntaxException;
-
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +23,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
 import io.socket.client.Ack;
-import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
@@ -35,6 +34,7 @@ public class App implements Runnable
 {
 	public float zoom = 1;
 	public Player[] players;
+	public ArrayList<Bullet> bullets;
 	public int myID = 0;
 	//public Socket socket;
 	
@@ -84,8 +84,8 @@ public class App implements Runnable
 					for(int i = 0; i < array.length(); i ++)
 					{
 						try {
-							players[i] = new Player(array.getJSONObject(i).getInt("X"), 
-									array.getJSONObject(i).getInt("Y"),30f, "sadiu");
+							players[i] = new Player(array.getJSONObject(i).getJSONObject("pos").getInt("x"), 
+									array.getJSONObject(i).getJSONObject("pos").getInt("y"),30f, "sadiu");
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -101,55 +101,52 @@ public class App implements Runnable
     			System.out.println("disconnected!");
     	}});
 		
-    	Main.gameSocket.on("new player", new Emitter.Listener() {
-    		@Override
-    		public void call(Object... args) {
-    			System.out.println("recieved a packet with a new Player!");
-    			JSONObject a = (JSONObject)args[0];
-    			int id = 0;
-    			try {
-					id = a.getInt("ID");
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    			if(id > players.length - 1)
-    			{
-    				System.out.println("Resizing the players array!");
-    				Player[] newPlayers = new Player[id + 1];
-    				for(int i = 0; i < players.length; i ++)
-    				{
-    					newPlayers[i] = players[i];
-    				}
-    				players = newPlayers;
-    			}
-    			try {
-    				System.out.println(a.getJSONObject("newPlayer"));
-					players[id] = new Player(a.getJSONObject("newPlayer").getInt("X"), 
-							a.getJSONObject("newPlayer").getInt("Y"),30f, "sadiu");
-					players[id].setDestination(a.getJSONObject("newPlayer").getInt("destX"), 
-							a.getJSONObject("newPlayer").getInt("destY"));
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-    	}});
+//    	Main.gameSocket.on("new player", new Emitter.Listener() {
+//    		@Override
+//    		public void call(Object... args) {
+//    			System.out.println("recieved a packet with a new Player!");
+//    			JSONObject a = (JSONObject)args[0];
+//    			int id = 0;
+//    			try {
+//					id = a.getInt("ID");
+//				} catch (JSONException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//    			if(id > players.length - 1)
+//    			{
+//    				System.out.println("Resizing the players array!");
+//    				Player[] newPlayers = new Player[id + 1];
+//    				for(int i = 0; i < players.length; i ++)
+//    				{
+//    					newPlayers[i] = players[i];
+//    				}
+//    				players = newPlayers;
+//    			}
+//    			try {
+//    				System.out.println(a.getJSONObject("newPlayer"));
+//					players[id] = new Player(a.getJSONObject("newPlayer").getInt("X"), 
+//							a.getJSONObject("newPlayer").getInt("Y"),30f, "sadiu");
+//					players[id].setDestination(a.getJSONObject("newPlayer").getInt("destX"), 
+//							a.getJSONObject("newPlayer").getInt("destY"));
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}
+//    	}});
     	Main.gameSocket.on("move", new Emitter.Listener() {
 			
 			@Override
 			public void call(Object... args) {
-				JSONObject a = (JSONObject)args[0];
-    			int id = 0;
+				System.out.println("a player has moved");
+				JSONObject pos = (JSONObject)args[0];
+				JSONObject dest = (JSONObject)args[1];
+    			int id = (Integer) args[2];
+    			
     			try {
-					id = a.getInt("ID");
+					players[id].setPos((float)pos.getDouble("x"), (float)pos.getDouble("y"));
+					players[id].setDestination((float)dest.getDouble("x"), (float)dest.getDouble("y"));
 				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				try {
-					//players[id].setDir((float) a.getDouble("dirX"), (float) a.getDouble("dirY"));
-					players[id].setPos((float) a.getDouble("X"), (float) a.getDouble("Y"));
-					players[id].setMoving(a.getBoolean("isMoving"));
-					players[id].setDestination((float) a.getDouble("destX"), (float) a.getDouble("destY"));
-				} catch (JSONException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}});
@@ -162,23 +159,6 @@ public class App implements Runnable
 				//players[id] = null;
 				
 		}});
-
-    	//long time0 = System.nanoTime();
-//    	try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-    	
-//    	if(!Main.socket.connected())
-//    	{
-//    		System.out.println("failed to connect!!");
-//    		System.exit(0);
-//    	}
-//    	else {
-//    		System.out.println("connected successfully");
-//    	}
     }
 	
 	public static void initDisplay() {
@@ -211,6 +191,8 @@ public class App implements Runnable
 
 	public void gameLoop() {
 		Time.initTime();
+		
+		bullets = new ArrayList<Bullet>();
 		
 		glEnable(GL_TEXTURE_2D);
 		
@@ -267,6 +249,14 @@ public class App implements Runnable
 				{
 					players[i].update();
 					players[i].draw();
+				}
+			}
+			
+			for (Bullet bullet : bullets) {
+				if(bullet != null)
+				{
+					bullet.update();
+					bullet.draw();
 				}
 			}
 			

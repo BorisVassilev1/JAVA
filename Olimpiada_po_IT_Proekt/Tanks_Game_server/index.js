@@ -17,29 +17,84 @@ console.log("Server listening at port 3000");
 console.log("Server listening at port 3001");
 //var players = [];
 
+class Vector2
+{
+    constructor(x,y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+    clone()
+    {
+        return new Vector2(this.x, this.y);
+    }
+    add(a)
+    {
+        this.x += a.x;
+        this.y += a.y;
+        return this;
+    }
+    sub(a)
+    {
+        this.x -= a.x;
+        this.y -= a.y;
+        return this;
+    }
+    lengthSquared()
+    {
+        return this.x * this.x + this.y * this.y;
+    }
+    scale(a)
+    {
+        this.x *= a;
+        this.y *= a;
+        return this;
+    }
+    set(x,y)
+    {
+        this.x = x;
+        this.y = y;
+        return this;
+    }
+}
+
 class Player{
     constructor(posX, posY) {
-        this.X = posX;
-        this.Y = posY;
+        this.pos = new Vector2(posX, posY);
         this.isMoving = true;
-        this.destX = posX;
-        this.destY = posY;
-    }
-    setPos(newX, newY) {
-        this.X = newX;
-        this.Y = newY;
-    }
-    setDir(newX, newY) {
-        this.dirX = newX;
-        this.dirY = newY;
+        this.currentDestination = this.pos.clone();
+        this.movementSpeed = 200;
+        this.lastUpdated = Date.now();
+        console.log(this.lastUpdated)
     }
     
     setDest(newX, newY)
     {
-        setDir(newX- this.X, newY - this.Y);
+        this.currentDestination.set(newX, newY);
         this.destX = newX;
         this.destY = newY;
     }
+    
+    update()
+	{
+        var deltaTime = Date.now() - this.lastUpdated;
+		if(this.isMoving)
+		{
+			var a = this.currentDestination.clone();
+            
+			a.sub(this.pos);
+			var traveledDistance = this.movementSpeed * deltaTime / 1000;
+            if(a.lengthSquared() < traveledDistance * traveledDistance)
+            {
+                this.pos.set(this.currentDestination.x, this.currentDestination.y);
+            }
+            else{
+                a.scale(traveledDistance / Math.sqrt(a.lengthSquared()));
+                this.pos.add(a);
+            }
+		}
+        this.lastUpdated = Date.now();
+	}
 }
 
 class Game{
@@ -58,6 +113,7 @@ gameio.sockets.on('connection',(socket) =>{
     var myGameID;
     var myGameName;
     var myIDInGame;
+    var myGame;
     
     var ID;
     socket.on("LauncherID", (id, fn) => {
@@ -67,11 +123,12 @@ gameio.sockets.on('connection',(socket) =>{
             {
                 if(games[i].playersPreviousConnectionIds[j] == id)
                 {
-                    console.log("this player is matched to game: " + games[i].name);
+                    //console.log("this player is matched to game: " + games[i].name);
                     socket.join(games[i].name);
                     myGameID = i;
                     myGameName = games[i].name;
                     myIDInGame = j;
+                    myGame = games[i];
                     break;
                 }
             }
@@ -84,22 +141,19 @@ gameio.sockets.on('connection',(socket) =>{
         var data = {players, ID: myIDInGame};
 //        socket.emit('init', data);
         //socket.broadcast.emit('new player',data);
-        console.log("SENDING THE INIT PACKET")
-        console.log(games[myGameID])
+        //console.log("SENDING THE INIT PACKET")
+        //console.log(games[myGameID])
         fn(data);
     });
     
-    socket.on('move', (data) => {
+    socket.on('move', (data, fn) => {
+        myGame.players[myIDInGame].update();
         //console.log(data);
         //players[data.ID].setPos(data.X, data.Y);
-        games[myGameID].players[data.ID].X = data.X;
-        games[myGameID].players[data.ID].Y = data.Y;
-        //players[data.ID].dirX = data.dirX;
-        //players[data.ID].dirY = data.dirY;
-        games[myGameID].players[data.ID].isMoving = data.isMoving;
-        games[myGameID].players[data.ID].destX = data.destX;
-        games[myGameID].players[data.ID].destY = data.destY;
-        socket.broadcast.to(myGameName).emit('move', data);
+        myGame.players[myIDInGame].setDest(data.destX, data.destY);
+        
+        socket.broadcast.to(myGameName).emit('move', myGame.players[myIDInGame].pos, myGame.players[myIDInGame].currentDestination, myIDInGame);
+        fn(myGame.players[myIDInGame].pos, myGame.players[myIDInGame].currentDestination);
     });
     
     socket.on('disconnect',() =>{
@@ -112,13 +166,13 @@ gameio.sockets.on('connection',(socket) =>{
 var MatchQueue = [];
 var games = [];
 var numberOfGamesPlaying = 0;
-var numberOfPlayersPerGame = 4;
+var numberOfPlayersPerGame = 2;
 
 basicio.sockets.on('connection', (socket) => {
     console.log("Connected to a launcher!");
     socket.on("Find Match", () => {
         MatchQueue.push(socket.id);
-        console.log("Players In Queue: " + MatchQueue.length);
+        console.log(socket.id + " has joined the queue");
         while(MatchQueue.length >= numberOfPlayersPerGame)
         {
             var havePlayersAcceptedCurrentGame = [numberOfPlayersPerGame];
@@ -137,7 +191,7 @@ basicio.sockets.on('connection', (socket) => {
             //console.log(havePlayersResponded);
             //console.log(havePlayersAcceptedCurrentGame);
             
-            console.log("attempting to start a game");
+            //console.log("attempting to start a game");
             for(var i = 0; i < numberOfPlayersPerGame; i ++)
             {
                 var some_socket = basicio.sockets.connected[MatchQueue[i]];
@@ -149,13 +203,13 @@ basicio.sockets.on('connection', (socket) => {
                     {
                         havePlayersAcceptedCurrentGame[i] = false;
                         havePlayersResponded[i] = true;
-                        console.log("a player has declined match: " + currentGame.name);
+                        //console.log("a player has declined match: " + currentGame.name);
                     }
                     else
                     {
                         havePlayersAcceptedCurrentGame[i] = true;
                         havePlayersResponded[i] = true;
-                        console.log("a player has accepted match: " + currentGame.name);
+                        //console.log("a player has accepted match: " + currentGame.name);
                     }
                     //console.log(fn);
                     
@@ -178,8 +232,10 @@ basicio.sockets.on('connection', (socket) => {
                         {
                             currentGame.players[k] = new Player(100,100);
                         }
+                        console.log("successfully created a game:")
+                        console.log(currentGame);
                         games.push(currentGame);
-                        console.log("starting the game...");
+                        
                         //fn("game is starting");
                         for(var p = 0; p < currentGame.playersPreviousConnectionIds.length; p ++)
                         {
@@ -189,9 +245,9 @@ basicio.sockets.on('connection', (socket) => {
                         }
                     }
                     else{
-                        console.log("some players declined");
+                        //console.log("some players declined");
                         //fn("fail");
-                         console.log("failed to create a game.returning the players to the queue.")
+                         //console.log("failed to create a game.returning the players to the queue.")
                         for(var p = 0; p < currentGame.playersPreviousConnectionIds.length; p ++)
                         {
                             var currentClientsSocket = basicio.sockets.connected[currentGame.playersPreviousConnectionIds[p]];

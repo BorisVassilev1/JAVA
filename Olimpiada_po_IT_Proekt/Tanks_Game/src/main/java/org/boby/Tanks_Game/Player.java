@@ -12,6 +12,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.lwjgl.input.Mouse;
 
+import io.socket.client.Ack;
+
 public class Player {
 	Vector2f pos;
 	float size;
@@ -25,6 +27,8 @@ public class Player {
 	Vector2f currentDestination;
 	float currentDestinatonRad = 0;
 	boolean isMoving = false;
+	
+	boolean canShoot = true;
 	
 	public Player(float x, float y, float size, String UUID) {
 		this.pos = new Vector2f(x,y);
@@ -71,34 +75,82 @@ public class Player {
 	public void Input()
 	{
 		boolean willmove = false;
+		boolean willShoot = false;
+		float x = 0, y = 0;
 		while(Mouse.next())//разглеждане на всички ивенти на мишката между предишното и текущото извикване на Input()
 		{
 			if(Mouse.isInsideWindow() && Mouse.getEventButton() == 0 && Mouse.getEventButtonState() == true)// ляв бутон кликнат върху прозореца
 			{
-				float x = Mouse.getX();
-				float y = Mouse.getY();
-				setDestination(x, y);
+				x = Mouse.getX();
+				y = Mouse.getY();
+				//setDestination(x, y);
 				willmove = true;
+			}
+			if(Mouse.isInsideWindow() && Mouse.getEventButton() == 1 && Mouse.getEventButtonState() == true)// десен -----||---------
+			{
+				x = Mouse.getX();
+				y = Mouse.getY();
+				willShoot = true;
 			}
 		}
 		
 		if(willmove)// ако има промяна в състоянието
 		{
 			JSONObject obj = new JSONObject();
-			try {
-				obj.put("X", pos.x);//информация за играча
-				obj.put("Y", pos.y);
-				//obj.put("dirX", direction.x);
-				//obj.put("dirY", direction.y);
-				obj.put("ID", Main.app.myID);
-				obj.put("isMoving", isMoving);
-				obj.put("destX", currentDestination.x);
-				obj.put("destY", currentDestination.y);
+			try {//информация за играча
+				obj.put("destX", x);
+				obj.put("destY", y);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Main.gameSocket.emit("move", obj);//изпращане на пакет със информацията
+			System.out.println("emitting \"move\" packet ");
+			Main.gameSocket.emit("move", obj, new Ack() {
+				
+				@Override
+				public void call(Object... args) {
+					//System.out.println(args);
+					System.out.println("\"move\" packet returned");
+					JSONObject pos = (JSONObject) args[0];
+					JSONObject dest = (JSONObject) args[1];
+					System.out.println(pos);
+					System.out.println(dest);
+					try {
+						setPos((float) pos.getDouble("x"), (float) pos.getDouble("y"));
+						setDestination((float) dest.getDouble("x"), (float) dest.getDouble("y"));
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+			});//изпращане на пакет със информацията
+		}
+		
+		if(willShoot && canShoot)
+		{
+			canShoot = false;
+			new java.util.Timer().schedule( 
+			        new java.util.TimerTask() {
+			            @Override
+			            public void run() {
+			            	canShoot = true;
+			            }
+			        }, 
+			        1000 
+			);
+			
+			final Bullet bullet = new Bullet((Vector2f) this.pos.clone(), (float) Math.atan2(y - this.pos.y, x - this.pos.x));
+			Main.app.bullets.add(bullet);
+			new java.util.Timer().schedule( 
+			        new java.util.TimerTask() {
+			            @Override
+			            public void run() {
+			            	Main.app.bullets.remove(Main.app.bullets.indexOf(bullet));
+			            }
+			        }, 
+			        5000 
+			);
 		}
 	}
 	
