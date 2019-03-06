@@ -40,15 +40,18 @@ public class App implements Runnable
 	
 	@Override
 	public void run() {//run the game
+		//Main.gameSocket.connect();
+		System.out.println("starting the game window...");
 		initDisplay();
+		System.out.println("inited display");
     	gameLoop();
     	cleanUp();
 	}
 	
 	public void initSockets()
     {
-        //System.out.println( "Hello World!" );s
-    	Main.gameSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+        //System.out.println( "Hello World!" );
+		Main.gameSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
     		public void call(Object... args) {
     		System.out.println("connection: " + Main.gameSocket.id());
     		System.out.println("sending my launcherID");
@@ -182,7 +185,7 @@ public class App implements Runnable
 		try {
 			Display.setDisplayMode(new DisplayMode(800, 600));
 			Display.setTitle("Game");
-			Display.setResizable(true);
+			Display.setResizable(false);
 			Display.create();
 		} catch (LWJGLException e) {
 			// TODO Auto-generated catch block
@@ -224,7 +227,7 @@ public class App implements Runnable
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(0, width, 0, height, -1, 1);
-		glTranslated(width/2f, height/2f, 0);
+		//glTranslated(width/2f, height/2f, 0);
 		
 		while (!Display.isCloseRequested()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -239,9 +242,9 @@ public class App implements Runnable
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
 				glOrtho(0, width, 0, height, -1, 1);
-				glTranslated(width/2f, height/2f, 0);
+				//glTranslated(width/2f, height/2f, 0);
 			}
-			glTranslatef(width/2, height/2, 0);
+			//glTranslatef(width/2, height/2, 0);
 			if(Time.deltaTimeI > 1000000000 / 60)
 			{
 				//System.out.println("FPS: " + 1000000000 / Time.deltaTimeI);

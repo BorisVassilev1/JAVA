@@ -58,7 +58,7 @@ public class Main {// това е launcher-а на играта
 	 * Create the application.
 	 */
 	public Main() {
-		NativeLoader.loadNatives("lib/natives-win");//natives на lwjgl библиотеката се налага да бъдат добавени, тъй като по неясна за мен причина maven не го прави
+		NativeLoader.loadNatives("lib/natives-win");//natives на lwjgl библиотеката се налага да бъдат добавени, тъй като по неясна за мен причина maven не го прави 
 		app = new App();
 		gameThread = new Thread(app);
 		initialize();
@@ -70,7 +70,7 @@ public class Main {// това е launcher-а на играта
 	private void initialize() {
 		try {
 			socket = IO.socket("http://localhost:3001");
-			gameSocket = IO.socket("https://localhost:3000");
+			gameSocket = IO.socket("http://localhost:3000");
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -162,6 +162,7 @@ public class Main {// това е launcher-а на играта
 					btnExitQueue.setEnabled(false);
 					btnExitQueue.setVisible(false);
 					System.out.println("Game start");
+					//startGame();
 					gameSocket.connect();
 					System.out.println("trying to connect...");
 			    	System.out.println("if it is taking too long, your internet connection may be interrupted! "
@@ -249,6 +250,8 @@ public class Main {// това е launcher-а на играта
 		btnExitQueue.setVisible(false);
 		frame.getContentPane().add(btnExitQueue);
 		
+		frame.setResizable(false);
+		
 	}
 	
 	public static void setStartButtonVisibility(boolean a)
@@ -257,10 +260,11 @@ public class Main {// това е launcher-а на играта
 	}
 	public static void startGame()
 	{
-		setStartButtonVisibility(false);
+		//setStartButtonVisibility(false);
 		gameThread = new Thread(app);
 		gameThread.setName("Tanks Game");
 		gameThread.start();// стартиране на играта
+		//gameSocket.connect();
 		isPlaying = true;
 	}
 }

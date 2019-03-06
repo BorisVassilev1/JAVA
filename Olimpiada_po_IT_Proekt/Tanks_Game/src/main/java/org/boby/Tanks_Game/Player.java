@@ -31,7 +31,7 @@ public class Player {
 		this.size = size;
 		this.UUID = UUID;
 		direction = new Vector2f();
-		color = new Vector3f(0,1 ,0);
+		color = new Vector3f(1,1 ,1);
 		currentDestination = (Vector2f) pos.clone();
 	}
 	

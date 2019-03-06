@@ -72,7 +72,7 @@ gameio.sockets.on('connection',(socket) =>{
                     myGameID = i;
                     myGameName = games[i].name;
                     myIDInGame = j;
-                    return;
+                    break;
                 }
             }
         }
@@ -81,10 +81,11 @@ gameio.sockets.on('connection',(socket) =>{
         //var newPlayer = new Player(0,0);
         //newPlayer.destY = 0;
         var players = games[myGameID].players;
-        var data = {players, myIDInGame};
+        var data = {players, ID: myIDInGame};
 //        socket.emit('init', data);
         //socket.broadcast.emit('new player',data);
         console.log("SENDING THE INIT PACKET")
+        console.log(games[myGameID])
         fn(data);
     });
     
@@ -111,7 +112,7 @@ gameio.sockets.on('connection',(socket) =>{
 var MatchQueue = [];
 var games = [];
 var numberOfGamesPlaying = 0;
-var numberOfPlayersPerGame = 2;
+var numberOfPlayersPerGame = 4;
 
 basicio.sockets.on('connection', (socket) => {
     console.log("Connected to a launcher!");
@@ -175,7 +176,7 @@ basicio.sockets.on('connection', (socket) => {
                     {
                         for(var k = 0; k < currentGame.playersPreviousConnectionIds.length; k ++)
                         {
-                            currentGame.players[k] = new Player(0,0);
+                            currentGame.players[k] = new Player(100,100);
                         }
                         games.push(currentGame);
                         console.log("starting the game...");

@@ -29,10 +29,12 @@ public class NativeLoader
       newpaths[newpaths.length-1]=nativepath;
 
       natives.set(null,newpaths); 
+      System.out.println("successfully loadad natives");
      }
      catch(Exception e)
      {
       e.printStackTrace();
+      System.out.println("failed installing the natives");
      }
  }
 }
