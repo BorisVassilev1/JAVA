@@ -1,9 +1,9 @@
 package org.boby.Tanks_Game;
 
-public class Time {// клас, който измерва времето между кадрите, за да не настъпват отклонения при устройства с различни възможности
+public class Time {// traces the time between updates
 	
-	static long deltaTimeI;// в секунди
-	static double deltaTime;// в наносекунди
+	static long deltaTimeI;// in seconds
+	static double deltaTime;// in nanosecs
 	static long timeNow;
 	static long timePrev;
 	

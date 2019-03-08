@@ -56,33 +56,45 @@ class Vector2
         this.y = y;
         return this;
     }
+    distSquared(a)
+    {
+        return this.clone().sub(a).lengthSquared()
+    }
 }
 
 class Player{
-    constructor(posX, posY) {
+    constructor(posX, posY, team) {
         this.pos = new Vector2(posX, posY);
         this.isMoving = true;
         this.currentDestination = this.pos.clone();
         this.movementSpeed = 200;
         this.lastUpdated = Date.now();
-        console.log(this.lastUpdated)
+        this.team = team;
+        this.maxHealth = 100;
+        this.health = this.maxHealth;
     }
     
     setDest(newX, newY)
     {
         this.currentDestination.set(newX, newY);
-        this.destX = newX;
-        this.destY = newY;
     }
     
     update()
 	{
         var deltaTime = Date.now() - this.lastUpdated;
+        if(deltaTime == 0)
+        {
+            return;
+        }
 		if(this.isMoving)
 		{
 			var a = this.currentDestination.clone();
-            
 			a.sub(this.pos);
+            if(a.lengthSquared() == 0)
+            {
+                this.lastUpdated = Date.now();
+                return;
+            }
 			var traveledDistance = this.movementSpeed * deltaTime / 1000;
             if(a.lengthSquared() < traveledDistance * traveledDistance)
             {
@@ -95,6 +107,35 @@ class Player{
 		}
         this.lastUpdated = Date.now();
 	}
+    
+    dealDamage()
+    {
+        
+    }
+}
+
+class Bullet{
+    constructor(pos, direction)
+    {
+        this.pos = new Vector2(pos.x, pos.y);
+        this.direction = new Vector2(direction.x, direction.y);
+        this.direction.sub(pos);
+        this.lastUpdated = Date.now();
+        this.lifetime = 5000;
+        this.deathTime = Date.now() + this.lifetime;
+        this.movementSpeed = 300;
+        this.team = 0;
+    }
+    
+    update()
+    {
+        var deltaTime = Date.now() - this.lastUpdated;
+        var a = this.direction.clone();
+        var traveledDistance = this.movementSpeed * deltaTime / 1000;
+        a.scale(traveledDistance / Math.sqrt(a.lengthSquared()));
+        this.pos.add(a);
+        this.lastUpdated = Date.now();
+    }
 }
 
 class Game{
@@ -102,10 +143,55 @@ class Game{
     constructor(name)
     {
         this.players = [];
+        this.bullets = [];
         this.playersPreviousConnectionIds = [];
         this.name = name;
     }
     
+    update()
+    {
+        for(var i = 0; i < this.players.length; i ++)
+        {
+            //if(Date.now() - this.players[i].lastUpdated > 20)
+            {
+                //console.log("player: ");
+                //console.log(this.players[i].pos)
+                this.players[i].update();
+                //console.log(this.players[i].pos)
+            }
+        }
+        for(var i = 0; i < this.bullets.length; i ++)
+        {
+            //console.log(this.bullets[i])
+            //if(this.bullets[i] != null)
+            {
+                this.bullets[i].update();
+                if(this.bullets[i].deathTime < Date.now())
+                {
+                    this.bullets.splice(i, 1);
+                }
+            }
+        }
+        for(var i = 0; i < this.players.length; i ++)
+        {
+            for(var j = 0; j < this.bullets.length; j ++)
+            {
+                
+//                console.log("player team: ");
+//                console.log(this.players[i].team);
+//                console.log("bullet team: ");
+//                console.log(this.bullets[j].team);
+////                console.log("\n")
+                if(this.players[i].team != this.bullets[j].team &&
+                    this.players[i].pos.distSquared(this.bullets[j].pos) < 400)
+                {
+                    gameio.to(this.name).emit("damage", i, j,20);
+                    console.log(i + " has taken damage");
+                    this.bullets.splice(j);
+                }
+            }
+        }
+    }
 }
 
 gameio.sockets.on('connection',(socket) =>{
@@ -114,6 +200,8 @@ gameio.sockets.on('connection',(socket) =>{
     var myGameName;
     var myIDInGame;
     var myGame;
+    var myTeam;
+    var lastShoot;
     
     var ID;
     socket.on("LauncherID", (id, fn) => {
@@ -123,37 +211,59 @@ gameio.sockets.on('connection',(socket) =>{
             {
                 if(games[i].playersPreviousConnectionIds[j] == id)
                 {
-                    //console.log("this player is matched to game: " + games[i].name);
                     socket.join(games[i].name);
                     myGameID = i;
                     myGameName = games[i].name;
                     myIDInGame = j;
                     myGame = games[i];
+                    lastShoot = Date.now();
+                    //games[i].players[j].team =  (j > numberOfPlayersPerGame/2) ? 1 : 0;
+                    myTeam = games[i].players[j].team;
                     break;
                 }
             }
         }
-        
-        //var ID = socket.id;
-        //var newPlayer = new Player(0,0);
-        //newPlayer.destY = 0;
         var players = games[myGameID].players;
         var data = {players, ID: myIDInGame};
-//        socket.emit('init', data);
-        //socket.broadcast.emit('new player',data);
-        //console.log("SENDING THE INIT PACKET")
-        //console.log(games[myGameID])
         fn(data);
     });
     
     socket.on('move', (data, fn) => {
+        //console.log("player: ");
+        //console.log(myGame.players[myIDInGame].pos)
         myGame.players[myIDInGame].update();
-        //console.log(data);
-        //players[data.ID].setPos(data.X, data.Y);
-        myGame.players[myIDInGame].setDest(data.destX, data.destY);
+        //console.log(myGame.players[myIDInGame].pos)
         
+        myGame.players[myIDInGame].currentDestination.set(data.x, data.y);
         socket.broadcast.to(myGameName).emit('move', myGame.players[myIDInGame].pos, myGame.players[myIDInGame].currentDestination, myIDInGame);
         fn(myGame.players[myIDInGame].pos, myGame.players[myIDInGame].currentDestination);
+    });
+    
+    socket.on("shoot", (mouseXY, fn) => {
+        if(Date.now() > lastShoot + 1000)
+        {
+            //console.log("player: ");
+            //console.log(myGame.players[myIDInGame].pos)
+            myGame.players[myIDInGame].update();
+            //console.log(myGame.players[myIDInGame].pos)
+            var bullet = new Bullet(myGame.players[myIDInGame].pos.clone(), mouseXY);
+            bullet.team = myTeam;
+            myGame.bullets.push(bullet);
+            
+//            for(var i = 0; ; i ++)
+//            {
+//                if(!myGame.bullets[i])
+//                {
+//                    myGame.bullets[i] = bullet;
+//                    break;
+//                }
+//            }
+//            
+            lastShoot = Date.now();
+            //console.log(bullet);
+            socket.broadcast.to(myGameName).emit('shoot',bullet, myIDInGame);
+            fn(bullet);
+        }
     });
     
     socket.on('disconnect',() =>{
@@ -230,7 +340,12 @@ basicio.sockets.on('connection', (socket) => {
                     {
                         for(var k = 0; k < currentGame.playersPreviousConnectionIds.length; k ++)
                         {
-                            currentGame.players[k] = new Player(100,100);
+                            if(k < numberOfPlayersPerGame / 2){
+                                currentGame.players[k] = new Player(100,100, 0);
+                            }
+                            else{
+                                currentGame.players[k] = new Player(100,100, 1);
+                            }
                         }
                         console.log("successfully created a game:")
                         console.log(currentGame);
@@ -245,14 +360,13 @@ basicio.sockets.on('connection', (socket) => {
                         }
                     }
                     else{
-                        //console.log("some players declined");
-                        //fn("fail");
                          //console.log("failed to create a game.returning the players to the queue.")
                         for(var p = 0; p < currentGame.playersPreviousConnectionIds.length; p ++)
                         {
                             var currentClientsSocket = basicio.sockets.connected[currentGame.playersPreviousConnectionIds[p]];
                             currentClientsSocket.emit("Game", false);
-                            MatchQueue.push(currentClientsSocket.id);
+                            //MatchQueue.push(currentClientsSocket.id);
+                            console.log(MatchQueue.length)
                         }
                     }
                 });
@@ -273,3 +387,15 @@ basicio.sockets.on('connection', (socket) => {
         console.log(socket.id + "'s launcher has disconnected!")
     });
 });
+
+setTimeout(update, 0);
+
+function update()
+{
+    for(var i = 0; i < games.length; i ++)
+    {
+        games[i].update();
+    }
+    setTimeout(update, 30)
+}
+

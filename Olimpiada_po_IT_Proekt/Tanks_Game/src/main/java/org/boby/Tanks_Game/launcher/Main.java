@@ -42,7 +42,7 @@ public class Main {// това е launcher-а на играта
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {//стартиране на прозореца
+		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					Main window = new Main();
@@ -54,25 +54,18 @@ public class Main {// това е launcher-а на играта
 		});
 	}
 
-	/**
-	 * Create the application.
-	 */
 	public Main() {
-		NativeLoader.loadNatives("lib/natives-win");//natives на lwjgl библиотеката се налага да бъдат добавени, тъй като по неясна за мен причина maven не го прави 
+		NativeLoader.loadNatives("lib/natives-win");//loading lwjgl natives
 		app = new App();
 		gameThread = new Thread(app);
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
 		try {
-			socket = IO.socket("http://localhost:3001");
-			gameSocket = IO.socket("http://localhost:3000");
+			socket = IO.socket("http://192.168.1.110:3001");
+			gameSocket = IO.socket("http://192.168.1.110:3000");
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -103,6 +96,7 @@ public class Main {// това е launcher-а на играта
 									btnExitQueue.setEnabled(false);
 									btnAccept.setVisible(false);
 									btnDecline.setVisible(false);
+									lblMatchFound.setVisible(false);
 									ack.call(args[0], false);
 									socket.emit("Leave Queue");
 									isInQueue = false;
@@ -111,16 +105,20 @@ public class Main {// това е launcher-а на играта
 				        }, 
 				        5000 
 				);
+				
+				lblMatchFound.setVisible(true);
+				
 				btnAccept = new JButton("Accept");
 				btnAccept.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						System.out.println("You have accepted the match");
-						ack.call(args[0], true);
 						happCont.happen();
 						btnDecline.setEnabled(false);
 						btnAccept.setEnabled(false);
 						lblMatchFound.setVisible(false);
 						lblWaiting.setVisible(true);
+						lblMatchFound.setVisible(false);
+						ack.call(args[0], true);
 					}
 				});
 				btnAccept.setBounds(167, 111, 89, 23);
@@ -130,20 +128,19 @@ public class Main {// това е launcher-а на играта
 				btnDecline.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						System.out.println("You have accepted the match");
-						ack.call(args[0], false);
 						happCont.happen();
 						btnAccept.setEnabled(false);
 						btnDecline.setEnabled(false);
 						lblMatchFound.setVisible(false);
 						lblWaiting.setVisible(true);
+						lblMatchFound.setVisible(false);
+						ack.call(args[0], false);
 					}
 				});
 				btnDecline.setBounds(167, 85, 89, 23);
 				frame.getContentPane().add(btnDecline);
-				//btnAccept.setEnabled(true);
 				
 				
-				//lblMatchFound.setEnabled(true);
 				System.out.println("created the buttons on the screen!");
 				frame.getContentPane().update(frame.getContentPane().getGraphics());
 				
@@ -154,11 +151,13 @@ public class Main {// това е launcher-а на играта
 			@Override
 			public void call(Object... args) {
 				
-				lblWaiting.setVisible(false);
-				btnAccept.setVisible(false);
-				btnDecline.setVisible(false);
+				
 				if((Boolean) args[0])
 				{
+					lblWaiting.setVisible(false);
+					btnAccept.setVisible(false);
+					btnDecline.setVisible(false);
+					
 					btnExitQueue.setEnabled(false);
 					btnExitQueue.setVisible(false);
 					System.out.println("Game start");
@@ -170,6 +169,12 @@ public class Main {// това е launcher-а на играта
 				}
 				else
 				{
+					lblWaiting.setVisible(false);
+					btnAccept.setVisible(false);
+					btnDecline.setVisible(false);
+					
+					btnExitQueue.setVisible(false);
+					btnFindMatch.setEnabled(true);
 					System.out.println("Game fail");
 				}
 			}
@@ -190,37 +195,13 @@ public class Main {// това е launcher-а на играта
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// искаме при затваряне на единия прозорец, да се затвори и другия.
 		frame.getContentPane().setLayout(null);
 		
-//		btnPlay = new JButton("play!!");
-//		btnPlay.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) 
-//			{
-//				//startGame();
-//				gameSocket.connect();
-//				System.out.println("trying to connect...");
-//		    	System.out.println("if it is taking too long, your internet connection may be interrupted! "
-//		    			+ "\nUse Ctrl + c to terminate the process. Chack your connection and try again.");
-//			}
-//		});
-//		btnPlay.setBounds(12, 13, 97, 25);
-//		frame.getContentPane().add(btnPlay);
-		
 		btnFindMatch = new JButton("Find Match");
 		btnFindMatch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-//				JSONObject obj = new JSONObject();
-//				try {
-//					obj.put("Random", true);
-//				} catch (JSONException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				if(!socket.connected())
-//				{
-//					System.out.println("the socket isnt connected");
-//				}
 				socket.emit("Find Match");
 				btnFindMatch.setEnabled(false);
 				btnExitQueue.setVisible(true);
+				btnExitQueue.setEnabled(true);
 			}
 		});
 		btnFindMatch.setBounds(157, 190, 108, 30);
@@ -233,7 +214,7 @@ public class Main {// това е launcher-а на играта
 
 		lblMatchFound = new JLabel("Match found!");
 		lblMatchFound.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblMatchFound.setBounds(167, 76, 98, 24);
+		lblMatchFound.setBounds(167, 56, 98, 24);
 		lblMatchFound.setVisible(false);
 		frame.getContentPane().add(lblMatchFound);
 		
@@ -241,7 +222,7 @@ public class Main {// това е launcher-а на играта
 		btnExitQueue.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnFindMatch.setEnabled(true);
-				btnExitQueue.setEnabled(false);
+				btnExitQueue.setVisible(false);
 				socket.emit("Leave Queue");
 				isInQueue = false;
 			}
@@ -254,17 +235,11 @@ public class Main {// това е launcher-а на играта
 		
 	}
 	
-	public static void setStartButtonVisibility(boolean a)
-	{
-		//btnPlay.setVisible(a);
-	}
 	public static void startGame()
 	{
-		//setStartButtonVisibility(false);
-		gameThread = new Thread(app);
+		gameThread = new Thread(app);//we need a new thread so when we start a second game after one has ended we dont get an exception
 		gameThread.setName("Tanks Game");
-		gameThread.start();// стартиране на играта
-		//gameSocket.connect();
+		gameThread.start();// start the game
 		isPlaying = true;
 	}
 }

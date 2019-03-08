@@ -6,7 +6,7 @@ import javax.vecmath.Vector3f;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
 
-public class Utils {//накакви методчета, които ми трябват на няколко места
+public class Utils {
 	
 	public static Vector2f PixelsToScreen(Vector2f pixels)
 	{

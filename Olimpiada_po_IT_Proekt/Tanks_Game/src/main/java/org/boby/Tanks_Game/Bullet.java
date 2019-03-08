@@ -12,6 +12,7 @@ public class Bullet {
 	
 	private Vector2f pos;
 	private Vector2f dir;
+	private float movementSpeed = 300;
 	private float directionRad = 0;
 	private float size;
 	private Vector3f color;
@@ -52,6 +53,8 @@ public class Bullet {
 	
 	public void update()
 	{
-		this.pos.add(dir);
+		Vector2f b = (Vector2f) dir.clone();
+		b.scale((float) (movementSpeed * Time.deltaTime)); 
+		this.pos.add(b);
 	}
 }
