@@ -63,8 +63,8 @@ public class Main {// това е launcher-а на играта
 
 	private void initialize() {
 		try {
-			socket = IO.socket("http://192.168.1.110:3001");
-			gameSocket = IO.socket("http://192.168.1.110:3000");
+			socket = IO.socket("http://84.238.227.150:3001");
+			gameSocket = IO.socket("http://84.238.227.150:3000");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
