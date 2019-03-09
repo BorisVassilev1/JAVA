@@ -21,6 +21,7 @@ public class Player {
 	
 	Vector2f direction;
 	float directionRad = (float) (Math.PI / 4);
+	float rotateSpeed = 0.1f;
 	
 	float movementSpeed = 200;
 	Vector2f currentDestination;
@@ -62,10 +63,10 @@ public class Player {
 			Vector2f v3 = new Vector2f(+size/2f, +size/2f);
 			Vector2f v4 = new Vector2f(-size/2f, +size/2f);
 			
-			v1 = Utils.vec3fto2f(Matrices.rotateVec2f(Utils.vec2fto3f(v1), directionRad));// ротиране на вурховете на фигурата
-			v2 = Utils.vec3fto2f(Matrices.rotateVec2f(Utils.vec2fto3f(v2), directionRad));
-			v3 = Utils.vec3fto2f(Matrices.rotateVec2f(Utils.vec2fto3f(v3), directionRad));
-			v4 = Utils.vec3fto2f(Matrices.rotateVec2f(Utils.vec2fto3f(v4), directionRad));
+			v1 = Utils.vec3fto2f(Matrices.rotateVec2f(Utils.vec2fto3f(v1), -directionRad));// ротиране на вурховете на фигурата
+			v2 = Utils.vec3fto2f(Matrices.rotateVec2f(Utils.vec2fto3f(v2), -directionRad));
+			v3 = Utils.vec3fto2f(Matrices.rotateVec2f(Utils.vec2fto3f(v3), -directionRad));
+			v4 = Utils.vec3fto2f(Matrices.rotateVec2f(Utils.vec2fto3f(v4), -directionRad));
 			v1.add(pos);// добавяне на позицията
 			v2.add(pos);
 			v3.add(pos);
@@ -73,10 +74,10 @@ public class Player {
 			glBegin(GL_QUADS);// рисуване
 			{
 				glColor3f(color.x, color.y, color.z);
-				Utils.glVertexv2f(Utils.PixelsToScreen(v1));
-				Utils.glVertexv2f(Utils.PixelsToScreen(v2));
-				Utils.glVertexv2f(Utils.PixelsToScreen(v3));
-				Utils.glVertexv2f(Utils.PixelsToScreen(v4));
+				glTexCoord2f(1, 1);	Utils.glVertexv2f(Utils.PixelsToScreen(v1));
+				glTexCoord2f(1, 0);	Utils.glVertexv2f(Utils.PixelsToScreen(v2));
+				glTexCoord2f(0, 0);	Utils.glVertexv2f(Utils.PixelsToScreen(v3));
+				glTexCoord2f(0, 1);	Utils.glVertexv2f(Utils.PixelsToScreen(v4));
 			}
 			glEnd();
 		}
@@ -120,14 +121,8 @@ public class Player {
 					
 					@Override
 					public void call(Object... args) {
-						//System.out.println("\"move\" packet returned");
 						JSONObject pos = (JSONObject) args[0];
 						JSONObject dest = (JSONObject) args[1];
-	//					System.out.println("prev pos: " + Player.this.pos);
-	//					System.out.println("prev dest: " + currentDestination);
-	//					System.out.println("sent dest: " + obj);
-	//					System.out.println("recieved pos: " + pos);
-	//					System.out.println("recieved dest: " + dest);
 						try {
 							setPos((float) pos.getDouble("x"), (float) pos.getDouble("y"));
 							setDestination((float) dest.getDouble("x"), (float) dest.getDouble("y"));
@@ -166,12 +161,24 @@ public class Player {
 							JSONObject bull = (JSONObject)args[0];
 							JSONObject pos = bull.getJSONObject("pos");
 							JSONObject dir = bull.getJSONObject("direction");
-							final Bullet bullet = new Bullet( new Vector2f((float)pos.getDouble("x"), (float)pos.getDouble("y")), (float)Math.atan2(dir.getDouble("y"), dir.getDouble("x")));
+							final Bullet bullet = new Bullet( new Vector2f((float)pos.getDouble("x"), (float)pos.getDouble("y")), (float)Math.atan2(dir.getDouble("y"), dir.getDouble("x")), (byte) bull.getInt("team"));
+							
+							if(bullet.team == Main.app.players[Main.app.myID].team)
+							{
+								bullet.color.set(0,1,0);
+							}
+							else
+							{
+								bullet.color.set(1, 0, 0);
+							}
+							
 							new java.util.Timer().schedule( 
 							        new java.util.TimerTask() {
 							            @Override
 							            public void run() {
-							            	Main.app.bullets.remove(Main.app.bullets.indexOf(bullet));
+							            	int ind = Main.app.bullets.indexOf(bullet);
+							            	if(ind != -1)
+							            	Main.app.bullets.remove(ind);
 							            }
 							        }, 
 							        5000 
@@ -190,22 +197,62 @@ public class Player {
 	
 	public void update()// това, което прави играчът всеки кадър от играта
 	{
-		if(isMoving && isActive)
+		if(isActive)
 		{
-			Vector2f a = (Vector2f) pos.clone();
-			a.sub(currentDestination);
-			if(a.lengthSquared() > Time.deltaTime * this.movementSpeed)// ако разстоянието до целта е повече от това, което иргачът ще измине за един кадър
+			if(isMoving)
 			{
-				Vector2f b = (Vector2f) (direction.clone());// мести се
-				b.scale((float) Time.deltaTime * this.movementSpeed);
-				pos.add(b);
+				Vector2f a = (Vector2f) pos.clone();
+				a.sub(currentDestination);
+				if(a.lengthSquared() > Time.deltaTime * this.movementSpeed)// ако разстоянието до целта е повече от това, което иргачът ще измине за един кадър
+				{
+					Vector2f b = (Vector2f) (direction.clone());// мести се
+					b.scale((float) Time.deltaTime * this.movementSpeed);
+					pos.add(b);
+				}
+				else
+				{
+					Vector2f b = (Vector2f) (direction.clone());// в противен случай, се мести се до целта
+					b.scale(a.lengthSquared());
+					pos.add(b);
+					this.isMoving = false;
+				}
+			}
+		
+			float differenceRad;
+			if(directionRad > currentDestinatonRad)
+			{
+				
+				if(Math.abs(currentDestinatonRad - directionRad) < Math.abs(-2 * Math.PI - directionRad + currentDestinatonRad))
+				{
+					differenceRad = (currentDestinatonRad - directionRad);
+				}
+				else
+				{
+					differenceRad = (float) (-2 * Math.PI - directionRad + currentDestinatonRad);
+				}
 			}
 			else
 			{
-				Vector2f b = (Vector2f) (direction.clone());// в противен случай, се мести се до целта
-				b.scale(a.lengthSquared());
-				pos.add(b);
-				this.isMoving = false;
+				if(Math.abs(currentDestinatonRad - directionRad) < Math.abs(2 * Math.PI - directionRad + currentDestinatonRad))
+				{
+					differenceRad = (currentDestinatonRad - directionRad);
+				}
+				else
+				{
+					differenceRad = (float) (2 * Math.PI - directionRad + currentDestinatonRad);
+				}
+			}
+			if(differenceRad < -rotateSpeed)
+			{
+				directionRad -= rotateSpeed;
+			}
+			else if(differenceRad > rotateSpeed)
+			{
+				directionRad += rotateSpeed;
+			}
+			else
+			{
+				directionRad = currentDestinatonRad;
 			}
 		}
 	}
@@ -228,6 +275,7 @@ public class Player {
 		this.setDir(x - pos.x, y - pos.y);
 		if(direction.lengthSquared() != 0)//the vecmath library makes the vector with coordinates NaN when normalizing a zero vector 
 		direction.normalize();
+		currentDestinatonRad = (float) Math.atan2(direction.x, direction.y);
 		currentDestination.set(x,y);
 		isMoving = true;
 	}

@@ -9,6 +9,8 @@ import org.boby.Tanks_Game.NativeLoader;
 import org.boby.Tanks_Game.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
+//import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.Texture;
 
 import io.socket.client.Ack;
 import io.socket.client.IO;
@@ -28,7 +30,7 @@ public class Main {// това е launcher-а на играта
 	public static Thread gameThread;
 	public static App app;
 	public static JButton btnFindMatch;
-	private static JButton btnPlay;
+	//private static JButton btnPlay;
 	private static JButton btnAccept;
 	private static JButton btnDecline;
 	private static JButton btnExitQueue;
@@ -38,6 +40,9 @@ public class Main {// това е launcher-а на играта
 	public static Socket socket;
 	private static boolean isPlaying = false;
 	private static boolean isInQueue = false;
+	public static Texture tankTex;
+	public static Texture backgroundTex;
+	public static Texture bulletTex;
 	/**
 	 * Launch the application.
 	 */
@@ -56,6 +61,8 @@ public class Main {// това е launcher-а на играта
 
 	public Main() {
 		NativeLoader.loadNatives("lib/natives-win");//loading lwjgl natives
+		
+		
 		app = new App();
 		gameThread = new Thread(app);
 		initialize();
@@ -63,8 +70,8 @@ public class Main {// това е launcher-а на играта
 
 	private void initialize() {
 		try {
-			socket = IO.socket("http://84.238.227.150:3001");
-			gameSocket = IO.socket("http://84.238.227.150:3000");
+			socket = IO.socket("http://192.168.1.110:3001");
+			gameSocket = IO.socket("http://192.168.1.110:3000");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}

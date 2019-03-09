@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
-import org.boby.Tanks_Game.Utils.HappeningContainer;
 import org.boby.Tanks_Game.launcher.Main;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +38,6 @@ public class App implements Runnable
 	public Player[] players;
 	public ArrayList<Bullet> bullets;
 	public int myID = 0;
-	//public Socket socket;
 	
 	@Override
 	public void run() {//run the game
@@ -132,7 +130,7 @@ public class App implements Runnable
 					JSONObject pos = bull.getJSONObject("pos");
 					JSONObject dir = bull.getJSONObject("direction");
 					int playerid = (Integer) args[1];
-					final Bullet bullet = new Bullet( new Vector2f((float)pos.getDouble("x"), (float)pos.getDouble("y")), (float)Math.atan2(dir.getDouble("y"), dir.getDouble("x")));
+					final Bullet bullet = new Bullet( new Vector2f((float)pos.getDouble("x"), (float)pos.getDouble("y")), (float)Math.atan2(dir.getDouble("y"), dir.getDouble("x")), players[myID].team);
 					new java.util.Timer().schedule( 
 					        new java.util.TimerTask() {
 					            @Override
@@ -165,6 +163,43 @@ public class App implements Runnable
 			}
 		});
     	
+    	Main.gameSocket.on("death", new Emitter.Listener() {
+			
+			@Override
+			public void call(Object... args) {
+					players[(Integer) args[0]].setActive(false);
+			}
+		});
+    	
+    	Main.gameSocket.on("revive", new Emitter.Listener() {
+			
+			@Override
+			public void call(Object... args) {
+				int id = (Integer)args[0];
+				JSONObject pl = (JSONObject)args[1];
+				System.out.println("reviving " + id);
+				try {
+					players[id] = new Player(pl.getJSONObject("pos").getInt("x"), 
+							pl.getJSONObject("pos").getInt("y"),30f, (byte) pl.getInt("team"));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				if(id == myID) {
+					players[id].color.set(0,1,0);
+				}
+				else if(players[id].team == players[myID].team)
+				{
+					players[id].color.set(0.5f, 0.5f, 1);
+				}
+				else
+				{
+					players[id].color.set(1, 0,0);
+				}
+			}
+		});
+    	
     	Main.gameSocket.on("player disconnected", new Emitter.Listener() {
 			
 			@Override
@@ -193,21 +228,10 @@ public class App implements Runnable
 		glDisable(GL_ALPHA_TEST);
 	}
 
-//	public static Texture loadTexture(String key) {
-//		try {
-//			return TextureLoader.getTexture("png", new FileInputStream(new File("res/" + key + ".png")));
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			System.out.println("problem loading the texture");
-//		}
-//		return null;
-//	}
-
 	public void gameLoop() {
 		Time.initTime();
-		
-		
+		Main.tankTex = Utils.loadTexture("Tank");
+		Main.bulletTex = Utils.loadTexture("bullet");
 		
 		glEnable(GL_TEXTURE_2D);
 		
@@ -246,18 +270,19 @@ public class App implements Runnable
 			{
 				//System.out.println("FPS: " + 1000000000 / Time.deltaTimeI);
 			}
-			int Dwheel = Mouse.getDWheel();
-			if(Dwheel < 0)
-			{
-				zoom *= 1.25f ;
-			}
-			else if(Dwheel > 0)
-			{
-				zoom *= 0.8f ;
-			}
-			glScalef(zoom, zoom, 1);
+//			int Dwheel = Mouse.getDWheel();
+//			if(Dwheel < 0)
+//			{
+//				zoom *= 1.25f ;
+//			}
+//			else if(Dwheel > 0)
+//			{
+//				zoom *= 0.8f ;
+//			}
+//			glScalef(zoom, zoom, 1);
 			
 			players[myID].Input();
+			Main.tankTex.bind();
 			for(int i = 0; i < players.length; i ++)
 			{
 				if(players[i] != null)
@@ -266,7 +291,7 @@ public class App implements Runnable
 					players[i].draw();
 				}
 			}
-			
+			Main.bulletTex.bind();
 			for(int i = 0; i < bullets.size(); i ++) {
 				if(bullets.get(i) != null)
 				{

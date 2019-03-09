@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glTexCoord2f;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -15,13 +16,15 @@ public class Bullet {
 	private float movementSpeed = 300;
 	private float directionRad = 0;
 	private float size;
-	private Vector3f color;
+	public byte team;
+	public Vector3f color;
 	
-	public Bullet(Vector2f position, float directionRad) {
+	public Bullet(Vector2f position, float directionRad, byte team) {
 		this.pos = position;
 		this.dir = new Vector2f((float)Math.cos(directionRad),(float)Math.sin(directionRad));
 		this.directionRad = directionRad;
 		this.size = 10;
+		this.team = team;
 		this.color = new Vector3f(1, 0, 0);
 	}
 	
@@ -43,10 +46,10 @@ public class Bullet {
 		glBegin(GL_QUADS);// рисуване
 		{
 			glColor3f(color.x, color.y, color.z);
-			Utils.glVertexv2f(Utils.PixelsToScreen(v1));
-			Utils.glVertexv2f(Utils.PixelsToScreen(v2));
-			Utils.glVertexv2f(Utils.PixelsToScreen(v3));
-			Utils.glVertexv2f(Utils.PixelsToScreen(v4));
+			glTexCoord2f(1, 1);	Utils.glVertexv2f(Utils.PixelsToScreen(v1));
+			glTexCoord2f(1, 0);	Utils.glVertexv2f(Utils.PixelsToScreen(v2));
+			glTexCoord2f(0, 0);	Utils.glVertexv2f(Utils.PixelsToScreen(v3));
+			glTexCoord2f(0, 1);	Utils.glVertexv2f(Utils.PixelsToScreen(v4));
 		}
 		glEnd();
 	}

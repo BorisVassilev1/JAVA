@@ -71,7 +71,9 @@ class Player{
         this.lastUpdated = Date.now();
         this.team = team;
         this.maxHealth = 100;
+        this.isActive = true;
         this.health = this.maxHealth;
+        this.reviveTimer = 0;
     }
     
     setDest(newX, newY)
@@ -82,11 +84,15 @@ class Player{
     update()
 	{
         var deltaTime = Date.now() - this.lastUpdated;
+        if(this.reviveTimer > 0)
+        {
+            this.reviveTimer -= deltaTime;
+        }
         if(deltaTime == 0)
         {
             return;
         }
-		if(this.isMoving)
+		if(this.isMoving && this.isActive)
 		{
 			var a = this.currentDestination.clone();
 			a.sub(this.pos);
@@ -108,9 +114,13 @@ class Player{
         this.lastUpdated = Date.now();
 	}
     
-    dealDamage()
+    dealDamage(amt)
     {
-        
+        this.health -= amt;
+		if(this.health <= 0)
+		{
+			return true;
+		}
     }
 }
 
@@ -157,6 +167,10 @@ class Game{
                 //console.log("player: ");
                 //console.log(this.players[i].pos)
                 this.players[i].update();
+                if(this.players[i].reviveTimer < 0)
+                {
+                    this.revive(i, games.indexOf(this))
+                }
                 //console.log(this.players[i].pos)
             }
         }
@@ -176,21 +190,35 @@ class Game{
         {
             for(var j = 0; j < this.bullets.length; j ++)
             {
-                
-//                console.log("player team: ");
-//                console.log(this.players[i].team);
-//                console.log("bullet team: ");
-//                console.log(this.bullets[j].team);
-////                console.log("\n")
-                if(this.players[i].team != this.bullets[j].team &&
+                if(this.players[i].isActive && this.players[i].team != this.bullets[j].team &&
                     this.players[i].pos.distSquared(this.bullets[j].pos) < 400)
                 {
                     gameio.to(this.name).emit("damage", i, j,20);
-                    console.log(i + " has taken damage");
+                    //console.log(i + " has taken damage");
+                    if(this.players[i].dealDamage(20))
+                    {
+                        gameio.to(this.name).emit("death", i);
+                        this.players[i].isActive = false;
+                        this.players[i].reviveTimer = 3000;
+                    }
                     this.bullets.splice(j);
                 }
             }
         }
+    }
+    
+    revive(id, gameid)
+    {
+        var pl;
+        if(id < numberOfPlayersPerGame / 2){
+            pl = new Player(50, 50, 0);
+        }
+        else{
+            pl = new Player(750, 550, 1);
+        }
+        games[gameid].players[id] = pl;
+        gameio.to(this.name).emit("revive", id, pl);
+        //console.log("reviving " + id)
     }
 }
 
@@ -341,10 +369,10 @@ basicio.sockets.on('connection', (socket) => {
                         for(var k = 0; k < currentGame.playersPreviousConnectionIds.length; k ++)
                         {
                             if(k < numberOfPlayersPerGame / 2){
-                                currentGame.players[k] = new Player(100,100, 0);
+                                currentGame.players[k] = new Player(50,50, 0);
                             }
                             else{
-                                currentGame.players[k] = new Player(100,100, 1);
+                                currentGame.players[k] = new Player(750,550, 1);
                             }
                         }
                         console.log("successfully created a game:")

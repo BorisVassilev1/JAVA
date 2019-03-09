@@ -4,7 +4,16 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.opengl.Display;
+import org.newdawn.slick.opengl.Texture;
+//import org.newdawn.slick.opengl.Texture;
+//import org.newdawn.slick.opengl.TextureLoader;
+import org.newdawn.slick.opengl.TextureLoader;
+
 import static org.lwjgl.opengl.GL11.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class Utils {
 	
@@ -42,5 +51,16 @@ public class Utils {
 		{
 			return hasHappened;
 		}
+	}
+	
+	public static Texture loadTexture(String key) {
+		try {
+			return TextureLoader.getTexture("png", new FileInputStream(new File("res/" + key + ".png")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("problem loading the texture");
+		}
+		return null;
 	}
 }
