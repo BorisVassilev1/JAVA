@@ -70,8 +70,8 @@ public class Main {// това е launcher-а на играта
 
 	private void initialize() {
 		try {
-			socket = IO.socket("http://192.168.1.110:3001");
-			gameSocket = IO.socket("http://192.168.1.110:3000");
+			socket = IO.socket("http://84.238.227.150:3001");
+			gameSocket = IO.socket("http://84.238.227.150:3000");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -203,6 +203,7 @@ public class Main {// това е launcher-а на играта
 		frame.getContentPane().setLayout(null);
 		
 		btnFindMatch = new JButton("Find Match");
+		btnFindMatch.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		btnFindMatch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				socket.emit("Find Match");
@@ -211,7 +212,7 @@ public class Main {// това е launcher-а на играта
 				btnExitQueue.setEnabled(true);
 			}
 		});
-		btnFindMatch.setBounds(157, 190, 108, 30);
+		btnFindMatch.setBounds(147, 182, 129, 38);
 		frame.getContentPane().add(btnFindMatch);
 		
 		lblWaiting = new JLabel("Waiting for other players");
@@ -225,7 +226,7 @@ public class Main {// това е launcher-а на играта
 		lblMatchFound.setVisible(false);
 		frame.getContentPane().add(lblMatchFound);
 		
-		btnExitQueue = new JButton("Exit");
+		btnExitQueue = new JButton("Leave Queue");
 		btnExitQueue.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnFindMatch.setEnabled(true);
@@ -234,7 +235,7 @@ public class Main {// това е launcher-а на играта
 				isInQueue = false;
 			}
 		});
-		btnExitQueue.setBounds(167, 231, 89, 23);
+		btnExitQueue.setBounds(157, 231, 108, 23);
 		btnExitQueue.setVisible(false);
 		frame.getContentPane().add(btnExitQueue);
 		

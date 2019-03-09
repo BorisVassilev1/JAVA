@@ -1,0 +1,1 @@
+java -jar target\Tanks\Tanks.jar -Djava.library.path=target/natives -cp target/Tanks/lib/slick-util.jar
