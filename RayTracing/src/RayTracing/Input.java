@@ -39,11 +39,11 @@ public class Input {
 		}
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-			Main.cam.moveY(-moveSpeed);
+			Main.cam.moveY(moveSpeed);
 		}
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-			Main.cam.moveY(moveSpeed);
+			Main.cam.moveY(-moveSpeed);
 		}
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_LMENU))

@@ -48,7 +48,7 @@ public class Camera {
 		glRotatef(rot.x,1,0,0);
 		glRotatef(rot.y,0,1,0);
 		glRotatef(rot.z,0,0,1);
-		glTranslatef(pos.x, pos.y, pos.z);
+		glTranslatef(-pos.x, -pos.y, -pos.z);
 		//System.out.println(rot);
 	}
 	
@@ -75,8 +75,8 @@ public class Camera {
 	
 	public void move(float speed, int dir)
 	{
-		pos.z += speed * Math.sin(Math.toRadians(rot.y + 90 * dir));
-		pos.x += speed * Math.cos(Math.toRadians(rot.y + 90 * dir));
+		pos.z -= speed * Math.sin(Math.toRadians(rot.y + 90 * dir));
+		pos.x -= speed * Math.cos(Math.toRadians(rot.y + 90 * dir));
 	}
 	
 	public void moveY(float speed)
