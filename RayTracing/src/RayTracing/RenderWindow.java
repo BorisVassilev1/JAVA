@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
 import Objects.Cube;
@@ -125,6 +126,8 @@ public class RenderWindow {
 							c.scale.set(0.1f, 0.1f, 0.1f);
 							
 							g.setColor(new Color(closest.object.mesh.colors[closest.triangleIndex].x,closest.object.mesh.colors[closest.triangleIndex].y,closest.object.mesh.colors[closest.triangleIndex].z));
+							//float dist = Vector3f.sub(Main.cam.pos, closest.point, null).lengthSquared() / 200 + 0.4f;
+							//g.setColor(new Color(dist , dist, dist));
 							g.drawRect(x , y, 1, 1);
 						}
 					}
