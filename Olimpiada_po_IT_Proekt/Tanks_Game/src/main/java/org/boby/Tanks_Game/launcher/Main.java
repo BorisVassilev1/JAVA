@@ -7,9 +7,6 @@ import javax.swing.JFrame;
 import org.boby.Tanks_Game.App;
 import org.boby.Tanks_Game.NativeLoader;
 import org.boby.Tanks_Game.Utils;
-import org.json.JSONException;
-import org.json.JSONObject;
-//import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.Texture;
 
 import io.socket.client.Ack;
@@ -17,12 +14,17 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
 import java.net.URISyntaxException;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
 
 public class Main {// това е launcher-а на играта
 
@@ -70,8 +72,8 @@ public class Main {// това е launcher-а на играта
 
 	private void initialize() {
 		try {
-			socket = IO.socket("http://84.238.227.150:3001");
-			gameSocket = IO.socket("http://84.238.227.150:3000");
+			socket = IO.socket("http://localhost:3001");
+			gameSocket = IO.socket("http://localhost:3000");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -198,6 +200,7 @@ public class Main {// това е launcher-а на играта
 		
 		System.out.println("connecting to the server...");
 		frame = new JFrame();
+		frame.setIconImage(new ImageIcon("res/Tank.png").getImage());
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// искаме при затваряне на единия прозорец, да се затвори и другия.
 		frame.getContentPane().setLayout(null);
