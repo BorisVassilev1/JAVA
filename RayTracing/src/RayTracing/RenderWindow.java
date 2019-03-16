@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
 import Objects.Cube;
@@ -72,6 +73,24 @@ public class RenderWindow {
 				g.setColor(Color.white);
 				g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
 				
+				float imageRatio = panel.getWidth() / (float )panel.getHeight();
+				
+				float fieldOfView = 70;
+				fieldOfView *= Math.PI / 180;
+				float planeOffset = (float) (1/Math.tan(fieldOfView/2));
+				
+				Vector3f campos2 = new Vector3f(Main.cam.pos.x, Main.cam.pos.y, Main.cam.pos.z);
+				Vector3f camrot2 = new Vector3f(Main.cam.rot.x, Main.cam.rot.y + 180, Main.cam.rot.z);
+				Vector3f[] projPlane = {
+						(Vector3f) new Vector3f(- 1 * imageRatio, - 1, planeOffset).normalise(),
+						(Vector3f) new Vector3f(+ 1 * imageRatio, - 1, planeOffset).normalise(),
+						(Vector3f) new Vector3f(- 1 * imageRatio, + 1, planeOffset).normalise(),
+						(Vector3f) new Vector3f(+ 1 * imageRatio, + 1, planeOffset).normalise()
+				};
+				projPlane[0] = Matrices.rotateVector(projPlane[0], (Vector3f) new Vector3f(camrot2).scale((float) (Math.PI / 180)));
+				projPlane[1] = Matrices.rotateVector(projPlane[1], (Vector3f) new Vector3f(camrot2).scale((float) (Math.PI / 180)));
+				projPlane[2] = Matrices.rotateVector(projPlane[2], (Vector3f) new Vector3f(camrot2).scale((float) (Math.PI / 180)));
+				projPlane[3] = Matrices.rotateVector(projPlane[3], (Vector3f) new Vector3f(camrot2).scale((float) (Math.PI / 180)));
 				
 //				for(int x = 0; x < panel.getWidth(); x ++)
 //				{
@@ -80,6 +99,7 @@ public class RenderWindow {
 				
 				for(int x = -panel.getWidth() / 2; x < panel.getWidth()/ 2; x ++)
 					{
+<<<<<<< HEAD
 						for(int y = -panel.getHeight() / 2; y < panel.getHeight() / 2; y ++)
 						{
 //						Vector3f[] projPlane = {
@@ -105,28 +125,45 @@ public class RenderWindow {
 								)).negate(null).scale((float) (Math.PI / 180)));
 						
 						//System.out.println(rayDir);
+=======
+						rayDir = lerp(projPlane[0], projPlane[1], projPlane[2], projPlane[3], x / (float) panel.getWidth(), y / (float) panel.getHeight());
+						
+>>>>>>> 12ec6b6b81732f2ecd4e61e0ab551a675c716d41
 						//ArrayList<IntersectionPoint> intPoints = new ArrayList<IntersectionPoint>();
 						IntersectionPoint closest = null;
 						for (Object3d obj : Main.scene) {
 							for(int i = 0; i < obj.mesh.tris.length; i ++)
 							{
-								if(Rays.rayToTriangle(Main.cam.pos, rayDir, obj.mesh.tris[i], intPoint)) {
+								if(Rays.rayToTriangle(campos2, rayDir, obj.mesh.tris[i], intPoint)) {
 									
 									if(closest == null)
 									{
 										closest = new IntersectionPoint(intPoint, obj, i);
 									}
-									else if(Vector3f.sub(Main.cam.pos, closest.point, null).length() > Vector3f.sub(Main.cam.pos, intPoint, null).length())
+									else if(Vector3f.sub(Main.cam.pos, closest.point, null).lengthSquared() > Vector3f.sub(Main.cam.pos, intPoint, null).lengthSquared())
 									{
 										closest.set(intPoint, obj, i);
 									}
+									
+//									g.setColor(new Color(obj.mesh.colors[i].x,obj.mesh.colors[i].y,obj.mesh.colors[i].z, 0.1f));
+//									g.drawRect(x , y, 1, 1);
 								}
 							}
 						}
 						if(closest != null)
 						{
+							Cube c = new Cube();
+							c.position.set(closest.point);
+							c.scale.set(0.1f, 0.1f, 0.1f);
+							
 							g.setColor(new Color(closest.object.mesh.colors[closest.triangleIndex].x,closest.object.mesh.colors[closest.triangleIndex].y,closest.object.mesh.colors[closest.triangleIndex].z));
+<<<<<<< HEAD
 							g.drawRect(x  + panel.getWidth() / 2, y + panel.getHeight() / 2, 1, 1);
+=======
+							//float dist = Vector3f.sub(Main.cam.pos, closest.point, null).lengthSquared() / 200 + 0.4f;
+							//g.setColor(new Color(dist , dist, dist));
+							g.drawRect(x , y, 1, 1);
+>>>>>>> 12ec6b6b81732f2ecd4e61e0ab551a675c716d41
 						}
 					}
 				}
@@ -137,8 +174,18 @@ public class RenderWindow {
 		frame.getContentPane().add(btnRender);
 	}
 	
+	public static Vector3f lerp(Vector3f a, Vector3f b, Vector3f c, Vector3f d, float x, float y)
+	{
+		Vector3f vecAB = lerp(a, b, x);
+		Vector3f vecCD = lerp(c, d, x);
+		return lerp(vecAB, vecCD, y);
+	}
+	public static float lerp(float a , float b, float k)
+	{
+		return (a * k + b * (1 - k));
+	}
 	public static Vector3f lerp(Vector3f a, Vector3f b, float k)
 	{
-		return new Vector3f((a.x * k + b.x * (1-k))/k,(a.y * k + b.y * (1-k))/k,(a.z * k + b.z * (1-k))/k);
+		return new Vector3f(lerp(a.x, b.x, k), lerp(a.y, b.y, k), lerp(a.z, b.z, k));
 	}
 }
