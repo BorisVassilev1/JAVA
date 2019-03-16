@@ -71,6 +71,9 @@ public class Main {
 		cam = new Camera(70f, (float) Display.getWidth() / (float) Display.getHeight(), 0.3f, 1000f);
 		
 		scene.add(new Cube());
+		Cube c2 = new Cube();
+		c2.scale.set(0.1f, 0.1f, 0.1f);
+		scene.add(c2);
 		
 		long deltatime;
 
@@ -94,26 +97,6 @@ public class Main {
 			for (Object3d obj : scene) {
 				obj.draw();
 			}
-			//rayTrace();
-//			Graphics g = RenderWindow.panel .getGraphics();
-//			g.clearRect(0, 0, RenderWindow.panel.getWidth(), RenderWindow.panel.getHeight());
-//			for (Object3d obj : scene) {
-//				for (Triangle tri : obj.mesh.tris) {
-//					Vector3f proj0, proj1, proj2;
-//					proj0 = cam.Projection(tri.v0, obj);
-//					proj1 = cam.Projection(tri.v1, obj);
-//					proj2 = cam.Projection(tri.v2, obj);
-//					if(proj0 != null && proj1 != null)
-//					drawLine2f(proj0, proj1);
-//					if(proj2 != null && proj1 != null)
-//					drawLine2f(proj2, proj1);
-//					if(proj0 != null && proj2 != null)
-//					drawLine2f(proj0, proj2);
-//				}
-//			}
-			
-			
-			
 			
 			Display.update();
 		}

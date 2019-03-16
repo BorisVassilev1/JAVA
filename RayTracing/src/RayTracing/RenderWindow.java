@@ -92,47 +92,17 @@ public class RenderWindow {
 				projPlane[2] = Matrices.rotateVector(projPlane[2], (Vector3f) new Vector3f(camrot2).scale((float) (Math.PI / 180)));
 				projPlane[3] = Matrices.rotateVector(projPlane[3], (Vector3f) new Vector3f(camrot2).scale((float) (Math.PI / 180)));
 				
-//				for(int x = 0; x < panel.getWidth(); x ++)
-//				{
-//					for(int y = 0; y < panel.getHeight(); y ++)
-//					{
-				
-				for(int x = -panel.getWidth() / 2; x < panel.getWidth()/ 2; x ++)
-					{
-<<<<<<< HEAD
-						for(int y = -panel.getHeight() / 2; y < panel.getHeight() / 2; y ++)
-						{
-//						Vector3f[] projPlane = {
-//								new Vector3f(Main.cam.getX() - panel.getWidth() / 2, Main.cam.getY() - panel.getHeight() / 2,100),
-//								new Vector3f(Main.cam.getX() + panel.getWidth() / 2, Main.cam.getY() - panel.getHeight() / 2,100),
-//								new Vector3f(Main.cam.getX() - panel.getWidth() / 2, Main.cam.getY() + panel.getHeight() / 2,100),
-//								new Vector3f(Main.cam.getX() + panel.getWidth() / 2, Main.cam.getY() + panel.getHeight() / 2,100)
-//						};
-//						projPlane[0] = Matrices.rotateVector(projPlane[0], (Vector3f) Main.cam.rot.negate(null).scale((float) (Math.PI / 180)));
-//						projPlane[1] = Matrices.rotateVector(projPlane[0], (Vector3f) Main.cam.rot.negate(null).scale((float) (Math.PI / 180)));
-//						projPlane[2] = Matrices.rotateVector(projPlane[0], (Vector3f) Main.cam.rot.negate(null).scale((float) (Math.PI / 180)));
-//						projPlane[3] = Matrices.rotateVector(projPlane[0], (Vector3f) Main.cam.rot.negate(null).scale((float) (Math.PI / 180)));
-//						
-//						rayDir = (Vector3f) new Vector3f(	lerp(projPlane[0], projPlane[1], x / panel.getWidth()).x,
-//												lerp(projPlane[0], projPlane[2], y / panel.getHeight()).y,
-//												projPlane[0].z).normalise();
-						
-						rayDir.set(0, 0, 1);
-						rayDir = Matrices.rotateVector(rayDir, (Vector3f) (new Vector3f(
-								Main.cam.rot.x + (float)y / panel.getHeight() * 2 * 35.0f,
-								Main.cam.rot.y + (float)x / panel.getWidth() * 2 * 35.0f,
-								Main.cam.rot.z
-								)).negate(null).scale((float) (Math.PI / 180)));
-						
-						//System.out.println(rayDir);
-=======
+				for(int x = 0; x < panel.getWidth(); x ++)
+				{
+					for(int y = 0; y < panel.getHeight(); y ++)
+					{		
 						rayDir = lerp(projPlane[0], projPlane[1], projPlane[2], projPlane[3], x / (float) panel.getWidth(), y / (float) panel.getHeight());
 						
->>>>>>> 12ec6b6b81732f2ecd4e61e0ab551a675c716d41
 						//ArrayList<IntersectionPoint> intPoints = new ArrayList<IntersectionPoint>();
 						IntersectionPoint closest = null;
 						for (Object3d obj : Main.scene) {
-							for(int i = 0; i < obj.mesh.tris.length; i ++)
+							for(int i = obj.mesh.tris.length - 1; i > - 1; i --)
+//							for(int i = 0; i < obj.mesh.tris.length; i ++)
 							{
 								if(Rays.rayToTriangle(campos2, rayDir, obj.mesh.tris[i], intPoint)) {
 									
@@ -152,18 +122,20 @@ public class RenderWindow {
 						}
 						if(closest != null)
 						{
-							Cube c = new Cube();
-							c.position.set(closest.point);
-							c.scale.set(0.1f, 0.1f, 0.1f);
-							
+							//if(x == panel.getWidth() / 2 && y == panel.getHeight() / 2)
+							{
+								Main.scene.get(1).position.set(closest.point);
+								try {
+									Thread.sleep(2);
+								} catch (InterruptedException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+							}
 							g.setColor(new Color(closest.object.mesh.colors[closest.triangleIndex].x,closest.object.mesh.colors[closest.triangleIndex].y,closest.object.mesh.colors[closest.triangleIndex].z));
-<<<<<<< HEAD
-							g.drawRect(x  + panel.getWidth() / 2, y + panel.getHeight() / 2, 1, 1);
-=======
 							//float dist = Vector3f.sub(Main.cam.pos, closest.point, null).lengthSquared() / 200 + 0.4f;
 							//g.setColor(new Color(dist , dist, dist));
 							g.drawRect(x , y, 1, 1);
->>>>>>> 12ec6b6b81732f2ecd4e61e0ab551a675c716d41
 						}
 					}
 				}
