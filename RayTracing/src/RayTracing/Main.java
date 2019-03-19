@@ -1,16 +1,11 @@
 package RayTracing;
 
 import static org.lwjgl.opengl.GL11.*;
-
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Panel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,18 +15,12 @@ import javax.swing.JPanel;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.EXTFramebufferObject;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureImpl;
 import org.newdawn.slick.opengl.TextureLoader;
 
 import Objects.Cube;
 import Objects.Object3d;
-import Objects.Triangle;
 
 public class Main {
 	public static Texture tex;
@@ -55,53 +44,8 @@ public class Main {
 			// Display.setDisplayMode(new DisplayMode(1000, 800));
 			Display.setTitle("Game");
 			Display.setResizable(false);
-			Display.setDisplayMode(new DisplayMode(800,600));
+			Display.setDisplayMode(new DisplayMode(800, 600));
 			Display.create();
-			
-			boolean FBOEnabled = GLContext.getCapabilities().GL_EXT_framebuffer_object;
-			IntBuffer buffer = ByteBuffer.allocateDirect(1*4).order(ByteOrder.nativeOrder()).asIntBuffer(); // allocate a 1 int byte buffer
-			EXTFramebufferObject.glGenFramebuffersEXT( buffer ); // generate 
-			int myFBOId = buffer.get();
-			
-			int framebuffer = EXTFramebufferObject.glCheckFramebufferStatusEXT( EXTFramebufferObject.GL_FRAMEBUFFER_EXT ); 
-			switch ( framebuffer ) {
-			    case EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT:
-			        break;
-			    case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-			        throw new RuntimeException( "FrameBuffer: " + myFBOId
-			                + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception" );
-			    case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-			        throw new RuntimeException( "FrameBuffer: " + myFBOId
-			                + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception" );
-			    case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-			        throw new RuntimeException( "FrameBuffer: " + myFBOId
-			                + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT exception" );
-			    case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-			        throw new RuntimeException( "FrameBuffer: " + myFBOId
-			                + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception" );
-			    case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-			        throw new RuntimeException( "FrameBuffer: " + myFBOId
-			                + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT exception" );
-			    case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-			        throw new RuntimeException( "FrameBuffer: " + myFBOId
-			                + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception" );
-			    default:
-			        throw new RuntimeException( "Unexpected reply from glCheckFramebufferStatusEXT: " + framebuffer );
-			}
-			
-			displayTex = loadTexture("images","jpg");
-			glBindTexture(GL_TEXTURE_2D, 0);
-			
-			EXTFramebufferObject.glBindFramebufferEXT( EXTFramebufferObject.GL_FRAMEBUFFER_EXT, myFBOId );
-			EXTFramebufferObject.glFramebufferTexture2DEXT( EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT,
-			                GL11.GL_TEXTURE_2D, displayTex.getTextureID(), 0);
-//			
-//			EXTFramebufferObject.glBindFramebufferEXT( EXTFramebufferObject.GL_FRAMEBUFFER_EXT, myFBOId );
-//			GL11.glPushAttrib(GL11.GL_VIEWPORT_BIT);
-//			GL11.glViewport( 0, 0, displayTex.getTextureWidth(), displayTex.getTextureHeight() );
-//			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-			//!! the screen turns black!!
-			
 		} catch (LWJGLException e) {
 			// TODO Auto-generated catch block
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
@@ -138,6 +82,7 @@ public class Main {
 		while (!Display.isCloseRequested()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glLoadIdentity();
+			
 			cam.useView();
 
 			Input.handleInput();
