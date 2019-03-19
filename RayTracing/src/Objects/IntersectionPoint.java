@@ -11,14 +11,14 @@ public class IntersectionPoint {
 	
 	public IntersectionPoint(Vector3f point, Object3d object, int triangleIndex)
 	{
-		this.point = point;
+		this.point = new Vector3f(point);
 		this.object = object;
 		this.triangleIndex = triangleIndex;
 	}
 	
 	public void set(Vector3f point, Object3d object, int triangleIndex)
 	{
-		this.point = point;
+		this.point.set(point);
 		this.object = object;
 		this.triangleIndex = triangleIndex;
 	}

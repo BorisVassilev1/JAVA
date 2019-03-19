@@ -1,6 +1,8 @@
-package Objects;
+package Mesh;
 
 import org.lwjgl.util.vector.Vector3f;
+
+import Objects.Triangle;
 
 public class Mesh {
 	

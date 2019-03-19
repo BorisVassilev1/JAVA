@@ -1,6 +1,9 @@
 package Objects;
 
 import org.lwjgl.util.vector.Vector3f;
+
+import Mesh.Mesh;
+
 import static org.lwjgl.opengl.GL11.*;
 
 public class Object3d {
