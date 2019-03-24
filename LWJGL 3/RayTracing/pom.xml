@@ -13,6 +13,7 @@
     	<maven.compiler.target>1.8</maven.compiler.target>
     	<downloadSources>true</downloadSources>
   		<downloadJavadocs>true</downloadJavadocs>
+  		<joml.version>1.9.6</joml.version>
 	</properties>
 
 	<build>
@@ -41,6 +42,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+            <groupId>org.joml</groupId>
+            <artifactId>joml</artifactId>
+            <version>${joml.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.lwjgl</groupId>
 			<artifactId>lwjgl</artifactId>

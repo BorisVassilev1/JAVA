@@ -8,57 +8,53 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-public class Mesh {
-	
-	private int VAOId;
-	private int VBOId;
-	private int indicesBufferId;
+
+public class Mesh extends MeshBase{
+	private int VAOID;
+	private int vertexBufferID;
+	private int indicesBufferID;
+	//private int texCoordsBufferID;
+	private int colorBufferID;
 	private int vertexCount;
 	private float vertices[];
 	private int indices[];
+	//private float texCoords[]; 
+	private float colors[];
 	
-	public Mesh(float[] vertices, int[] indices) {
+	public Mesh(float[] vertices, int[] indices, float[] colors, float[] texCoords) {
 		this.vertices = vertices;
 		this.indices = indices;
 		this.vertexCount = indices.length;
+		//this.texCoords = texCoords;
+		this.colors = colors;
 	}
 	
 	public void create()
 	{
-		FloatBuffer buffer = BufferUtils.createFloatBuffer(vertices.length);
-		buffer.put(vertices);
-		buffer.flip();
-		IntBuffer indicesBuffer = BufferUtils.createIntBuffer(indices.length);
-		indicesBuffer.put(indices);
-		indicesBuffer.flip();
-		VAOId = GL30.glGenVertexArrays();
-		GL30.glBindVertexArray(VAOId);
-		VBOId = GL30.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, VBOId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
-		
-		indicesBufferId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBufferId);
-		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
-		GL20.glEnableVertexAttribArray(0);
-		GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
-		GL30.glBindVertexArray(0);
-		GL20.glDisableVertexAttribArray(0);
+    	VAOID = super.createVertexArray();
+    	indicesBufferID = super.bindIndicesBuffer(indices);
+        vertexBufferID = super.storeData(0, 3, vertices);
+        colorBufferID = super.storeData(1, 3, colors);
+        //texCoordsBufferID = super.storeData(2, 2, texCoords);
+		vertexCount = indices.length;
+        GL30.glBindVertexArray(0);
 	}
 	
 	public void remove()
 	{
-		GL30.glDeleteVertexArrays(VAOId);
-		GL15.glDeleteBuffers(VBOId);
-		GL15.glDeleteBuffers(indicesBufferId);
+		GL30.glDeleteVertexArrays(VAOID);
+		GL15.glDeleteBuffers(vertexBufferID);
+		GL15.glDeleteBuffers(indicesBufferID);
+		//GL15.glDeleteBuffers(texCoordsBufferID);
+		GL15.glDeleteBuffers(colorBufferID);
 	}
 
-	public int getVAOId() {
-		return VAOId;
+	public int getVAOID() {
+		return VAOID;
 	}
 
-	public int getVBOId() {
-		return VBOId;
+	public int getVertexBufferID() {
+		return vertexBufferID;
 	}
 
 	public int getVertexCount() {

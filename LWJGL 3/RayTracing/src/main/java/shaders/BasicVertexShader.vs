@@ -1,11 +1,11 @@
 #version 400 core
 
-in vec3 vertices;
+in vec3 position;
+in vec3 inColor;
 
 out vec4 color;
 
-void main()
-{
-	gl_position = vec4(vertices, 1.0);
-	color = vec4(vertices.x + 0.5, vertices.y + 0.5, 1.0);
+void main() {
+	gl_Position = vec4(position, 1.0);
+	color = vec4(inColor,1.0);
 }

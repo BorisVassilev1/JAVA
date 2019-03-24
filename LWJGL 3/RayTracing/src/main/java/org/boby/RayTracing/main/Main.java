@@ -8,6 +8,8 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import objects.Object3d;
+import objects.Quad;
+import shaders.BasicShader;
 
 import java.nio.*;
 
@@ -21,13 +23,18 @@ public class Main {
 
 	// The window handle
 	private Window window;
-	Object3d obj;
+	Quad obj;
+	BasicShader bs;
+	Texture tex;
+
 	public void run() {
+		//Configuration.DEBUG.set(true);
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
-		window = new Window(800, 600, "lmao tva raboti");
+		window = new Window(800, 600, "something");
 		window.create();
 		
+		init();
 		loop();
 
 		// Free the window callbacks and destroy the window
@@ -39,44 +46,26 @@ public class Main {
 		glfwSetErrorCallback(null).free();
 	}
 
-	
-
-	private void loop() {
+	private void init() {
 		GL.createCapabilities();// create the opengl context
 		
 		glEnable(GL_TEXTURE_2D);
+		tex = new Texture("./res/rubyblock.png");
+		obj = new Quad();
+		bs = new BasicShader();
+		bs.create();
+	}
 
-		glClearColor(1, 0, 0, 0);
-		Texture tex = new Texture("./res/rubyblock.png");
-		obj = new Object3d();
-		
-		
+	private void loop() {
 		while (!window.shouldClose()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			Time.updateTime();
-			//System.out.println(1/Time.deltaTime);
-			
+			// System.out.println(1/Time.deltaTime);
 			glfwPollEvents();
-			
-//			tex.bind();
-//			glBegin(GL_QUADS);
-//			{
-//				glTexCoord2f(0, 0);
-//				glVertex2f(-0.5f, -0.5f);
-//				
-//				glTexCoord2f(0, 1);
-//				glVertex2f(-0.5f, 0.5f);
-//				
-//				glTexCoord2f(1, 1);
-//				glVertex2f(0.5f, 0.5f);
-//				
-//				glTexCoord2f(1, 0);
-//				glVertex2f(0.5f, -0.5f);
-//			}
-//			glEnd();
-			
+
+			bs.bind();
+			tex.bind();
 			obj.draw();
-			
 			window.swapBuffers();
 		}
 	}

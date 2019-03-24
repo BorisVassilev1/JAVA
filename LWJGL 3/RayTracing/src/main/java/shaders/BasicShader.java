@@ -2,7 +2,7 @@ package shaders;
 
 public class BasicShader extends Shader{
 
-	private static final String VERTEX_FILE = "", FRAGMENT_FILE = "";
+	private static final String VERTEX_FILE = "src/main/java/shaders/BasicVertexShader.vs", FRAGMENT_FILE = "src/main/java/shaders/BasicFragmentShader.fs";
 	
 	public BasicShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
@@ -10,6 +10,7 @@ public class BasicShader extends Shader{
 
 	@Override
 	public void bindAllAttributes() {
-		super.bindAttribute(0, "vertices");
+		super.bindAttribute(0, "position");
+		super.bindAttribute(1, "inColor");
 	}
 }

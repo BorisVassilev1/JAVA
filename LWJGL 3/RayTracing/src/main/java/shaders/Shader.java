@@ -34,25 +34,26 @@ public abstract class Shader {
 		}
 		
 		fragmentShaderID = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER);
-		GL20.glShaderSource(fragmentShaderID, readFile(vertexFile));
+		GL20.glShaderSource(fragmentShaderID, readFile(fragmentFile));
 		GL20.glCompileShader(fragmentShaderID);
 		
 		if(GL20.glGetShaderi(fragmentShaderID, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
 			System.err.println("Error: Fragment Shader - " + GL20.glGetShaderInfoLog(fragmentShaderID));
 		}
 		
+		bindAllAttributes();
+		
 		GL20.glAttachShader(programID, vertexShaderID);
 		GL20.glAttachShader(programID, fragmentShaderID);
 		
 		GL20.glLinkProgram(programID);
-		GL20.glValidateProgram(programID);
-		
 		if(GL20.glGetProgrami(programID, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
-			System.err.println("Error: Program Linking - " + GL20.glGetShaderInfoLog(programID));
+			System.err.println("Error: Program Linking - \n" + GL20.glGetShaderInfoLog(programID,1024));
 		}
 		
+		GL20.glValidateProgram(programID);
 		if(GL20.glGetProgrami(programID, GL20.GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
-			System.err.println("Error: Program Validation - " + GL20.glGetShaderInfoLog(programID));
+			System.err.println("Error: Program Validation - \n" + GL20.glGetShaderInfoLog(programID,1024));
 		}
 	}
 	

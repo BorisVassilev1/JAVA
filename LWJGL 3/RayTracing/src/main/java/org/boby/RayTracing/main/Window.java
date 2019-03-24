@@ -40,7 +40,6 @@ public class Window {
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
-
 		// Create the window
 		id = glfwCreateWindow(width, height, name, NULL, NULL);
 		if (id == NULL)
@@ -108,5 +107,14 @@ public class Window {
 	public long getId()
 	{
 		return id;
+	}
+	
+	public int getWidth()
+	{
+		return width;
+	}
+	public int getHeight()
+	{
+		return height;
 	}
 }
