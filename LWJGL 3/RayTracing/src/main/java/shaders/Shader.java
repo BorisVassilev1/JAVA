@@ -3,9 +3,13 @@ package shaders;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.FloatBuffer;
+import java.util.HashMap;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.system.MemoryStack;
 
 public abstract class Shader {
 	private int vertexShaderID;
@@ -14,13 +18,17 @@ public abstract class Shader {
 	
 	private String vertexFile;
 	private String fragmentFile;
-	
+    
+    private final HashMap<String, Integer> uniforms;
+    
 	public Shader(String vertexFile, String fragmentFile) {
 		this.vertexFile = vertexFile;
 		this.fragmentFile = fragmentFile;
-		
+		uniforms = new HashMap<String, Integer>();
 	}
-	
+	/**
+	 * creates the shader from the shader files, specified in the constructor
+	 */
 	public void create()
 	{
 		programID = GL20.glCreateProgram();
@@ -55,17 +63,54 @@ public abstract class Shader {
 		if(GL20.glGetProgrami(programID, GL20.GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
 			System.err.println("Error: Program Validation - \n" + GL20.glGetShaderInfoLog(programID,1024));
 		}
+		
+		createUniforms();
+	}
+	/**
+	 * use bindAttribute() to pass parameters to the shader
+	 */
+	protected abstract void bindAllAttributes();
+	/**
+	 * use this to pass parameters to the shader
+	 * @param index - in which VBO is the data stored in
+	 * @param location - the name of the shader parameter this data should be passed to
+	 */
+	protected void  bindAttribute(int index, String location) {
+		GL20.glBindAttribLocation(programID, index, location);
 	}
 	
-	public abstract void bindAllAttributes();
+	protected abstract void createUniforms();
 	
-	public void  bindAttribute(int index, String location) {
-		GL20.glBindAttribLocation(programID, index, location);
+	protected void createUniform(String uniformName) throws Exception {
+	    int uniformLocation = GL20.glGetUniformLocation(programID,
+	        uniformName);
+	    if (uniformLocation < 0) {
+	        throw new Exception("Could not find uniform:" +
+	            uniformName);
+	    }
+	    uniforms.put(uniformName, uniformLocation);
+	}
+	
+	public void setUniform(String uniformName, int value) {
+	    GL20.glUniform1i(uniforms.get(uniformName), value);
+	}
+    
+	public void setUniform(String uniformName, Matrix4f value) {
+	    // Dump the matrix into a float buffer
+	    try (MemoryStack stack = MemoryStack.stackPush()) {
+	        FloatBuffer fb = stack.mallocFloat(16);
+	        value.get(fb);
+	        GL20.glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
+	    }
 	}
 	
 	public void bind()
 	{
 		GL20.glUseProgram(programID);
+	}
+	public void unbind()
+	{
+		GL20.glUseProgram(0);
 	}
 	
 	public void remove()
