@@ -1,6 +1,6 @@
-package objects;
+package org.boby.RayTracing.objects;
 
-import mesh.Mesh;
+import org.boby.RayTracing.mesh.Mesh;
 
 public class Quad extends Object3d{
 
@@ -29,6 +29,7 @@ public class Quad extends Object3d{
 						0,1
 				}
 				));
+		this.getPosition().set(0,0,-1);
 	}
 
 }

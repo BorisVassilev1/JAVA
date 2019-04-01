@@ -1,4 +1,4 @@
-package mesh;
+package org.boby.RayTracing.mesh;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
