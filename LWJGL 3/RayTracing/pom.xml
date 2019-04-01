@@ -38,45 +38,10 @@
 			        </execution>
 			    </executions>
 			</plugin>
-			<plugin>
-		        <artifactId>maven-resources-plugin</artifactId>
-		        <version>3.1.0</version>
-		        <executions>
-		          	<execution>
-		            	<id>copy-resources</id>
-		           		<!-- here the phase you need -->
-		            	<phase>validate</phase>
-		            	<goals>
-		              		<goal>copy-resources</goal>
-		            	</goals>
-		            	<configuration>
-		              		<outputDirectory>${basedir}/target/res</outputDirectory>
-		              		<resources>          
-		                		<resource>
-		                  			<directory>res</directory>
-		                  			<filtering>true</filtering>
-		                		</resource>
-		              		</resources>              
-		            	</configuration>            
-		        	</execution>
-		    	</executions>
-			</plugin>
 		</plugins>
 	</build>
 
 	<dependencies>
-		<dependency>
-    		<groupId>org.lwjgl</groupId>
-    		<artifactId>lwjgl-stb</artifactId>
-    		<version>${lwjgl.version}</version>
-		</dependency>
-		<!--<dependency>
-    		<groupId>org.lwjgl</groupId>
-    		<artifactId>lwjgl-stb</artifactId>
-    		<version>${lwjgl.version}</version>
-    		<classifier>${native.target}</classifier>
-    		<scope>runtime</scope>
-		</dependency>-->
 		<dependency>
             <groupId>org.joml</groupId>
             <artifactId>joml</artifactId>

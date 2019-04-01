@@ -1,22 +1,15 @@
 package org.boby.RayTracing.utils;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.stb.STBImage.*;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
-import org.lwjgl.system.MemoryStack;
 
 public class Texture {
 	private int id;
@@ -25,50 +18,47 @@ public class Texture {
 	/**
 	 * loads a texture from a file.
 	 * @param filename - path to the file
-	 * @throws Exception 
 	 */
-	public Texture(String fileName) throws Exception {
-		int width;
-	    int height;
-	    ByteBuffer buf;
-	    // Load Texture file
-	    try (MemoryStack stack = MemoryStack.stackPush()) {
-	        IntBuffer w = stack.mallocInt(1);
-	        IntBuffer h = stack.mallocInt(1);
-	        IntBuffer channels = stack.mallocInt(1);
-
-	        //URL url = Texture.class.getResource(fileName);
-	        //File file = Paths.get(url.toURI()).toFile();
-	        File file = new File(fileName);
-	        String filePath = file.getAbsolutePath();
-	        buf = stbi_load(filePath, w, h, channels, 4);
-	        if (buf == null) {
-	            throw new Exception("Image file [" + filePath  + "] not loaded: " + stbi_failure_reason());
-	        }
-
-	        /* Get width and height of image */
-	        width = w.get();
-	        height = h.get();
-	    }
-	    
-	    id = glGenTextures();
-	    // Bind the texture
-	    glBindTexture(GL_TEXTURE_2D, id);
-	    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width,
-	    	    height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	    GL30.glGenerateMipmap(GL_TEXTURE_2D);
-	    stbi_image_free(buf);
-
+	public Texture(String filename) {
+		BufferedImage bi;
+		try {
+			bi = ImageIO.read(new File(filename));
+			width = bi.getWidth();
+			height = bi.getHeight();
+			
+			int[] pixels_raw = new int[width * height * 4];
+			pixels_raw = bi.getRGB(0, 0, width, height, null, 0, width);
+			ByteBuffer pixels = BufferUtils.createByteBuffer(width * height * 4);
+			for(int y = 0; y < height; y ++)
+			{
+				for(int x = 0; x < width; x ++)
+				{
+					int pixel = pixels_raw[y * width + x];
+					
+					pixels.put((byte) ((pixel >> 16) & 0xFF));//red
+					pixels.put((byte) ((pixel >> 8) & 0xFF));//green
+					pixels.put((byte) (pixel  & 0xFF));//blue
+					pixels.put((byte) ((pixel >> 24) & 0xFF));//alpha
+				}
+			}
+			
+			pixels.flip();
+			
+			id = glGenTextures();
+			glBindTexture(GL_TEXTURE_2D, id);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * binds this texture
 	 */
 	public void bind()
 	{
-		GL20.glActiveTexture(GL20.GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, id);
 	}
 	/**
@@ -79,8 +69,5 @@ public class Texture {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
-	public int getID()
-	{
-		return id;
-	}
+	
 }

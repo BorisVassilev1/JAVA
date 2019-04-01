@@ -1,4 +1,4 @@
-package org.boby.RayTracing.mesh;
+package mesh;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -13,19 +13,19 @@ public class Mesh extends MeshBase{
 	private int VAOID;
 	private int vertexBufferID;
 	private int indicesBufferID;
-	private int texCoordsBufferID;
+	//private int texCoordsBufferID;
 	private int colorBufferID;
 	private int vertexCount;
 	private float vertices[];
 	private int indices[];
-	private float texCoords[]; 
+	//private float texCoords[]; 
 	private float colors[];
 	
 	public Mesh(float[] vertices, int[] indices, float[] colors, float[] texCoords) {
 		this.vertices = vertices;
 		this.indices = indices;
 		this.vertexCount = indices.length;
-		this.texCoords = texCoords;
+		//this.texCoords = texCoords;
 		this.colors = colors;
 	}
 	
@@ -35,7 +35,7 @@ public class Mesh extends MeshBase{
     	indicesBufferID = super.bindIndicesBuffer(indices);
         vertexBufferID = super.storeData(0, 3, vertices);
         colorBufferID = super.storeData(1, 3, colors);
-        texCoordsBufferID = super.storeData(2, 2, texCoords);
+        //texCoordsBufferID = super.storeData(2, 2, texCoords);
 		vertexCount = indices.length;
         GL30.glBindVertexArray(0);
 	}
@@ -45,7 +45,7 @@ public class Mesh extends MeshBase{
 		GL30.glDeleteVertexArrays(VAOID);
 		GL15.glDeleteBuffers(vertexBufferID);
 		GL15.glDeleteBuffers(indicesBufferID);
-		GL15.glDeleteBuffers(texCoordsBufferID);
+		//GL15.glDeleteBuffers(texCoordsBufferID);
 		GL15.glDeleteBuffers(colorBufferID);
 	}
 

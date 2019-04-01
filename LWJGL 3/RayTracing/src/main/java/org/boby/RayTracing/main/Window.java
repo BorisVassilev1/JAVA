@@ -19,7 +19,6 @@ public class Window {
 	private int height;
 	private String name;
 	private long id;
-	private boolean resized;
 	
 	public Window(int width, int height, String name) {
 		this.width = width;
@@ -41,10 +40,6 @@ public class Window {
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		// Create the window
 		id = glfwCreateWindow(width, height, name, NULL, NULL);
 		if (id == NULL)
@@ -52,11 +47,6 @@ public class Window {
 
 		Input.initInput(id);
 
-		glfwSetFramebufferSizeCallback(id, (window, width, height) -> {
-		    Window.this.width = width;
-		    Window.this.height = height;
-		    Window.this.setResized(true);
-		});
 		// Get the thread stack and push a new frame
 		try (MemoryStack stack = stackPush()) {
 			IntBuffer pWidth = stack.mallocInt(1); // int*
@@ -114,7 +104,6 @@ public class Window {
 		}
 	}
 	
-	
 	public long getId()
 	{
 		return id;
@@ -127,13 +116,5 @@ public class Window {
 	public int getHeight()
 	{
 		return height;
-	}
-	
-	public boolean isResized() {
-		return resized;
-	}
-	
-	public void setResized(boolean resized) {
-		this.resized = resized;
 	}
 }

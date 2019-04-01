@@ -1,8 +1,5 @@
 package org.boby.RayTracing.main;
 
-import org.boby.RayTracing.objects.Cube;
-import org.boby.RayTracing.objects.Object3d;
-import org.boby.RayTracing.objects.Quad;
 import org.boby.RayTracing.utils.Texture;
 import org.boby.RayTracing.utils.Time;
 import org.lwjgl.*;
@@ -10,6 +7,8 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import objects.Object3d;
+import objects.Quad;
 import shaders.BasicShader;
 
 import java.nio.*;
@@ -17,13 +16,16 @@ import java.nio.*;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryStack.*;
+import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main {
 
 	// The window handle
-	public static Window window;
-	Object3d obj;
-	static Texture tex;
+	private Window window;
+	Quad obj;
+	BasicShader bs;
+	Texture tex;
 
 	public void run() {
 		//Configuration.DEBUG.set(true);
@@ -39,7 +41,6 @@ public class Main {
 		glfwFreeCallbacks(window.getId());
 		glfwDestroyWindow(window.getId());
 		obj.destroy();
-		
 		// Terminate GLFW and free the error callback
 		glfwTerminate();
 		glfwSetErrorCallback(null).free();
@@ -47,39 +48,24 @@ public class Main {
 
 	private void init() {
 		GL.createCapabilities();// create the opengl context
-		Renderer.init();
+		
 		glEnable(GL_TEXTURE_2D);
-		glEnable(GL_DEPTH_TEST);
-		try {
-			tex = new Texture("./res/rubyblock.png");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		obj = new Cube();
-
-		//bs.setUniform("projectionMatrix", Renderer.getMatrix());
+		tex = new Texture("./res/rubyblock.png");
+		obj = new Quad();
+		bs = new BasicShader();
+		bs.create();
 	}
 
 	private void loop() {
-		
-
 		while (!window.shouldClose()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			Time.updateTime();
 			// System.out.println(1/Time.deltaTime);
 			glfwPollEvents();
-			
-			
-			// Update rotation angle
-			float rotation = obj.getRotation().x + 1.5f;
-			if ( rotation > 360 ) {
-			    rotation = 0;
-			}
-			obj.getRotation().set(rotation, rotation, rotation);
+
+			bs.bind();
 			tex.bind();
-			Renderer.draw(obj);
-			tex.unbind();
+			obj.draw();
 			window.swapBuffers();
 		}
 	}
