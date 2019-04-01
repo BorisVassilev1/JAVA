@@ -58,7 +58,7 @@ public class RenderWindow {
 		frame.getContentPane().setLayout(null);
 		
 		panel = new JPanel();
-		panel.setBackground(Color.BLACK);
+		panel.setBackground(Color.WHITE);
 		panel.setBounds(10, 11, 800, 600);
 		frame.getContentPane().add(panel);
 		
@@ -67,7 +67,7 @@ public class RenderWindow {
 			@SuppressWarnings({ "unused" })
 			public void actionPerformed(ActionEvent e) {
 				Graphics g = panel.getGraphics();
-				g.setColor(Color.BLACK);
+				g.setColor(Color.white);
 				g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
 				
 				float imageRatio = panel.getWidth() / (float )panel.getHeight();

@@ -16,7 +16,6 @@ public class Mesh extends MeshBase{
 	private int texCoordsBufferID;
 	private int colorBufferID;
 	private int vertexCount;
-	private int indicesCount;
 	private float vertices[];
 	private int indices[];
 	private float texCoords[]; 
@@ -37,8 +36,7 @@ public class Mesh extends MeshBase{
         vertexBufferID = super.storeData(0, 3, vertices);
         colorBufferID = super.storeData(1, 3, colors);
         texCoordsBufferID = super.storeData(2, 2, texCoords);
-		indicesCount = indices.length;
-		vertexCount = vertices.length;
+		vertexCount = indices.length;
         GL30.glBindVertexArray(0);
 	}
 	
@@ -63,27 +61,8 @@ public class Mesh extends MeshBase{
 		return vertexCount;
 	}
 	
-	public int getIndicesBufferID()
+	public float[] getVertices()
 	{
-		return indicesBufferID;
-	}
-	
-	public FloatBuffer getVerticesBuffer()
-	{
-		FloatBuffer buff = BufferUtils.createFloatBuffer(vertexCount);
-		GL20.glGetBufferSubData(GL20.GL_ARRAY_BUFFER, 0, buff);
-		return buff;
-	}
-	
-	public IntBuffer getIndicesBuffer()
-	{
-		IntBuffer buff = BufferUtils.createIntBuffer(indicesCount);
-		GL20.glGetBufferSubData(GL20.GL_ELEMENT_ARRAY_BUFFER, 0, buff);
-		return buff;
-	}
-
-	public int getIndicesCount() {
-		// TODO Auto-generated method stub
-		return indicesCount;
+		return vertices;
 	}
 }

@@ -102,7 +102,7 @@ public class Calculate extends Main {
 		if (i == iterations) {
 			return 0;
 		} else {
-			return (int) (i*255.0/iterations);
+			return i*255/iterations;
 		}
 	}
 
