@@ -4,39 +4,26 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.HashMap;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL40;
-import org.lwjgl.opengl.GL43;
 import org.lwjgl.system.MemoryStack;
 
 public abstract class Shader {
 	private int vertexShaderID;
 	private int fragmentShaderID;
-	private int computeShaderID;
 	private int programID;
 	
 	private String vertexFile;
 	private String fragmentFile;
     
-	private String computeFile;
-	
     private final HashMap<String, Integer> uniforms;
     
 	public Shader(String vertexFile, String fragmentFile) {
 		this.vertexFile = vertexFile;
 		this.fragmentFile = fragmentFile;
-		uniforms = new HashMap<String, Integer>();
-	}
-	
-	public Shader(String computeFile)
-	{
-		this.computeFile = computeFile;
 		uniforms = new HashMap<String, Integer>();
 	}
 	/**
@@ -79,31 +66,6 @@ public abstract class Shader {
 		
 		createUniforms();
 	}
-	
-	public void createComputeShader()
-	{
-		programID = GL20.glCreateProgram();
-		computeShaderID = GL20.glCreateShader(GL43.GL_COMPUTE_SHADER);
-		GL20.glShaderSource(computeShaderID, readFile(computeFile));
-		GL20.glCompileShader(computeShaderID);
-		if(GL20.glGetShaderi(computeShaderID, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-			System.err.println("Error: Compute Shader - " + GL20.glGetShaderInfoLog(computeShaderID));
-		}
-		GL20.glAttachShader(programID, computeShaderID);
-		GL20.glLinkProgram(programID);
-		
-		if(GL20.glGetProgrami(programID, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
-			System.err.println("Error: Program Linking - \n" + GL20.glGetShaderInfoLog(programID,1024));
-		}
-		
-		GL20.glValidateProgram(programID);
-		if(GL20.glGetProgrami(programID, GL20.GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
-			System.err.println("Error: Program Validation - \n" + GL20.glGetShaderInfoLog(programID,1024));
-		}
-		
-		createUniforms();
-	}
-	
 	/**
 	 * use bindAttribute() to pass parameters to the shader
 	 */
@@ -123,7 +85,7 @@ public abstract class Shader {
 	    int uniformLocation = GL20.glGetUniformLocation(programID,
 	        uniformName);
 	    if (uniformLocation < 0) {
-	        throw new Exception("Could not find uniform: " +
+	        throw new Exception("Could not find uniform:" +
 	            uniformName);
 	    }
 	    uniforms.put(uniformName, uniformLocation);
@@ -140,20 +102,6 @@ public abstract class Shader {
 	        value.get(fb);
 	        GL20.glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
 	    }
-	}
-	
-	public void setUniform(String uniformName, Vector3f value)
-	{
-		GL20.glUniform3f(uniforms.get(uniformName), value.x, value.y, value.z);
-	}
-	
-	public void setUniform(String uniformName, FloatBuffer value)
-	{
-		GL20.glUniform3fv(uniforms.get(uniformName),value);
-	}
-	
-	public void setUniform(String uniformName, IntBuffer value) {
-		GL20.glUniform3iv(uniforms.get(uniformName), value);
 	}
 	
 	public void bind()
@@ -191,6 +139,4 @@ public abstract class Shader {
 		}
 		return string.toString();
 	}
-
-
 }

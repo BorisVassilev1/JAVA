@@ -63,7 +63,6 @@ public class Texture {
 	    stbi_image_free(buf);
 
 	}
-	
 	/**
 	 * binds this texture
 	 */

@@ -22,8 +22,7 @@ public class Main {
 
 	// The window handle
 	public static Window window;
-	public static Object3d renderQuad;
-	Object3d cube;
+	Object3d obj;
 	static Texture tex;
 
 	public void run() {
@@ -39,7 +38,7 @@ public class Main {
 		// Free the window callbacks and destroy the window
 		glfwFreeCallbacks(window.getId());
 		glfwDestroyWindow(window.getId());
-		renderQuad.destroy();
+		obj.destroy();
 		
 		// Terminate GLFW and free the error callback
 		glfwTerminate();
@@ -54,10 +53,12 @@ public class Main {
 		try {
 			tex = new Texture("./res/rubyblock.png");
 		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		renderQuad = new Quad();
-		cube = new Cube();
+		obj = new Cube();
+
+		//bs.setUniform("projectionMatrix", Renderer.getMatrix());
 	}
 
 	private void loop() {
@@ -70,8 +71,14 @@ public class Main {
 			glfwPollEvents();
 			
 			
+			// Update rotation angle
+			float rotation = obj.getRotation().x + 1.5f;
+			if ( rotation > 360 ) {
+			    rotation = 0;
+			}
+			obj.getRotation().set(rotation, rotation, rotation);
 			tex.bind();
-			Renderer.draw(renderQuad,cube);
+			Renderer.draw(obj);
 			tex.unbind();
 			window.swapBuffers();
 		}
