@@ -19,7 +19,13 @@ public class BasicShader extends Shader{
 		try {
 			super.createUniform("projectionMatrix");
 			super.createUniform("worldMatrix");
-			super.createUniform("texture_sampler");
+			//super.createUniform("texture_sampler");
+			//super.createUniform("ray00");
+			//super.createUniform("ray01");
+			//super.createUniform("ray10");
+			//super.createUniform("ray11");
+			//super.createUniform("vertexArray");
+			//super.createUniform("indicesArray");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
