@@ -22,12 +22,13 @@ public class Main {
 
 	// The window handle
 	public static Window window;
-	Object3d obj;
+	static Quad renderingQuad;
+	static Object3d obj;
 	static Texture tex;
 
 	public void run() {
 		//Configuration.DEBUG.set(true);
-		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+		System.out.println("LWJGL version: " + Version.getVersion());
 
 		window = new Window(800, 600, "something");
 		window.create();
@@ -38,7 +39,7 @@ public class Main {
 		// Free the window callbacks and destroy the window
 		glfwFreeCallbacks(window.getId());
 		glfwDestroyWindow(window.getId());
-		obj.destroy();
+		renderingQuad.destroy();
 		
 		// Terminate GLFW and free the error callback
 		glfwTerminate();
@@ -56,6 +57,7 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		renderingQuad = new Quad();
 		obj = new Cube();
 
 		//bs.setUniform("projectionMatrix", Renderer.getMatrix());
@@ -70,15 +72,8 @@ public class Main {
 			// System.out.println(1/Time.deltaTime);
 			glfwPollEvents();
 			
-			
-			// Update rotation angle
-			float rotation = obj.getRotation().x + 1.5f;
-			if ( rotation > 360 ) {
-			    rotation = 0;
-			}
-			obj.getRotation().set(rotation, rotation, rotation);
 			tex.bind();
-			Renderer.draw(obj);
+			Renderer.draw(obj,renderingQuad);
 			tex.unbind();
 			window.swapBuffers();
 		}

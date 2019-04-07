@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.MemoryStack;
@@ -102,6 +104,21 @@ public abstract class Shader {
 	        value.get(fb);
 	        GL20.glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
 	    }
+	}
+	
+	public void setUniform(String uniformName, FloatBuffer value)
+	{
+		GL20.glUniform3fv(uniforms.get(uniformName), value);
+	}
+	
+	public void setUniform(String uniformName, IntBuffer value)
+	{
+		GL20.glUniform3iv(uniforms.get(uniformName), value);
+	}
+	
+	public void setUniform(String uniformName, Vector3f vec)
+	{
+		GL20.glUniform3f(uniforms.get(uniformName), vec.x, vec.y, vec.z);
 	}
 	
 	public void bind()

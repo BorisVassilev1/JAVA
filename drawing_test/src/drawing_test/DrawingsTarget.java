@@ -100,9 +100,9 @@ public class DrawingsTarget extends JFrame {
 				float zoff = (float) Math.random();
 
 				float xoff = 0f;
-				for (int x = 0; x < 250; x++) {
+				for (int x = 0; x < 1000; x++) {
 					float yoff = 0f;
-					for (int y = 0; y < 250; y++) {
+					for (int y = 0; y < 1000; y++) {
 						// simNoise[x][y]= (int) (snoise.noise(xoff, yoff, zoff)*128+128);
 						Color gridColor = new Color((int) (snoise.noise(xoff, yoff, zoff) * 128 + 128),
 								(int) (snoise.noise(xoff, yoff, zoff) * 128 + 128),

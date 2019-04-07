@@ -7,10 +7,10 @@ public class Quad extends Object3d{
 	public Quad() {
 		super(new Mesh(
 				new float[] {
-						-0.5f, +0.5f, 0,
-						+0.5f, +0.5f, 0,
-						+0.5f, -0.5f, 0,
-						-0.5f, -0.5f, 0
+						-1.0f, +1.0f, 0,
+						+1.0f, +1.0f, 0,
+						+1.0f, -1.0f, 0,
+						-1.0f, -1.0f, 0
 				},
 				new int[] {
 						0, 1, 2,

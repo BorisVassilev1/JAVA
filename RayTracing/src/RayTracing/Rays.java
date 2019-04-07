@@ -41,6 +41,9 @@ public class Rays {
 		
 		rayDir = Utils.lerp(projPlane[0], projPlane[1], projPlane[2], projPlane[3], x , y);
 		
+//		rayDir = new Vector3f(0, 0, -1);
+//		rayDir = Matrices.rotateVector(rayDir, new Vector3f(-0.5f + x,-0.5f + y,0));
+		
 		IntersectionPoint closest = null;
 		for (Object3d obj : Main.scene) {
 			for(int i = 0; i < obj.mesh.tris.length; i ++)
