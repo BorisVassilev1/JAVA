@@ -1,9 +1,10 @@
 package org.boby.RayTracing.main;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
+//import static org.lwjgl.opengl.GL11.*;
+//import static org.lwjgl.opengl.GL15.*;
+//import static org.lwjgl.opengl.GL20.*;
+//import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL46.*;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -14,6 +15,7 @@ import org.boby.RayTracing.objects.Transformation;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
+import shaders.ComputeShader;
 
 public class Renderer {
 	private static final float FOV = (float) Math.toRadians(70f);
@@ -106,6 +108,30 @@ public class Renderer {
         glBindVertexArray(0);
         renderingQuad.getMaterial().getShader().unbind();
 	}
+    
+    
+    public static void Compute(ComputeShader shader) {
+    	shader.bind();
+    	
+    	// dimensions of the image
+    	int tex_w = 512, tex_h = 512;
+    	int tex_output;
+    	tex_output = glGenTextures();
+    	glActiveTexture(GL_TEXTURE0);
+    	glBindTexture(GL_TEXTURE_2D, tex_output);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT, null);
+    	glBindImageTexture(0, tex_output, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
+    	
+    	glDispatchCompute(100, 100, 1);
+    	
+    	shader.unbind();
+    }
+    
+    
     
 	public static void UpdateViewPlane(float imageRatio, float fovRad)
 	{

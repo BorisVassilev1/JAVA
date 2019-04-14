@@ -11,20 +11,22 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL40;
+import org.lwjgl.opengl.GL43;
+import org.lwjgl.opengl.GL46;
+import org.lwjgl.opengl.GL46C;
 import org.lwjgl.system.MemoryStack;
 
 public abstract class ComputeShader {
 	private int computeShaderID;
 	private int programID;
 	
-	private String vertexFile;
-	private String fragmentFile;
+	private String computeFile;
     
     private final HashMap<String, Integer> uniforms;
     
-	public ComputeShader(String vertexFile, String fragmentFile) {
-		this.vertexFile = vertexFile;
-		this.fragmentFile = fragmentFile;
+	public ComputeShader(String computeFile) {
+		this.computeFile = computeFile;
 		uniforms = new HashMap<String, Integer>();
 	}
 	/**
@@ -34,9 +36,8 @@ public abstract class ComputeShader {
 	{
 		programID = GL20.glCreateProgram();
 		
-		
-		computeShaderID = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER);
-		GL20.glShaderSource(computeShaderID, readFile(fragmentFile));
+		computeShaderID = GL20.glCreateShader(GL46C.GL_COMPUTE_SHADER);
+		GL20.glShaderSource(computeShaderID, readFile(computeFile));
 		GL20.glCompileShader(computeShaderID);
 		
 		if(GL20.glGetShaderi(computeShaderID, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
@@ -162,7 +163,11 @@ public abstract class ComputeShader {
 		GL20.glDeleteShader(computeShaderID);
 		GL20.glDeleteProgram(programID);
 	}
-	
+	/**
+	 * a private method for reading text files
+	 * @param file - the file path beginning with ./res/
+	 * @return the file in the form of a String
+	 */
 	private String readFile(String file)
 	{
 		BufferedReader reader = null;

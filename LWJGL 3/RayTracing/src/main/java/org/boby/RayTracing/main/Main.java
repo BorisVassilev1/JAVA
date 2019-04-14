@@ -11,6 +11,7 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import shaders.BasicShader;
+import shaders.ComputeShader;
 
 import java.nio.*;
 
@@ -25,6 +26,21 @@ public class Main {
 	static Quad renderingQuad;
 	static Object3d obj;
 	static Texture tex;
+	
+	static ComputeShader comp = new ComputeShader("./res/sahders/RayTracingShader.comp") {
+		
+		@Override
+		protected void createUniforms() {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		protected void bindAllAttributes() {
+			// TODO Auto-generated method stub
+			
+		}
+	};
 
 	public void run() {
 		//Configuration.DEBUG.set(true);
@@ -59,8 +75,7 @@ public class Main {
 		}
 		renderingQuad = new Quad();
 		obj = new Cube();
-
-		//bs.setUniform("projectionMatrix", Renderer.getMatrix());
+		comp.create();
 	}
 
 	private void loop() {
@@ -72,9 +87,10 @@ public class Main {
 			// System.out.println(1/Time.deltaTime);
 			glfwPollEvents();
 			
-			tex.bind();
-			Renderer.draw(obj,renderingQuad);
-			tex.unbind();
+			//tex.bind();
+			//Renderer.draw(obj,renderingQuad);
+			//tex.unbind();
+			Renderer.Compute(comp);
 			window.swapBuffers();
 		}
 	}
