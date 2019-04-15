@@ -18,21 +18,31 @@ import java.nio.*;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL15.GL_WRITE_ONLY;
+import static org.lwjgl.opengl.GL30.GL_RGBA32F;
+import static org.lwjgl.opengl.GL42.glBindImageTexture;
 
 public class Main {
 
 	// The window handle
 	public static Window window;
 	static Quad renderingQuad;
-	static Object3d obj;
 	static Texture tex;
 	
-	static ComputeShader comp = new ComputeShader("./res/sahders/RayTracingShader.comp") {
+	static ComputeShader comp = new ComputeShader("./res/shaders/RayTracingShader.comp") {
 		
 		@Override
 		protected void createUniforms() {
 			// TODO Auto-generated method stub
-			
+			try {
+				super.createUniform("img_output");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		@Override
@@ -74,23 +84,50 @@ public class Main {
 			e.printStackTrace();
 		}
 		renderingQuad = new Quad();
-		obj = new Cube();
 		comp.create();
 	}
 
 	private void loop() {
+		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0));
+		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1));
+		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2));
+		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0));
+		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1));
+		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2));
+		System.out.println(GL46.glGetInteger(GL46.GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS));
 		
-
+		int tex_w = 512, tex_h = 512;
+    	int tex_output;
+    	tex_output = glGenTextures();
+    	glActiveTexture(GL_TEXTURE0);
+    	glBindTexture(GL_TEXTURE_2D, tex_output);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT,(ByteBuffer) null);
+    	glBindImageTexture(0, tex_output, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
+		
 		while (!window.shouldClose()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			Time.updateTime();
 			// System.out.println(1/Time.deltaTime);
 			glfwPollEvents();
+			comp.bind();
 			
+			GL46.glActiveTexture(GL46.GL_TEXTURE0);
+			GL46.glBindTexture(GL46.GL_TEXTURE_2D, tex_output);
+			
+			GL46.glDispatchCompute(tex_w, tex_h, 1);
+			GL46.glMemoryBarrier(GL46.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 			//tex.bind();
-			//Renderer.draw(obj,renderingQuad);
+			GL46.glBindTexture(GL46.GL_TEXTURE_2D, tex_output);
+			//GL46.glBindTexture(GL46.GL_TEXTURE_2D, tex.getID());
+			Renderer.draw(renderingQuad);
 			//tex.unbind();
-			Renderer.Compute(comp);
+			
+			
+			//Renderer.Compute(comp);
 			window.swapBuffers();
 		}
 	}

@@ -1,11 +1,8 @@
 package org.boby.RayTracing.main;
 
-//import static org.lwjgl.opengl.GL11.*;
-//import static org.lwjgl.opengl.GL15.*;
-//import static org.lwjgl.opengl.GL20.*;
-//import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL46.*;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -15,6 +12,7 @@ import org.boby.RayTracing.objects.Transformation;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
+
 import shaders.ComputeShader;
 
 public class Renderer {
@@ -34,79 +32,45 @@ public class Renderer {
     	projPlane = new Vector3f[4];
     }
     
-    public static void draw(Object3d obj, Quad renderingQuad)
+    public static void draw(Object3d obj)
 	{
     	if ( Main.window.isResized() ) {
             glViewport(0, 0, Main.window.getWidth(), Main.window.getHeight());
             Main.window.setResized(false);
         }
-    	renderingQuad.getPosition().set(0,0,(float) ( - 1/Math.tan(FOV / 2)));
+    	obj.getPosition().set(0,0,(float) ( - 1/Math.tan(FOV / 2)));
     	
-    	renderingQuad.getMaterial().getShader().bind();
+    	obj.getMaterial().getShader().bind();
 		
 		Matrix4f projectionMatrix = transform.getProjectionMatrix(FOV, Main.window.getWidth(),  Main.window.getHeight(), Z_NEAR, Z_FAR);
-		renderingQuad.getMaterial().getShader().setUniform("projectionMatrix", projectionMatrix);
+		obj.getMaterial().getShader().setUniform("projectionMatrix", projectionMatrix);
 		
 		
 		Matrix4f worldMatrix =
 	            transform.getWorldMatrix(
-	                renderingQuad.getPosition(),
-	                renderingQuad.getRotation(),
-	                renderingQuad.getScale());
-		renderingQuad.getMaterial().getShader().setUniform("worldMatrix", worldMatrix);
+	                obj.getPosition(),
+	                obj.getRotation(),
+	                obj.getScale());
+		obj.getMaterial().getShader().setUniform("worldMatrix", worldMatrix);
 		
 		//obj.getMaterial().getShader().setUniform("texture_sampler", 0);
 		//GL20.glActiveTexture(GL20.GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_2D, Main.tex.getID());
-		glBindVertexArray(obj.getMesh().getVAOID());
-		glBindBuffer(GL_ARRAY_BUFFER, obj.getMesh().getVertexBufferID());
-		FloatBuffer vertexBuffer =  obj.getMesh().getVertexBuffer();
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		FloatBuffer translatedVertexBuffer = BufferUtils.createFloatBuffer(vertexBuffer.limit());
-		for(int i = 0; i < vertexBuffer.limit(); i ++)
-		{
-			float num = vertexBuffer.get(i);
-			if(i % 3 == 2)
-			{
-				translatedVertexBuffer.put(num - 10);
-			}
-			else
-			{
-				translatedVertexBuffer.put(num);
-			}
-		}
 		
-//		for(int i = 0; i < translatedVertexBuffer.limit(); i ++)
-//		{
-//			System.out.print(translatedVertexBuffer.get(i) + " ");
-//		}
-//		System.out.println();
-		renderingQuad.getMaterial().getShader().setUniform("vertexArray",translatedVertexBuffer);
 		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.getMesh().getIndicesBufferID());
-		IntBuffer indicesBuffer = obj.getMesh().getIndicesBuffer();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		renderingQuad.getMaterial().getShader().setUniform("indicesArray", indicesBuffer);
-		
-		UpdateViewPlane(Main.window.getWidth()/Main.window.getHeight(), FOV);
-		
-		renderingQuad.getMaterial().getShader().setUniform("ray00", projPlane[0]);
-		renderingQuad.getMaterial().getShader().setUniform("ray10", projPlane[1]);
-		renderingQuad.getMaterial().getShader().setUniform("ray01", projPlane[2]);
-		renderingQuad.getMaterial().getShader().setUniform("ray11", projPlane[3]);
 		
 		
 		//render the object
-		glBindVertexArray(renderingQuad.getMesh().getVAOID());
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-        glDrawElements(GL_TRIANGLES, renderingQuad.getMesh().getIndicesCount(), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(obj.getMesh().getVAOID());
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+		glDrawElements(GL_TRIANGLES, obj.getMesh().getIndicesCount(), GL_UNSIGNED_INT, 0);
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);
         glBindVertexArray(0);
-        renderingQuad.getMaterial().getShader().unbind();
+        obj.getMaterial().getShader().unbind();
 	}
     
     
@@ -123,10 +87,10 @@ public class Renderer {
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT, null);
+    	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT,(ByteBuffer) null);
     	glBindImageTexture(0, tex_output, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
     	
-    	glDispatchCompute(100, 100, 1);
+    	glDispatchCompute(tex_w,tex_h, 1);
     	
     	shader.unbind();
     }
