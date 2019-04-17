@@ -10,8 +10,10 @@ import org.boby.RayTracing.objects.Object3d;
 import org.boby.RayTracing.objects.Quad;
 import org.boby.RayTracing.objects.Transformation;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL46;
 
 import shaders.ComputeShader;
 
@@ -41,23 +43,25 @@ public class Renderer {
     	obj.getPosition().set(0,0,(float) ( - 1/Math.tan(FOV / 2)));
     	
     	obj.getMaterial().getShader().bind();
+		if(obj.getMaterial().getShader().hasUniform("projectionMatrix")) {
+			Matrix4f projectionMatrix = transform.getProjectionMatrix(FOV, Main.window.getWidth(),  Main.window.getHeight(), Z_NEAR, Z_FAR);
+			obj.getMaterial().getShader().setUniform("projectionMatrix", projectionMatrix);
+		}
 		
-		Matrix4f projectionMatrix = transform.getProjectionMatrix(FOV, Main.window.getWidth(),  Main.window.getHeight(), Z_NEAR, Z_FAR);
-		obj.getMaterial().getShader().setUniform("projectionMatrix", projectionMatrix);
+		if(obj.getMaterial().getShader().hasUniform("worldMatrix")) {
+			Matrix4f worldMatrix =
+		            transform.getWorldMatrix(
+		                obj.getPosition(),
+		                obj.getRotation(),
+		                obj.getScale());
+			obj.getMaterial().getShader().setUniform("worldMatrix", worldMatrix);
+		}
 		
-		
-		Matrix4f worldMatrix =
-	            transform.getWorldMatrix(
-	                obj.getPosition(),
-	                obj.getRotation(),
-	                obj.getScale());
-		obj.getMaterial().getShader().setUniform("worldMatrix", worldMatrix);
-		
-		//obj.getMaterial().getShader().setUniform("texture_sampler", 0);
-		//GL20.glActiveTexture(GL20.GL_TEXTURE0);
+		if(obj.getMaterial().getShader().hasUniform("texture_sampler")) {
+			obj.getMaterial().getShader().setUniform("texture_sampler", 0);
+		}
+		//GL46.glActiveTexture(GL46.GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_2D, Main.tex.getID());
-		
-		
 		
 		
 		//render the object
@@ -74,23 +78,19 @@ public class Renderer {
 	}
     
     
-    public static void Compute(ComputeShader shader) {
+    public static void Compute(ComputeShader shader, int tex_output, int tex_w, int tex_h) {
     	shader.bind();
     	
-    	// dimensions of the image
-    	int tex_w = 512, tex_h = 512;
-    	int tex_output;
-    	tex_output = glGenTextures();
-    	glActiveTexture(GL_TEXTURE0);
+    	
     	glBindTexture(GL_TEXTURE_2D, tex_output);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT,(ByteBuffer) null);
-    	glBindImageTexture(0, tex_output, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
+    	//glBindImageTexture(0, tex_output, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
+    	
+    	if(shader.hasUniform("resolution")) {
+    		shader.setUniform("resolution", new Vector2f(Main.window.getWidth(), Main.window.getHeight()));
+    	}
     	
     	glDispatchCompute(tex_w,tex_h, 1);
+    	GL46.glMemoryBarrier(GL46.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     	
     	shader.unbind();
     }

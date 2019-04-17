@@ -8,6 +8,7 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -140,6 +141,20 @@ public abstract class ComputeShader {
 	{
 		GL20.glUniform3f(uniforms.get(uniformName), vec.x, vec.y, vec.z);
 	}
+	
+	public void setUniform(String uniformName, Vector2f vec) {
+		GL20.glUniform2f(uniforms.get(uniformName), vec.x, vec.y);
+	}
+	
+	/**
+	 * TODO: write this
+	 * @param uniformName
+	 * @return
+	 */
+	public boolean hasUniform(String uniformName) {
+		return uniforms.containsKey(uniformName);
+	}
+	
 	/**
 	 * the shader will be used after this line till it is either unbound or another shader is bound.
 	 */

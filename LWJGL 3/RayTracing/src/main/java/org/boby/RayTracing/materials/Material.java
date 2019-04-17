@@ -2,11 +2,12 @@ package org.boby.RayTracing.materials;
 
 import shaders.BasicShader;
 import shaders.Shader;
+import shaders.TextureOnScreenShader;
 
 public class Material {
 	Shader shader;
 	public Material() {
-		shader = new BasicShader();
+		shader = new TextureOnScreenShader();
 		shader.create();
 	}
 	public Shader getShader()
@@ -17,4 +18,8 @@ public class Material {
 	{
 		shader.remove();
 	}
+	public void setShader(Shader a) {
+		this.shader = a;
+	}
+	
 }

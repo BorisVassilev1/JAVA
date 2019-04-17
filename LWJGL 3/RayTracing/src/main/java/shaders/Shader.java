@@ -121,10 +121,15 @@ public abstract class Shader {
 		GL20.glUniform3f(uniforms.get(uniformName), vec.x, vec.y, vec.z);
 	}
 	
+	public boolean hasUniform(String uniformName) {
+		return uniforms.containsKey(uniformName);
+	}
+	
 	public void bind()
 	{
 		GL20.glUseProgram(programID);
 	}
+	
 	public void unbind()
 	{
 		GL20.glUseProgram(0);

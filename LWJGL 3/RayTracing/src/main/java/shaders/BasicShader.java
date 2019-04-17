@@ -17,8 +17,6 @@ public class BasicShader extends Shader{
 	@Override
 	public void createUniforms() {
 		try {
-			super.createUniform("projectionMatrix");
-			super.createUniform("worldMatrix");
 			super.createUniform("texture_sampler");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
