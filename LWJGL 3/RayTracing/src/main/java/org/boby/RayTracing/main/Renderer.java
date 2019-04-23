@@ -9,6 +9,7 @@ import java.nio.IntBuffer;
 import org.boby.RayTracing.objects.Object3d;
 import org.boby.RayTracing.objects.Quad;
 import org.boby.RayTracing.objects.Transformation;
+import org.boby.RayTracing.utils.Texture;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -78,18 +79,18 @@ public class Renderer {
 	}
     
     
-    public static void Compute(ComputeShader shader, int tex_output, int tex_w, int tex_h) {
+    public static void Compute(ComputeShader shader, Texture tex) {
     	shader.bind();
     	
     	
-    	glBindTexture(GL_TEXTURE_2D, tex_output);
+    	glBindTexture(GL_TEXTURE_2D, tex.getID());
     	//glBindImageTexture(0, tex_output, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
     	
     	if(shader.hasUniform("resolution")) {
     		shader.setUniform("resolution", new Vector2f(Main.window.getWidth(), Main.window.getHeight()));
     	}
     	
-    	glDispatchCompute(tex_w,tex_h, 1);
+    	glDispatchCompute(tex.getWidth(), tex.getHeight(), 1);
     	GL46.glMemoryBarrier(GL46.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     	
     	shader.unbind();

@@ -1,0 +1,94 @@
+#version 460
+
+#ifdef GL_ES
+precision highp float;
+#endif
+
+layout(local_size_x = 1, local_size_y = 1) in;
+layout(rgba32f, binding = 0) uniform image2D img_output;
+
+uniform vec2 resolution;
+
+vec3 cam_pos = vec3(0.5,0.5,-0.6);
+
+vec3 light = vec3(1.5,2.6,0.4);
+
+struct Sphere {
+	vec3 pos;
+	float radius;
+};
+
+float dist(vec3 a, Sphere p) {
+	vec3 delta = a - p.pos;
+	return length(delta) - p.radius;
+}
+
+vec3 lerp(vec3 v00, vec3 v10, vec3 v01, vec3 v11, float x, float y) {
+	return mix(
+	mix(v00,v10,x),
+	mix(v01,v11,x),
+	y
+	);
+}
+
+Sphere sphs[3] = Sphere[3](
+	Sphere(vec3(0.5,1.3,1.5),0.5),
+	Sphere(vec3(1.3,0.2,2),0.7),
+	Sphere(vec3(-0.4,0.5,2),0.5)
+);
+
+float minDist(vec3 p) {
+	float mind = dist(p,sphs[0]);
+	for(int i = 1; i < 3; i ++) {
+		mind = min(mind, dist(p,sphs[i]));
+	}
+	mind = min(mind, p.y + 0.5);
+	return mind;
+}
+
+float angleBetween(vec3 v1, vec3 v2) {
+    return acos(dot(normalize(v1), normalize(v2))) / 3.14;
+}
+
+const float EPS = 0.00005;
+vec3 normal(vec3 p) {
+    return normalize(vec3(
+        minDist(vec3(p.x + EPS, p.y, p.z)) - minDist(vec3(p.x - EPS, p.y, p.z)),
+        minDist(vec3(p.x, p.y + EPS, p.z)) - minDist(vec3(p.x, p.y - EPS, p.z)),
+        minDist(vec3(p.x, p.y, p.z + EPS)) - minDist(vec3(p.x, p.y, p.z - EPS))
+    ));
+}
+
+float EPSILON = 0.01;
+int iterations = 4000;
+
+void main() {
+  	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+  	vec3 globalDir = vec3(gl_GlobalInvocationID.xy / resolution.xy ,0.0);
+  	
+  	
+  	vec3 dir = normalize(globalDir - cam_pos);
+  	dir.y = -dir.y;
+  	dir.x *= resolution.x / resolution.y;
+  	vec4 pixel = vec4(0.0,0.0,0.0,0.0);
+  	vec3 rayPosition = cam_pos;
+  	float i = 0;
+  	
+  	float ang = angleBetween(dir, light);
+    float coef = 1.0;
+  	
+  	for(; i < iterations; i ++) {
+		float min_dist = minDist(rayPosition);
+		  	
+		if(min_dist <= EPSILON) {
+			vec3 currNormal = normal(rayPosition);
+			dir = reflect(dir,currNormal);
+			ang = angleBetween(dir, light);
+           	coef *= 0.7;
+           	float color = coef * (1.0 - ang);
+  			pixel = vec4(color, color, color, 1.0);
+		}
+		rayPosition += dir * min_dist / 80.0;
+  	}
+  	imageStore(img_output, pixel_coords, pixel);
+}

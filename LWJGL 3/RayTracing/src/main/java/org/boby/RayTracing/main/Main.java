@@ -13,19 +13,14 @@ import org.lwjgl.system.*;
 
 import shaders.BasicShader;
 import shaders.ComputeShader;
+import shaders.RayMarchingComputeShader;
 import shaders.TextureOnScreenShader;
 
 import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL15.GL_WRITE_ONLY;
-import static org.lwjgl.opengl.GL30.GL_RGBA32F;
-import static org.lwjgl.opengl.GL42.glBindImageTexture;
+import static org.lwjgl.opengl.GL46.*;
 
 public class Main {
 
@@ -33,33 +28,15 @@ public class Main {
 	public static Window window;
 	static RenderingQuad renderingQuad;
 	static Texture tex;
+	static Texture renderTexture;
 	
-	static ComputeShader comp = new ComputeShader("./res/shaders/RayTracingShader.comp") {
-		
-		@Override
-		protected void createUniforms() {
-			// TODO Auto-generated method stub
-			try {
-				super.createUniform("img_output");
-				super.createUniform("resolution");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		@Override
-		protected void bindAllAttributes() {
-			// TODO Auto-generated method stub
-			
-		}
-	};
+	static ComputeShader comp = new RayMarchingComputeShader();
 
 	public void run() {
 		//Configuration.DEBUG.set(true);
 		System.out.println("LWJGL version: " + Version.getVersion());
 
-		window = new Window(800, 600, "something");
+		window = new Window(1000, 600, "something");
 		window.create();
 		
 		init();
@@ -87,6 +64,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		renderingQuad = new RenderingQuad();
+		renderTexture = new Texture(window.getWidth(), window.getHeight());
 		comp.create();
 	}
 
@@ -98,26 +76,8 @@ public class Main {
 //		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1));
 //		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2));
 //		System.out.println(GL46.glGetInteger(GL46.GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS));
-		
-		int tex_w = window.getWidth(), tex_h = window.getHeight();
-    	int tex_output;
-    	tex_output = glGenTextures();
-    	glActiveTexture(GL_TEXTURE0);
-    	glBindTexture(GL_TEXTURE_2D, tex_output);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT,(ByteBuffer) null);
-    	glBindImageTexture(0, tex_output, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
-		
-		double delta = System.nanoTime();
-		GL46.glBindTexture(GL_TEXTURE_2D, 0);
-		Renderer.Compute(comp, tex_output, tex_w, tex_h);
-		delta = System.nanoTime() - delta;
-		delta /= 1000000.0;
-		System.out.println("Frame computed in " + delta + " miliseconds!");
-		if(delta <= 33.333333) { System.out.println("THIS SIMULATION CAN BE REALTIME!!");}
+    	
+		Renderer.Compute(comp, renderTexture);
     	
 		while (!window.shouldClose()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -125,7 +85,7 @@ public class Main {
 			// System.out.println(1/Time.deltaTime);
 			glfwPollEvents();
 			
-			//Renderer.Compute(comp, tex_output, tex_w, tex_h);
+			//Renderer.Compute(comp, renderTexture);
 			
 			Renderer.draw(renderingQuad);
 			window.swapBuffers();

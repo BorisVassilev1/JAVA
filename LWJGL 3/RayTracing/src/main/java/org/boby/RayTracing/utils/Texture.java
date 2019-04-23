@@ -1,6 +1,12 @@
 package org.boby.RayTracing.utils;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL15.GL_WRITE_ONLY;
+import static org.lwjgl.opengl.GL30.GL_RGBA32F;
+import static org.lwjgl.opengl.GL42.glBindImageTexture;
 import static org.lwjgl.stb.STBImage.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -49,6 +55,8 @@ public class Texture {
 	        /* Get width and height of image */
 	        width = w.get();
 	        height = h.get();
+	        this.width = width;
+	        this.height = height;
 	    }
 	    
 	    id = glGenTextures();
@@ -61,8 +69,24 @@ public class Texture {
 	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	    GL30.glGenerateMipmap(GL_TEXTURE_2D);
 	    stbi_image_free(buf);
-
+	    glBindTexture(GL_TEXTURE_2D, 0);
 	}
+	
+	public Texture(int width, int height) {
+		this.width = width;
+		this.height = height;
+		this.id = glGenTextures();
+    	glActiveTexture(GL_TEXTURE0);
+    	glBindTexture(GL_TEXTURE_2D, id);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT,(ByteBuffer) null);
+    	glBindImageTexture(0, id, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
+    	glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	
 	/**
 	 * binds this texture
 	 */
@@ -79,8 +103,20 @@ public class Texture {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
+	public void remove() {
+		glDeleteTextures(this.id);
+	}
+	
 	public int getID()
 	{
 		return id;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
 	}
 }
