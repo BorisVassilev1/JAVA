@@ -14,7 +14,6 @@ import org.lwjgl.system.*;
 import shaders.BasicShader;
 import shaders.ComputeShader;
 import shaders.RayMarchingComputeShader;
-import shaders.RayTracingComputeShader;
 import shaders.TextureOnScreenShader;
 
 import java.nio.*;
@@ -31,7 +30,7 @@ public class Main {
 	static Texture tex;
 	static Texture renderTexture;
 	
-	static ComputeShader comp = new RayTracingComputeShader();
+	static ComputeShader comp = new RayMarchingComputeShader();
 
 	public void run() {
 		//Configuration.DEBUG.set(true);

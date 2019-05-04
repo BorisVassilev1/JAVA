@@ -17,20 +17,7 @@ public class RayTracingComputeShader extends ComputeShader{
 
 	@Override
 	protected void createUniforms() {
-		try {
-			super.createUniform("img_output");
-			super.createUniform("resolution");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 6c583498aff69d780224ff0418b66f5de5feae54
 		// TODO Auto-generated method stub
->>>>>>> 6c583498aff69d780224ff0418b66f5de5feae54
 		
 	}
 
