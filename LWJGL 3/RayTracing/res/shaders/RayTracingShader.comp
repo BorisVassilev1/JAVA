@@ -7,9 +7,10 @@ precision highp float;
 layout(local_size_x = 1, local_size_y = 1) in;
 layout(rgba32f, binding = 0) uniform image2D img_output;
 
+uniform mat4 cameraMatrix;
 uniform vec2 resolution;
 
-vec3 cam_pos = vec3(0.5,0.5,-0.6);
+vec3 cam_pos = vec3(0.0,0.0,0.0);
 
 vec3 light = vec3(1.5,2.6,0.4);
 
@@ -92,8 +93,8 @@ void main() {
   vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);
   ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
   vec2 pixel_position = pixel_coords / resolution;
-  
-  Ray ray = createRay(vec3(0.5,0.5,0.0), normalize( lerp4vec( v00, v10, v01, v11, pixel_position.x, pixel_position.y) ) );
+  cam_pos = (cameraMatrix * vec4(cam_pos,0.0)).xyz;
+  Ray ray = createRay(cam_pos, normalize( lerp4vec( v00, v10, v01, v11, pixel_position.x, pixel_position.y) ) );
   ray.direction.y *= -1;
   //pixel = vec4(direction.direction.x, direction.direction.y, 1.0,1.0);
   

@@ -86,7 +86,7 @@ public class Main {
 			// System.out.println(1/Time.deltaTime);
 			glfwPollEvents();
 			
-			//Renderer.Compute(comp, renderTexture);
+			Renderer.Compute(comp, renderTexture);
 			
 			Renderer.draw(renderingQuad);
 			window.swapBuffers();

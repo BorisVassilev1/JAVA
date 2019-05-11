@@ -88,7 +88,7 @@ public abstract class ComputeShader {
 	    int uniformLocation = GL20.glGetUniformLocation(programID,
 	        uniformName);
 	    if (uniformLocation < 0) {
-	        throw new Exception("Could not find uniform:" +
+	        throw new Exception("Could not find uniform: " +
 	            uniformName);
 	    }
 	    uniforms.put(uniformName, uniformLocation);

@@ -20,6 +20,7 @@ public class RayTracingComputeShader extends ComputeShader{
 		try {
 			super.createUniform("img_output");
 			super.createUniform("resolution");
+			super.createUniform("cameraMatrix");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

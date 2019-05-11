@@ -27,6 +27,8 @@ public class Renderer {
     
     private static Transformation transform;
     
+    private static Vector3f camPos = new Vector3f(0.5f,0,0);
+    
     private static Vector3f projPlane[];
     
     public static void init()
@@ -41,7 +43,7 @@ public class Renderer {
             glViewport(0, 0, Main.window.getWidth(), Main.window.getHeight());
             Main.window.setResized(false);
         }
-    	obj.getPosition().set(0,0,(float) ( - 1/Math.tan(FOV / 2)));
+    	//obj.getPosition().set(0,0,(float) ( - 1/Math.tan(FOV / 2)));
     	
     	obj.getMaterial().getShader().bind();
 		if(obj.getMaterial().getShader().hasUniform("projectionMatrix")) {
@@ -90,12 +92,17 @@ public class Renderer {
     		shader.setUniform("resolution", new Vector2f(Main.window.getWidth(), Main.window.getHeight()));
     	}
     	
+    	if(shader.hasUniform("cameraMatrix")) {
+    		Matrix4f mat = transform.getWorldMatrix(camPos, new Vector3f() , 1);
+    		//if(mat == null) System.out.println("ashdksd");
+    		shader.setUniform("cameraMatrix", mat);
+    	}
+    	
     	glDispatchCompute(tex.getWidth(), tex.getHeight(), 1);
     	GL46.glMemoryBarrier(GL46.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     	
     	shader.unbind();
     }
-    
     
     
 	public static void UpdateViewPlane(float imageRatio, float fovRad)
