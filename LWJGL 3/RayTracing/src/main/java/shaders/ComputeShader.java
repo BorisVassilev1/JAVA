@@ -10,14 +10,9 @@ import java.util.HashMap;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL40;
-import org.lwjgl.opengl.GL43;
-import org.lwjgl.opengl.GL46;
-import org.lwjgl.opengl.GL46C;
 import org.lwjgl.system.MemoryStack;
 
+import static org.lwjgl.opengl.GL46.*;
 public abstract class ComputeShader {
 	private int computeShaderID;
 	private int programID;
@@ -35,28 +30,28 @@ public abstract class ComputeShader {
 	 */
 	public void create()
 	{
-		programID = GL20.glCreateProgram();
+		programID = glCreateProgram();
 		
-		computeShaderID = GL20.glCreateShader(GL46C.GL_COMPUTE_SHADER);
-		GL20.glShaderSource(computeShaderID, readFile(computeFile));
-		GL20.glCompileShader(computeShaderID);
+		computeShaderID = glCreateShader(GL_COMPUTE_SHADER);
+		glShaderSource(computeShaderID, readFile(computeFile));
+		glCompileShader(computeShaderID);
 		
-		if(GL20.glGetShaderi(computeShaderID, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-			System.err.println("Error: Fragment Shader - " + GL20.glGetShaderInfoLog(computeShaderID));
+		if(glGetShaderi(computeShaderID, GL_COMPILE_STATUS) == GL_FALSE) {
+			System.err.println("Error: Fragment Shader - " + glGetShaderInfoLog(computeShaderID));
 		}
 		
 		bindAllAttributes();
 		
-		GL20.glAttachShader(programID, computeShaderID);
+		glAttachShader(programID, computeShaderID);
 		
-		GL20.glLinkProgram(programID);
-		if(GL20.glGetProgrami(programID, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
-			System.err.println("Error: Program Linking - \n" + GL20.glGetShaderInfoLog(programID,1024));
+		glLinkProgram(programID);
+		if(glGetProgrami(programID, GL_LINK_STATUS) == GL_FALSE) {
+			System.err.println("Error: Program Linking - \n" + glGetShaderInfoLog(programID,1024));
 		}
 		
-		GL20.glValidateProgram(programID);
-		if(GL20.glGetProgrami(programID, GL20.GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
-			System.err.println("Error: Program Validation - \n" + GL20.glGetShaderInfoLog(programID,1024));
+		glValidateProgram(programID);
+		if(glGetProgrami(programID, GL_VALIDATE_STATUS) == GL_FALSE) {
+			System.err.println("Error: Program Validation - \n" + glGetShaderInfoLog(programID,1024));
 		}
 		
 		createUniforms();
@@ -71,7 +66,7 @@ public abstract class ComputeShader {
 	 * @param location - the name of the shader parameter this data should be passed to
 	 */
 	protected void  bindAttribute(int index, String location) {
-		GL20.glBindAttribLocation(programID, index, location);
+		glBindAttribLocation(programID, index, location);
 	}
 	
 	/**
@@ -85,7 +80,7 @@ public abstract class ComputeShader {
 	 * @throws Exception if the uniform is not used or does not exist in the GLSL shader, an Exception is thrown.
 	 */
 	protected void createUniform(String uniformName) throws Exception {
-	    int uniformLocation = GL20.glGetUniformLocation(programID,
+	    int uniformLocation = glGetUniformLocation(programID,
 	        uniformName);
 	    if (uniformLocation < 0) {
 	        throw new Exception("Could not find uniform: " +
@@ -99,7 +94,7 @@ public abstract class ComputeShader {
 	 * @param value - the value for the uniform variable to be set to. 
 	 */
 	public void setUniform(String uniformName, int value) {
-	    GL20.glUniform1i(uniforms.get(uniformName), value);
+	    glUniform1i(uniforms.get(uniformName), value);
 	}
 	/**
 	 * Sets the specified uniform variable.
@@ -111,7 +106,7 @@ public abstract class ComputeShader {
 	    try (MemoryStack stack = MemoryStack.stackPush()) {
 	        FloatBuffer fb = stack.mallocFloat(16);
 	        value.get(fb);
-	        GL20.glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
+	        glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
 	    }
 	}
 	/**
@@ -121,7 +116,7 @@ public abstract class ComputeShader {
 	 */
 	public void setUniform(String uniformName, FloatBuffer value)
 	{
-		GL20.glUniform3fv(uniforms.get(uniformName), value);
+		glUniform3fv(uniforms.get(uniformName), value);
 	}
 	/**
 	 * Sets the specified uniform variable.
@@ -130,7 +125,7 @@ public abstract class ComputeShader {
 	 */
 	public void setUniform(String uniformName, IntBuffer value)
 	{
-		GL20.glUniform3iv(uniforms.get(uniformName), value);
+		glUniform3iv(uniforms.get(uniformName), value);
 	}
 	/**
 	 * Sets the specified uniform variable.
@@ -139,11 +134,11 @@ public abstract class ComputeShader {
 	 */
 	public void setUniform(String uniformName, Vector3f vec)
 	{
-		GL20.glUniform3f(uniforms.get(uniformName), vec.x, vec.y, vec.z);
+		glUniform3f(uniforms.get(uniformName), vec.x, vec.y, vec.z);
 	}
 	
 	public void setUniform(String uniformName, Vector2f vec) {
-		GL20.glUniform2f(uniforms.get(uniformName), vec.x, vec.y);
+		glUniform2f(uniforms.get(uniformName), vec.x, vec.y);
 	}
 	
 	/**
@@ -160,23 +155,23 @@ public abstract class ComputeShader {
 	 */
 	public void bind()
 	{
-		GL20.glUseProgram(programID);
+		glUseProgram(programID);
 	}
 	/**
 	 * no shader will be used after this line till a shader is bound.
 	 */
 	public void unbind()
 	{
-		GL20.glUseProgram(0);
+		glUseProgram(0);
 	}
 	/**
 	 * deletes the shader. It can be created again with create() and used normally after that.
 	 */
 	public void remove()
 	{
-		GL20.glDetachShader(programID, computeShaderID);
-		GL20.glDeleteShader(computeShaderID);
-		GL20.glDeleteProgram(programID);
+		glDetachShader(programID, computeShaderID);
+		glDeleteShader(computeShaderID);
+		glDeleteProgram(programID);
 	}
 	/**
 	 * a private method for reading text files
