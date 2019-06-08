@@ -2,18 +2,12 @@ package org.boby.RayTracing.main;
 
 import static org.lwjgl.opengl.GL46.*;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-
 import org.boby.RayTracing.objects.Object3d;
-import org.boby.RayTracing.objects.Quad;
 import org.boby.RayTracing.objects.Transformation;
 import org.boby.RayTracing.utils.Texture;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL46;
 
 import shaders.ComputeShader;
@@ -27,7 +21,7 @@ public class Renderer {
     
     private static Transformation transform;
     
-    private static Vector3f camPos = new Vector3f(0.5f,0,0);
+    public static Vector3f camPos = new Vector3f(0.0f,0.0f,0.0f);
     
     private static Vector3f projPlane[];
     
@@ -94,7 +88,6 @@ public class Renderer {
     	
     	if(shader.hasUniform("cameraMatrix")) {
     		Matrix4f mat = transform.getWorldMatrix(camPos, new Vector3f() , 1);
-    		//if(mat == null) System.out.println("ashdksd");
     		shader.setUniform("cameraMatrix", mat);
     	}
     	

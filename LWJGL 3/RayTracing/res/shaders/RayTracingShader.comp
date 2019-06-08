@@ -65,7 +65,7 @@ bool intersectGroundPlane(in Ray ray, in float PlaneHeight, inout RayHit hit) {
 	if(t > 0 && t < hit.distance) {
 		hit.position = ray.origin + ray.direction * t;
 		hit.distance = t;
-		hit.normal = vec3(0.0,1.0,0.0);
+		hit.normal = normalize(vec3(0.0,1.0,0.0));
 		return true;	
 	}
 	return false;
@@ -93,24 +93,32 @@ void main() {
   vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);
   ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
   vec2 pixel_position = pixel_coords / resolution;
-  cam_pos = (cameraMatrix * vec4(cam_pos,0.0)).xyz;
+  cam_pos = (cameraMatrix * vec4(0.0,0.0,0.0,1.0)).xyz;
+  
   Ray ray = createRay(cam_pos, normalize( lerp4vec( v00, v10, v01, v11, pixel_position.x, pixel_position.y) ) );
   ray.direction.y *= -1;
-  //pixel = vec4(direction.direction.x, direction.direction.y, 1.0,1.0);
   
   
 	RayHit hit;
-	
-	//for(int i = 0; i < 5; i ++) {
+	float mult = 1.0;
+	for(int i = 0; i < 5; i ++) {
 		hit.distance = 1.0 / 0.0;
 		intersectGroundPlane(ray,0.0,hit);
 		intersectSphere(ray, sphs[0], hit);
 		intersectSphere(ray, sphs[1], hit);
 		intersectSphere(ray, sphs[2], hit);
-		//reflect(ray.direction,hit.normal);
-		//ray.origin = hit.position;
-	//}
-  	pixel = vec4(hit.distance / 5, hit.distance / 5, hit.distance / 5,1.0);
+		
+		if(hit.distance < 1.0/0.0) {
+			
+			ray.direction = reflect(ray.direction,hit.normal);
+			float angle = angleBetween(ray.direction,light);
+			mult *= 0.9;
+			mult *= 1-angle;
+			ray.origin = hit.position;
+		}
+		//else mult = 0.0;
+	}
+  	pixel = vec4(mult, mult, mult,1.0);
   
   imageStore(img_output, pixel_coords, pixel);
 }

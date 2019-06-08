@@ -4,7 +4,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class Input {
 	
-	public static boolean[] isKeyPressed = new boolean[255];
+	public static boolean[] isKeyPressed = new boolean[344];
 	
 	public static void initInput(long windowid)
 	{

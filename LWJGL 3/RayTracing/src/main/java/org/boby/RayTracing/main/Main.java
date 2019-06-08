@@ -4,6 +4,7 @@ import org.boby.RayTracing.objects.Cube;
 import org.boby.RayTracing.objects.Object3d;
 import org.boby.RayTracing.objects.Quad;
 import org.boby.RayTracing.objects.RenderingQuad;
+import org.boby.RayTracing.utils.Input;
 import org.boby.RayTracing.utils.Texture;
 import org.boby.RayTracing.utils.Time;
 import org.lwjgl.*;
@@ -86,6 +87,10 @@ public class Main {
 			// System.out.println(1/Time.deltaTime);
 			glfwPollEvents();
 			
+			if(Input.isKeyPressed[GLFW_KEY_UP]) Renderer.camPos.y += 0.1;
+			if(Input.isKeyPressed[GLFW_KEY_DOWN]) Renderer.camPos.y -= 0.1;
+			if(Input.isKeyPressed[GLFW_KEY_LEFT]) Renderer.camPos.x -= 0.1;
+			if(Input.isKeyPressed[GLFW_KEY_RIGHT]) Renderer.camPos.x += 0.1;
 			Renderer.Compute(comp, renderTexture);
 			
 			Renderer.draw(renderingQuad);
