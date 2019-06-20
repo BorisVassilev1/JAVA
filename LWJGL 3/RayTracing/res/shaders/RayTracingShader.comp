@@ -1,4 +1,4 @@
-#version 450
+#version 460
 
 #ifdef GL_ES
 precision highp float;
@@ -101,7 +101,7 @@ void main() {
   
 	RayHit hit;
 	float mult = 1.0;
-	for(int i = 0; i < 5; i ++) {
+	for(int i = 0; i < 2; i ++) {
 		hit.distance = 1.0 / 0.0;
 		intersectGroundPlane(ray,0.0,hit);
 		intersectSphere(ray, sphs[0], hit);
@@ -111,8 +111,8 @@ void main() {
 		if(hit.distance < 1.0/0.0) {
 			
 			ray.direction = reflect(ray.direction,hit.normal);
-			float angle = angleBetween(ray.direction,light);
-			mult *= 0.9;
+			float angle = angleBetween(ray.direction,light - cam_pos);
+			mult *= 0.8;
 			mult *= 1-angle;
 			ray.origin = hit.position;
 		}
