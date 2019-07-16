@@ -1,4 +1,4 @@
-#version 460
+#version 450
 
 #ifdef GL_ES
 precision highp float;
@@ -65,7 +65,8 @@ bool intersectGroundPlane(in Ray ray, in float PlaneHeight, inout RayHit hit) {
 	if(t > 0 && t < hit.distance) {
 		hit.position = ray.origin + ray.direction * t;
 		hit.distance = t;
-		hit.normal = normalize(vec3(0.0,1.0,0.0));
+		if(ray.direction.y < 0) hit.normal = normalize(vec3(0.0,1.0,0.0));
+		else hit.normal = normalize(vec3(0.0,-1.0,0.0));
 		return true;	
 	}
 	return false;
@@ -86,7 +87,7 @@ Sphere sphs[3] = Sphere[3](
 );
 
 float angleBetween(vec3 v1, vec3 v2) {
-    return acos(dot(normalize(v1), normalize(v2))) / 3.14;
+    return acos(dot(normalize(v1), normalize(v2))) / 3.14159;
 }
 
 void main() {
@@ -101,7 +102,7 @@ void main() {
   
 	RayHit hit;
 	float mult = 1.0;
-	for(int i = 0; i < 2; i ++) {
+	for(int i = 0; i < 10; i ++) {
 		hit.distance = 1.0 / 0.0;
 		intersectGroundPlane(ray,0.0,hit);
 		intersectSphere(ray, sphs[0], hit);
@@ -112,13 +113,12 @@ void main() {
 			
 			ray.direction = reflect(ray.direction,hit.normal);
 			float angle = angleBetween(ray.direction,light - cam_pos);
-			mult *= 0.8;
+			//mult *= 0.8;
 			mult *= 1-angle;
-			ray.origin = hit.position;
+			ray.origin = hit.position + hit.normal * 0.0001;
 		}
 		//else mult = 0.0;
 	}
   	pixel = vec4(mult, mult, mult,1.0);
-  
   imageStore(img_output, pixel_coords, pixel);
 }
