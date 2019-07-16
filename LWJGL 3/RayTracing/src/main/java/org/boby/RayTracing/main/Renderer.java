@@ -2,12 +2,15 @@ package org.boby.RayTracing.main;
 
 import static org.lwjgl.opengl.GL46.*;
 
+import java.nio.FloatBuffer;
+
 import org.boby.RayTracing.objects.Object3d;
 import org.boby.RayTracing.objects.Transformation;
 import org.boby.RayTracing.utils.Texture;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL46;
 
 import shaders.ComputeShader;
@@ -57,6 +60,13 @@ public class Renderer {
 		if(obj.getMaterial().getShader().hasUniform("texture_sampler")) {
 			obj.getMaterial().getShader().setUniform("texture_sampler", 0);
 		}
+		
+		int bufferWithSpheres;
+		bufferWithSpheres = glGenBuffers();
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, bufferWithSpheres);
+		glBufferData(GL_SHADER_STORAGE_BUFFER,new float[] {1.0f}, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, bufferWithSpheres);
+		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		//GL46.glActiveTexture(GL46.GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_2D, Main.tex.getID());
 		
