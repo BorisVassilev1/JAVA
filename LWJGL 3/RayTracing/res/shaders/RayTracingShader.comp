@@ -101,20 +101,20 @@ void main() {
   
 	RayHit hit;
 	float mult = 1.0;
-	for(int i = 0; i < 2; i ++) {
+	for(int i = 0; i < 10; i ++) {
 		hit.distance = 1.0 / 0.0;
 		intersectGroundPlane(ray,0.0,hit);
 		intersectSphere(ray, sphs[0], hit);
 		intersectSphere(ray, sphs[1], hit);
 		intersectSphere(ray, sphs[2], hit);
 		
-		if(hit.distance < 1.0/0.0) {
+		if(hit.distance != 1.0/0.0) {
 			
 			ray.direction = reflect(ray.direction,hit.normal);
 			float angle = angleBetween(ray.direction,light - cam_pos);
-			mult *= 0.8;
+			//mult *= 0.8;
 			mult *= 1-angle;
-			ray.origin = hit.position;
+			ray.origin = hit.position + hit.normal * 0.0001;
 		}
 		//else mult = 0.0;
 	}
