@@ -38,7 +38,7 @@ public class Main {
 		//Configuration.DEBUG.set(true);
 		System.out.println("LWJGL version: " + Version.getVersion());
 
-		window = new Window(1000, 600, "something");
+		window = new Window(1000, 1000, "something");
 		window.create();
 		
 		init();
@@ -91,6 +91,8 @@ public class Main {
 			if(Input.isKeyPressed[GLFW_KEY_DOWN]) Renderer.camPos.y -= 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_LEFT]) Renderer.camPos.x -= 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_RIGHT]) Renderer.camPos.x += 0.1;
+			if(Input.isKeyPressed[GLFW_KEY_W]) Renderer.camPos.z += 0.1;
+			if(Input.isKeyPressed[GLFW_KEY_S]) Renderer.camPos.z -= 0.1;
 			Renderer.Compute(comp, renderTexture);
 			
 			Renderer.draw(renderingQuad);
