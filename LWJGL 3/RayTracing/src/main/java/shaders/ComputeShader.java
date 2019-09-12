@@ -132,19 +132,41 @@ public abstract class ComputeShader {
 	 * @param uniformName - name of an already created uniform variable. Will throw a NullPointerException if the uniform has not been created.
 	 * @param value - the value for the uniform variable to be set to.
 	 */
-	public void setUniform(String uniformName, Vector3f vec)
+	public void setUniform(String uniformName, Vector3f value)
 	{
-		glUniform3f(uniforms.get(uniformName), vec.x, vec.y, vec.z);
-	}
-	
-	public void setUniform(String uniformName, Vector2f vec) {
-		glUniform2f(uniforms.get(uniformName), vec.x, vec.y);
+		glUniform3f(uniforms.get(uniformName), value.x, value.y, value.z);
 	}
 	
 	/**
-	 * TODO: write this
-	 * @param uniformName
-	 * @return
+	 * Sets the specified uniform variable.
+	 * @param uniformName - name of an already created uniform variable. Will throw a NullPointerException if the uniform has not been created.
+	 * @param value - the value for the uniform variable to be set to.
+	 */
+	public void setUniform(String uniformName, Vector2f value) {
+		glUniform2f(uniforms.get(uniformName), value.x, value.y);
+	}
+	
+	/**
+	 * Sets the specified uniform variable.
+	 * @param uniformName - name of an already created uniform variable. Will throw a NullPointerException if the uniform has not been created.
+	 * @param value - the value for the uniform variable to be set to.
+	 */
+	public void setUniform(String uniformName, float value) {
+		glUniform1f(uniforms.get(uniformName), value);
+	}
+	/**
+	 * Sets the specified uniform variable.
+	 * @param uniformName - name of an already created uniform variable. Will throw a NullPointerException if the uniform has not been created.
+	 * @param value - the value for the uniform variable to be set to.
+	 */
+	public void setUniform(String uniformName, double value) {
+		glUniform1d(uniforms.get(uniformName), value);
+	}
+	
+	/**
+	 * Checks if the shader has a definition for a uniform.
+	 * @param uniformName - the name of the searched uniform
+	 * @return true if the uniform has already been defined, false if it is not.
 	 */
 	public boolean hasUniform(String uniformName) {
 		return uniforms.containsKey(uniformName);

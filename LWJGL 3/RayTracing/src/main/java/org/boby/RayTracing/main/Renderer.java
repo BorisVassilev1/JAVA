@@ -7,6 +7,7 @@ import java.nio.FloatBuffer;
 import org.boby.RayTracing.objects.Object3d;
 import org.boby.RayTracing.objects.Transformation;
 import org.boby.RayTracing.utils.Texture;
+import org.boby.RayTracing.utils.Time;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -24,7 +25,8 @@ public class Renderer {
     
     private static Transformation transform;
     
-    public static Vector3f camPos = new Vector3f(0.0f,0.0f,0.0f);
+    public static Vector3f camPos = new Vector3f(0.0f,1.0f,0.0f);
+    public static Vector3f camRot = new Vector3f(0.0f,0.0f,0.0f);
     
     private static Vector3f projPlane[];
     
@@ -40,7 +42,6 @@ public class Renderer {
             glViewport(0, 0, Main.window.getWidth(), Main.window.getHeight());
             Main.window.setResized(false);
         }
-    	//obj.getPosition().set(0,0,(float) ( - 1/Math.tan(FOV / 2)));
     	
     	obj.getMaterial().getShader().bind();
 		if(obj.getMaterial().getShader().hasUniform("projectionMatrix")) {
@@ -61,11 +62,12 @@ public class Renderer {
 			obj.getMaterial().getShader().setUniform("texture_sampler", 0);
 		}
 		
-		int bufferWithSpheres;
-		bufferWithSpheres = glGenBuffers();
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, bufferWithSpheres);
-		glBufferData(GL_SHADER_STORAGE_BUFFER,new float[] {1.0f}, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, bufferWithSpheres);
+		//int bufferWithSpheres;
+		//bufferWithSpheres = glGenBuffers();
+		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, bufferWithSpheres);
+		//glBufferData(GL_SHADER_STORAGE_BUFFER,new float[] {1.0f}, GL_DYNAMIC_DRAW);
+		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, bufferWithSpheres);
+		
 		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		//GL46.glActiveTexture(GL46.GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_2D, Main.tex.getID());
@@ -90,15 +92,23 @@ public class Renderer {
     	
     	
     	glBindTexture(GL_TEXTURE_2D, tex.getID());
-    	//glBindImageTexture(0, tex_output, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
     	
     	if(shader.hasUniform("resolution")) {
     		shader.setUniform("resolution", new Vector2f(Main.window.getWidth(), Main.window.getHeight()));
     	}
     	
     	if(shader.hasUniform("cameraMatrix")) {
-    		Matrix4f mat = transform.getWorldMatrix(camPos, new Vector3f() , 1);
+    		Matrix4f mat = transform.getWorldMatrix(camPos, camRot , 1.0f);
     		shader.setUniform("cameraMatrix", mat);
+    	}
+    	
+    	if(shader.hasUniform("fov")) {
+    		shader.setUniform("fov", FOV);
+    	}
+    	
+    	if(shader.hasUniform("deltaTime")) {
+    		shader.setUniform("deltaTime", (int)Time.timeFromStart);
+    		System.out.println((int)Time.timeFromStart);
     	}
     	
     	glDispatchCompute(tex.getWidth(), tex.getHeight(), 1);

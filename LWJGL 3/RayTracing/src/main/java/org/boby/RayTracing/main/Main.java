@@ -38,7 +38,7 @@ public class Main {
 		//Configuration.DEBUG.set(true);
 		System.out.println("LWJGL version: " + Version.getVersion());
 
-		window = new Window(1000, 1000, "something");
+		window = new Window(800, 600, "nqkva glupost bate");
 		window.create();
 		
 		init();
@@ -84,6 +84,7 @@ public class Main {
 		while (!window.shouldClose()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			Time.updateTime();
+			Input.update();
 			// System.out.println(1/Time.deltaTime);
 			glfwPollEvents();
 			
@@ -93,8 +94,15 @@ public class Main {
 			if(Input.isKeyPressed[GLFW_KEY_RIGHT]) Renderer.camPos.x += 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_W]) Renderer.camPos.z += 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_S]) Renderer.camPos.z -= 0.1;
-			Renderer.Compute(comp, renderTexture);
+			if(Input.isKeyPressed[GLFW_KEY_1]) {
+				renderTexture.save("./res/kartinka lol.png");
+			}
 			
+			Renderer.camRot.x += Input.mouseD.y / 5;
+			Renderer.camRot.y -= Input.mouseD.x / 5;
+			
+			Renderer.Compute(comp, renderTexture);
+			///sasa
 			Renderer.draw(renderingQuad);
 			window.swapBuffers();
 		}

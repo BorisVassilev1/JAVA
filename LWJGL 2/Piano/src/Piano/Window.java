@@ -61,7 +61,6 @@ public class Window {
 				try {
 					SoundUtils.tone((int)(Math.pow(2, (i-49) / 12f) * 440) , 200, 0.1);
 				} catch (LineUnavailableException ex) {
-					// TODO Auto-generated catch block
 					ex.printStackTrace();
 				}
 			}

@@ -39,7 +39,7 @@ public class SoundUtils {
 	    sdl.close();
 	  }
 
-	  public static void main(String[] args) throws Exception {
+	  /*public static void main(String[] args) throws Exception {
 	    SoundUtils.tone(1000,100);
 	    Thread.sleep(1000);
 	    SoundUtils.tone(100,1000);
@@ -50,5 +50,5 @@ public class SoundUtils {
 	    Thread.sleep(1000);
 	    SoundUtils.tone(400,500, 0.2);
 
-	  }
+	  }*/
 	}

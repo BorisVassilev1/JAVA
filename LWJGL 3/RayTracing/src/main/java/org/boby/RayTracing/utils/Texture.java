@@ -87,6 +87,15 @@ public class Texture {
     	glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
+	public void save(String fileName) {
+//		ByteBuffer buff;
+//		buff = BufferUtils.createByteBuffer(width * height);
+//		glBindTexture(GL_TEXTURE_2D, id);
+//		glGetTexImage(GL_TEXTURE_2D, 1, GL_RGBA, GL_UNSIGNED_BYTE, buff);
+//		System.out.println("asdf");
+//		stbi_
+	}
+	
 	/**
 	 * binds this texture
 	 */
