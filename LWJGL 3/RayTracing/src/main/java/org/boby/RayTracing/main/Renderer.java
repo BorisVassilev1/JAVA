@@ -106,10 +106,10 @@ public class Renderer {
     		shader.setUniform("fov", FOV);
     	}
     	
-    	if(shader.hasUniform("deltaTime")) {
-    		shader.setUniform("deltaTime", (int)Time.timeFromStart);
-    		System.out.println((int)Time.timeFromStart);
-    	}
+    	/*if(shader.hasUniform("deltaTime")) {
+    		shader.setUniform("deltaTime", (int)Time.deltaTimeI);
+    		System.out.println((int)Time.deltaTime);
+    	}*/
     	
     	glDispatchCompute(tex.getWidth(), tex.getHeight(), 1);
     	GL46.glMemoryBarrier(GL46.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);

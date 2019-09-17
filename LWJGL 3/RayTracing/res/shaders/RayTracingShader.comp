@@ -10,6 +10,7 @@ layout(rgba32f, binding = 0) uniform image2D img_output;
 uniform mat4 cameraMatrix;
 uniform vec2 resolution;
 uniform float fov;
+uniform int deltaTime;
 
 vec3 cam_pos = vec3(0.0,0.0,0.0);
 
@@ -151,6 +152,6 @@ void main() {
 		}
 		//else mult = 0.0;
 	}
-  	pixel = vec4(color * mult,1.0);
+  	pixel = vec4(color * mult,1.0 );
   imageStore(img_output, pixel_coords, pixel);
 }
