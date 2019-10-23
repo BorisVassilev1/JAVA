@@ -10,9 +10,11 @@ import java.util.HashMap;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryStack;
 
 import static org.lwjgl.opengl.GL46.*;
+
 public abstract class ComputeShader {
 	private int computeShaderID;
 	private int programID;
@@ -55,6 +57,8 @@ public abstract class ComputeShader {
 		}
 		
 		createUniforms();
+		
+		createSSBO();//TODO: this shouldnt be here.
 	}
 	/**
 	 * use bindAttribute() to pass parameters to the shader
@@ -171,6 +175,22 @@ public abstract class ComputeShader {
 	public boolean hasUniform(String uniformName) {
 		return uniforms.containsKey(uniformName);
 	}
+	
+	
+	public int createSSBO() {
+		int ssbo = glGenBuffers();
+		
+		FloatBuffer buff = BufferUtils.createFloatBuffer(3);
+		buff.put(0.1f);
+		buff.put(0.4f);
+		buff.put(0.5f);
+		
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, buff, GL_DYNAMIC_COPY);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		return ssbo;
+	}
+	
 	
 	/**
 	 * the shader will be used after this line till it is either unbound or another shader is bound.
