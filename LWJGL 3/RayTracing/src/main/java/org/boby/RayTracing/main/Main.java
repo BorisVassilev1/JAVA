@@ -22,6 +22,7 @@ import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.glGetError;
 import static org.lwjgl.opengl.GL46.*;
 
 public class Main {
@@ -57,8 +58,12 @@ public class Main {
 	private void init() {
 		GL.createCapabilities();// create the opengl context
 		Renderer.init();
+		
+		
 		glEnable(GL_TEXTURE_2D);
+		System.out.println("error on glenable(GL_TEXTURE_2D): " + glGetError());
 		glEnable(GL_DEPTH_TEST);
+		
 		try {
 			tex = new Texture("./res/rubyblock.png");
 		} catch (Exception e) {
@@ -95,6 +100,7 @@ public class Main {
 			if(Input.isKeyPressed[GLFW_KEY_W]) Renderer.camPos.z += 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_S]) Renderer.camPos.z -= 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_1]) {
+				//System.out.println("ASDF");
 				renderTexture.save("./res/kartinka lol.png");
 			}
 			

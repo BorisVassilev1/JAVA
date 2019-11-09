@@ -7,6 +7,10 @@ precision highp float;
 layout(local_size_x = 1, local_size_y = 1) in;
 layout(rgba32f, binding = 0) uniform image2D img_output;
 
+layout(binding = 1) buffer shader_data {
+	vec4 sph;
+};
+
 uniform mat4 cameraMatrix;
 uniform vec2 resolution;
 uniform float fov;
@@ -86,11 +90,12 @@ vec3 lerp4vec(vec3 v00, vec3 v10, vec3 v01, vec3 v11, float x, float y) {
 	);
 }
 
-Sphere sphs[4] = Sphere[4](
+Sphere sphs[5] = Sphere[5](
 	Sphere(vec3(0.5,1.3,1.5),0.5 ,vec3(1.0,0.0,0.0)),
 	Sphere(vec3(1.3,0.2,2)  ,0.7 ,vec3(0.0,1.0,0.0)),
 	Sphere(vec3(-0.4,0.5,1.5) ,0.5 ,vec3(0.0,0.0,1.0)),
-	Sphere(vec3(1.5,2.6,0.4) ,0.1 ,vec3(1.0,1.0,0.0))
+	Sphere(vec3(1.5,2.6,0.4) ,0.1 ,vec3(1.0,1.0,0.0)),
+	Sphere(sph.xyz, 0.5, sph.xyz)
 );
 
 float angleBetween(vec3 v1, vec3 v2) {
@@ -122,6 +127,7 @@ void main() {
 		intersectSphere(ray, sphs[1], hit);
 		intersectSphere(ray, sphs[2], hit);
 		//intersectSphere(ray, sphs[3], hit);
+		intersectSphere(ray, sphs[4], hit);
 		if(hit.distance != 1.0/0.0) {
 			
 			ray.direction = reflect(ray.direction,hit.normal);
@@ -136,6 +142,7 @@ void main() {
 			intersectSphere(toLight, sphs[1], shadowHit);
 			intersectSphere(toLight, sphs[2], shadowHit);
 			//intersectSphere(toLight, sphs[3], shadowHit);
+			intersectSphere(ray, sphs[4], hit);
 			
 			if(shadowHit.distance != 1.0/0.0) {
 				float shadowAngle = angleBetween(hit.normal, toLight.direction);

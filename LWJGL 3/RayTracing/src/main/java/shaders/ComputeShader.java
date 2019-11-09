@@ -19,6 +19,9 @@ public abstract class ComputeShader {
 	private int computeShaderID;
 	private int programID;
 	
+	private int ssboID;
+	
+	
 	private String computeFile;
     
     private final HashMap<String, Integer> uniforms;
@@ -55,6 +58,7 @@ public abstract class ComputeShader {
 		if(glGetProgrami(programID, GL_VALIDATE_STATUS) == GL_FALSE) {
 			System.err.println("Error: Program Validation - \n" + glGetShaderInfoLog(programID,1024));
 		}
+		
 		
 		createUniforms();
 		
@@ -178,16 +182,52 @@ public abstract class ComputeShader {
 	
 	
 	public int createSSBO() {
+		System.out.println(glGetError());
 		int ssbo = glGenBuffers();
 		
-		FloatBuffer buff = BufferUtils.createFloatBuffer(3);
+		FloatBuffer buff = BufferUtils.createFloatBuffer(4);
 		buff.put(0.1f);
 		buff.put(0.4f);
-		buff.put(0.5f);
+		buff.put(1.5f);
+		buff.put(0.2f);
 		
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, buff, GL_DYNAMIC_COPY);
+		System.out.println(glGetError());
+		IntBuffer b = BufferUtils.createIntBuffer(1);
+		glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_SIZE, b);
+		System.out.println("buffer size: " + b.get(0));
+		
+		glBufferData(GL_SHADER_STORAGE_BUFFER, buff, GL_DYNAMIC_DRAW);
+		System.out.println(glGetError());
+		
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		System.out.println(glGetError());
+		
+		FloatBuffer a = BufferUtils.createFloatBuffer(4);
+		
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+		System.out.println(glGetError());
+		
+		glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, a);
+		System.out.println(glGetError());
+		
+		for(int i = 0; i < a.capacity(); i ++) {
+			System.out.println(a.get(i));
+		}
+		
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		ssboID = ssbo;
+		
+		int block_index = glGetProgramResourceIndex(programID, GL_SHADER_STORAGE_BLOCK, "shader_data");
+		System.out.println(block_index);
+		
+		int ssbo_binding_point_index = 1;
+		glShaderStorageBlockBinding(programID, block_index, ssbo_binding_point_index);
+		
+		
+		int binding_point_index = 1;
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point_index, ssbo);
+		
 		return ssbo;
 	}
 	
