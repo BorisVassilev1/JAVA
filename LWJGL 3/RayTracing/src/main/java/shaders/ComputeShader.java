@@ -185,36 +185,65 @@ public abstract class ComputeShader {
 		System.out.println(glGetError());
 		int ssbo = glGenBuffers();
 		
-		FloatBuffer buff = BufferUtils.createFloatBuffer(4);
-		buff.put(0.1f);
-		buff.put(0.4f);
-		buff.put(1.5f);
-		buff.put(0.2f);
+		FloatBuffer buff = BufferUtils.createFloatBuffer(21);
 		
+		//Sphere(vec3(0.5,1.3,1.5),0.5 ,vec3(1.0,0.0,0.0)),
+		//Sphere(vec3(1.3,0.2,2.0)  ,0.7 ,vec3(0.0,1.0,0.0)),
+		//Sphere(vec3(-0.4,0.5,1.5) ,0.5 ,vec3(0.0,0.0,1.0)),
+		//buff.put(1.0f);
+		
+		//buff.put(new float[] {0.5f, 1.3f, 1.5f, 0.5f, 1.0f, 0.0f, 0.0f});
+		//buff.put(new float[] {1.3f, 0.2f, 2.0f, 0.7f, 0.0f, 1.0f, 0.0f});
+		//buff.put(new float[] {-0.4f, 0.5f, 1.5f, 0.5f, 0.0f, 0.0f, 1.0f});
+		
+		/*buff.put(new float[] {
+				0.5f, 1.3f, 1.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+				1.3f, 0.2f, 2.0f, 0.7f, 0.0f, 1.0f, 0.0f,
+				-0.4f, 0.5f, 1.5f, 0.5f, 0.0f, 0.0f, 1.0f
+				});*/
+		
+		buff.put(0.5f);
+		buff.put(1.3f);
+		buff.put(1.5f);
+		buff.put(0.5f);
+		buff.put(1.0f);
+		buff.put(0.0f);
+		buff.put(0.0f);
+		
+		buff.put(1.3f);
+		buff.put(0.2f);
+		buff.put(2.0f);
+		buff.put(0.7f);
+		buff.put(0.0f);
+		buff.put(1.0f);
+		buff.put(0.0f);
+		
+		buff.put(-0.4f);
+		buff.put(0.5f);
+		buff.put(1.5f);
+		buff.put(0.5f);
+		buff.put(0.0f);
+		buff.put(0.0f);
+		buff.put(1.0f);
+		
+		buff.flip();
+
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+		System.out.println(glGetError());
+		
+		glBufferData(GL_SHADER_STORAGE_BUFFER, buff, GL_DYNAMIC_READ);
 		System.out.println(glGetError());
 		
 		IntBuffer b = BufferUtils.createIntBuffer(1);
 		glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_SIZE, b);
 		System.out.println("buffer size: " + b.get(0));
 		
-		glBufferData(GL_SHADER_STORAGE_BUFFER, buff, GL_DYNAMIC_DRAW);
-		System.out.println(glGetError());
-		
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-		System.out.println(glGetError());
-		
-		FloatBuffer a = BufferUtils.createFloatBuffer(4);
-		
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-		System.out.println(glGetError());
-		
+		FloatBuffer a = BufferUtils.createFloatBuffer(21);
 		glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, a);
-		System.out.println(glGetError());
-		
-		for(int i = 0; i < a.capacity(); i ++) {
-			System.out.println(a.get(i));
-		}
+		System.out.println();
+		for(int i = 0; i < a.capacity(); i++) {
+			System.out.print(a.get(i) + " ");
+		}System.out.println();
 		
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		ssboID = ssbo;
@@ -222,11 +251,11 @@ public abstract class ComputeShader {
 		int block_index = glGetProgramResourceIndex(programID, GL_SHADER_STORAGE_BLOCK, "shader_data");
 		System.out.println(block_index);
 		
-		int ssbo_binding_point_index = 1;
+		int ssbo_binding_point_index = 2;
 		glShaderStorageBlockBinding(programID, block_index, ssbo_binding_point_index);
 		
 		
-		int binding_point_index = 1;
+		int binding_point_index = 2;
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point_index, ssbo);
 		
 		return ssbo;
