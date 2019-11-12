@@ -32,9 +32,9 @@ uniform int data_length;
 
 const int buffer_size = 3;
 
-buffer shader_data {
-	Sphere sphs[3];
-} abc;
+layout(std430) buffer shader_data {
+	Sphere sphs[];
+};
 
 uniform mat4 cameraMatrix;
 uniform vec2 resolution;
@@ -45,10 +45,12 @@ vec3 cam_pos = vec3(0.0,0.0,0.0);
 
 vec3 light = vec3(1.5,2.6,0.4);
 
-vec3 v00 = vec3(-1.0,-1.0, cos(fov/2));
-vec3 v01 = vec3(-1.0, 1.0, cos(fov/2));
-vec3 v11 = vec3( 1.0, 1.0, cos(fov/2));
-vec3 v10 = vec3( 1.0,-1.0, cos(fov/2));
+float aspect = resolution.x / resolution.y;
+
+vec3 v00 = vec3(-1.0 * aspect,-1.0, cos(fov/2));
+vec3 v01 = vec3(-1.0 * aspect, 1.0, cos(fov/2));
+vec3 v11 = vec3( 1.0 * aspect, 1.0, cos(fov/2));
+vec3 v10 = vec3( 1.0 * aspect,-1.0, cos(fov/2));
 
 Ray createRay(vec3 origin, vec3 direction) {
 	Ray ray = Ray(origin, direction);
@@ -120,36 +122,31 @@ void main() {
 	for(int i = 0; i < 10; i ++) {
 		hit.distance = 1.0 / 0.0;
 		intersectGroundPlane(ray,0.0,hit);
-		//for(int s = 0; s < buffer_size; s ++) {
-		//	intersectSphere(ray, spheres[s], hit);
-		//}
-		intersectSphere(ray, abc.sphs[0], hit);
-		intersectSphere(ray, abc.sphs[1], hit);
-		intersectSphere(ray, abc.sphs[2], hit);
-		//intersectSphere(ray, spheres[3], hit);
+		for(int s = 0; s < buffer_size; s ++) {
+			intersectSphere(ray, sphs[s], hit);
+		}
 
 		if(hit.distance != 1.0/0.0) {
 			
 			ray.direction = reflect(ray.direction,hit.normal);
 			
 			Ray toLight = Ray(vec3(hit.position + hit.normal * 0.00001),normalize(+light - hit.position));
-			//Ray toLight = Ray(vec3(hit.position + hit.normal * 0.00001),normalize(vec3(0.0,1.0,0.0)));
 
 			RayHit shadowHit;
 			shadowHit.distance = 1.0/0.0;
 
 			intersectGroundPlane(toLight,0.0,shadowHit);
 			for(int s = 0; s < buffer_size; s++) {
-				intersectSphere(toLight, abc.sphs[s], shadowHit);
+				intersectSphere(toLight, sphs[s], shadowHit);
 			}
 			
 			if(shadowHit.distance != 1.0/0.0) {
 				float shadowAngle = angleBetween(hit.normal, toLight.direction);
-				mult *= 0;//cos(shadowAngle - 3.14 / 2);
+				mult *= 0;
 			} 
 			else {
 				float angle = angleBetween(hit.normal,toLight.direction);
-				mult *=  cos(angle);
+				mult *= cos(angle);
 			}
 			if(i == 0) color = hit.object.color;
 			color = color * 0.5 + hit.object.color * 0.5;

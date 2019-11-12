@@ -231,20 +231,21 @@ public abstract class ComputeShader {
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
 		System.out.println(glGetError());
 		
-		glBufferData(GL_SHADER_STORAGE_BUFFER, buff, GL_DYNAMIC_READ);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, buff, GL_DYNAMIC_DRAW);
 		System.out.println(glGetError());
 		
 		IntBuffer b = BufferUtils.createIntBuffer(1);
 		glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_SIZE, b);
 		System.out.println("buffer size: " + b.get(0));
 		
+		/*
 		FloatBuffer a = BufferUtils.createFloatBuffer(21);
 		glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, a);
 		System.out.println();
 		for(int i = 0; i < a.capacity(); i++) {
 			System.out.print(a.get(i) + " ");
 		}System.out.println();
-		
+		*/
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		ssboID = ssbo;
 		
