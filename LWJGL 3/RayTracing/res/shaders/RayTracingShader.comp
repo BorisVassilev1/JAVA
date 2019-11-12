@@ -4,12 +4,37 @@
 precision highp float;
 #endif
 
+
+struct Sphere {
+	vec3 position;
+	float radius;
+	vec3 color;
+};
+
+struct Ray
+{
+    vec3 origin;
+    vec3 direction;
+};
+
+struct RayHit
+{
+    vec3 position;
+    float distance;
+    vec3 normal;
+    Sphere object;
+};
+
 layout(local_size_x = 1, local_size_y = 1) in;
 layout(rgba32f, binding = 0) uniform image2D img_output;
 
-layout(binding = 1) buffer shader_data {
-	vec4 sph;
-};
+uniform int data_length;
+
+const int buffer_size = 3;
+
+buffer shader_data {
+	Sphere sphs[3];
+} abc;
 
 uniform mat4 cameraMatrix;
 uniform vec2 resolution;
@@ -25,30 +50,10 @@ vec3 v01 = vec3(-1.0, 1.0, cos(fov/2));
 vec3 v11 = vec3( 1.0, 1.0, cos(fov/2));
 vec3 v10 = vec3( 1.0,-1.0, cos(fov/2));
 
-struct Sphere {
-	vec3 position;
-	float radius;
-	vec3 color;
-};
-
-struct Ray
-{
-    vec3 origin;
-    vec3 direction;
-};
-
 Ray createRay(vec3 origin, vec3 direction) {
 	Ray ray = Ray(origin, direction);
 	return ray;
 }
-
-struct RayHit
-{
-    vec3 position;
-    float distance;
-    vec3 normal;
-    Sphere object;
-};
 
 bool intersectSphere(in Ray ray, in Sphere sphere, inout RayHit hit) {
 	// Calculate distance along the ray where the sphere is intersected
@@ -90,14 +95,6 @@ vec3 lerp4vec(vec3 v00, vec3 v10, vec3 v01, vec3 v11, float x, float y) {
 	);
 }
 
-Sphere sphs[5] = Sphere[5](
-	Sphere(vec3(0.5,1.3,1.5),0.5 ,vec3(1.0,0.0,0.0)),
-	Sphere(vec3(1.3,0.2,2)  ,0.7 ,vec3(0.0,1.0,0.0)),
-	Sphere(vec3(-0.4,0.5,1.5) ,0.5 ,vec3(0.0,0.0,1.0)),
-	Sphere(vec3(1.5,2.6,0.4) ,0.1 ,vec3(1.0,1.0,0.0)),
-	Sphere(sph.xyz, 0.5, sph.xyz)
-);
-
 float angleBetween(vec3 v1, vec3 v2) {
     return acos(dot(normalize(v1), normalize(v2))); /// 3.14159;
 }
@@ -123,11 +120,14 @@ void main() {
 	for(int i = 0; i < 10; i ++) {
 		hit.distance = 1.0 / 0.0;
 		intersectGroundPlane(ray,0.0,hit);
-		intersectSphere(ray, sphs[0], hit);
-		intersectSphere(ray, sphs[1], hit);
-		intersectSphere(ray, sphs[2], hit);
-		//intersectSphere(ray, sphs[3], hit);
-		intersectSphere(ray, sphs[4], hit);
+		//for(int s = 0; s < buffer_size; s ++) {
+		//	intersectSphere(ray, spheres[s], hit);
+		//}
+		intersectSphere(ray, abc.sphs[0], hit);
+		intersectSphere(ray, abc.sphs[1], hit);
+		intersectSphere(ray, abc.sphs[2], hit);
+		//intersectSphere(ray, spheres[3], hit);
+
 		if(hit.distance != 1.0/0.0) {
 			
 			ray.direction = reflect(ray.direction,hit.normal);
@@ -137,12 +137,11 @@ void main() {
 
 			RayHit shadowHit;
 			shadowHit.distance = 1.0/0.0;
+
 			intersectGroundPlane(toLight,0.0,shadowHit);
-			intersectSphere(toLight, sphs[0], shadowHit);
-			intersectSphere(toLight, sphs[1], shadowHit);
-			intersectSphere(toLight, sphs[2], shadowHit);
-			//intersectSphere(toLight, sphs[3], shadowHit);
-			intersectSphere(ray, sphs[4], hit);
+			for(int s = 0; s < buffer_size; s++) {
+				intersectSphere(toLight, abc.sphs[s], shadowHit);
+			}
 			
 			if(shadowHit.distance != 1.0/0.0) {
 				float shadowAngle = angleBetween(hit.normal, toLight.direction);
