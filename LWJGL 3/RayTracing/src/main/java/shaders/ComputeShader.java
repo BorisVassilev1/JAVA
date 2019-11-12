@@ -193,6 +193,7 @@ public abstract class ComputeShader {
 		
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
 		System.out.println(glGetError());
+		
 		IntBuffer b = BufferUtils.createIntBuffer(1);
 		glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_SIZE, b);
 		System.out.println("buffer size: " + b.get(0));
