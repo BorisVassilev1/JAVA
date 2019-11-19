@@ -196,12 +196,12 @@ public abstract class ComputeShader {
 		//buff.put(new float[] {1.3f, 0.2f, 2.0f, 0.7f, 0.0f, 1.0f, 0.0f});
 		//buff.put(new float[] {-0.4f, 0.5f, 1.5f, 0.5f, 0.0f, 0.0f, 1.0f});
 		
-		/*buff.put(new float[] {
+		buff.put(new float[] {
 				0.5f, 1.3f, 1.5f, 0.5f, 1.0f, 0.0f, 0.0f,
 				1.3f, 0.2f, 2.0f, 0.7f, 0.0f, 1.0f, 0.0f,
 				-0.4f, 0.5f, 1.5f, 0.5f, 0.0f, 0.0f, 1.0f
-				});*/
-		
+				});
+		/*
 		buff.put(0.5f);
 		buff.put(1.3f);
 		buff.put(1.5f);
@@ -209,7 +209,9 @@ public abstract class ComputeShader {
 		buff.put(1.0f);
 		buff.put(0.0f);
 		buff.put(0.0f);
+		*/
 		
+		/*
 		buff.put(1.3f);
 		buff.put(0.2f);
 		buff.put(2.0f);
@@ -217,7 +219,8 @@ public abstract class ComputeShader {
 		buff.put(0.0f);
 		buff.put(1.0f);
 		buff.put(0.0f);
-		
+		*/
+		/*
 		buff.put(-0.4f);
 		buff.put(0.5f);
 		buff.put(1.5f);
@@ -225,7 +228,7 @@ public abstract class ComputeShader {
 		buff.put(0.0f);
 		buff.put(0.0f);
 		buff.put(1.0f);
-		
+		*/
 		buff.flip();
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
