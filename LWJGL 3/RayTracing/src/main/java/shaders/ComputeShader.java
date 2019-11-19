@@ -185,7 +185,7 @@ public abstract class ComputeShader {
 		System.out.println(glGetError());
 		int ssbo = glGenBuffers();
 		
-		FloatBuffer buff = BufferUtils.createFloatBuffer(21);
+		FloatBuffer buff = BufferUtils.createFloatBuffer(36);
 		
 		//Sphere(vec3(0.5,1.3,1.5),0.5 ,vec3(1.0,0.0,0.0)),
 		//Sphere(vec3(1.3,0.2,2.0)  ,0.7 ,vec3(0.0,1.0,0.0)),
@@ -197,9 +197,9 @@ public abstract class ComputeShader {
 		//buff.put(new float[] {-0.4f, 0.5f, 1.5f, 0.5f, 0.0f, 0.0f, 1.0f});
 		
 		buff.put(new float[] {
-				0.5f, 1.3f, 1.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-				1.3f, 0.2f, 2.0f, 0.7f, 0.0f, 1.0f, 0.0f,
-				-0.4f, 0.5f, 1.5f, 0.5f, 0.0f, 0.0f, 1.0f
+				 0.5f, 1.3f, 1.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.5f,0.0f,0.0f,0.0f,
+				 1.3f, 0.2f, 2.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.7f,0.0f,0.0f,0.0f,
+				-0.4f, 0.5f, 1.5f, 0.0f, 0.0f, 0.0f, 1.5f, 0.0f, 0.5f,0.0f,0.0f,0.0f
 				});
 		/*
 		buff.put(0.5f);

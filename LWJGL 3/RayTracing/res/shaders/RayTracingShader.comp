@@ -6,9 +6,9 @@ precision highp float;
 
 
 struct Sphere {
-	vec3 position;
+	vec4 position;
+	vec4 color;
 	float radius;
-	vec3 color;
 };
 
 struct Ray
@@ -59,7 +59,7 @@ Ray createRay(vec3 origin, vec3 direction) {
 
 bool intersectSphere(in Ray ray, in Sphere sphere, inout RayHit hit) {
 	// Calculate distance along the ray where the sphere is intersected
-    vec3 d = ray.origin - sphere.position;
+    vec3 d = ray.origin - sphere.position.xyz;
     float p1 = -dot(ray.direction, d);
     float p2sqr = p1 * p1 - dot(d, d) + sphere.radius * sphere.radius;
     if (p2sqr < 0)
@@ -70,7 +70,7 @@ bool intersectSphere(in Ray ray, in Sphere sphere, inout RayHit hit) {
     {
         hit.distance = t;
         hit.position = ray.origin + t * ray.direction;
-        hit.normal = normalize(hit.position - sphere.position);
+        hit.normal = normalize(hit.position - sphere.position.xyz);
         hit.object = sphere;
     }
 }
@@ -83,7 +83,7 @@ bool intersectGroundPlane(in Ray ray, in float PlaneHeight, inout RayHit hit) {
 		hit.distance = t;
 		if(ray.direction.y < PlaneHeight) hit.normal = normalize(vec3(0.0,1.0,0.0));
 		else hit.normal = normalize(vec3(0.0,-1.0,0.0));
-		hit.object = Sphere(vec3(0.0,0.0,0.0),0.0,vec3(1.0,1.0,1.0));
+		hit.object = Sphere(vec4(0.0,0.0,0.0,0.0),vec4(1.0,1.0,1.0,0.0),0.0);
 		return true;	
 	}
 	return false;
@@ -118,11 +118,11 @@ void main() {
   
 	RayHit hit;
 	float mult = 1.0;
-	vec3 color = vec3(1.0,1.0,1.0);
+	vec4 color = vec4(1.0,1.0,1.0, 1.0);
 	for(int i = 0; i < 10; i ++) {
 		hit.distance = 1.0 / 0.0;
 		intersectGroundPlane(ray,0.0,hit);
-		for(int s = 0; s < sphs.length(); s ++) {
+		for(int s = 0; s < buffer_size; s ++) {
 			intersectSphere(ray, sphs[s], hit);
 		}
 
@@ -142,7 +142,7 @@ void main() {
 			
 			if(shadowHit.distance != 1.0/0.0) {
 				float shadowAngle = angleBetween(hit.normal, toLight.direction);
-				mult *= 0;
+				mult *= 0.0;
 			} 
 			else {
 				float angle = angleBetween(hit.normal,toLight.direction);
@@ -155,6 +155,6 @@ void main() {
 		}
 		//else mult = 0.0;
 	}
-  	pixel = vec4(color * mult,1.0 );
+  	pixel = color * mult;
   imageStore(img_output, pixel_coords, pixel);
 }
