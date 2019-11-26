@@ -21,14 +21,15 @@ public abstract class ComputeShader {
 	
 	private int ssboID;
 	
-	
 	private String computeFile;
     
     private final HashMap<String, Integer> uniforms;
+    private final HashMap<String, Integer> SSBOs;
     
 	public ComputeShader(String computeFile) {
 		this.computeFile = computeFile;
 		uniforms = new HashMap<String, Integer>();
+		SSBOs = new HashMap<String, Integer>();
 	}
 	/**
 	 * creates the shader from the shader files, specified in the constructor
@@ -61,8 +62,6 @@ public abstract class ComputeShader {
 		
 		
 		createUniforms();
-		
-		createSSBO();//TODO: this shouldnt be here.
 	}
 	/**
 	 * use bindAttribute() to pass parameters to the shader
@@ -181,88 +180,33 @@ public abstract class ComputeShader {
 	}
 	
 	
-	public int createSSBO() {
-		System.out.println(glGetError());
+	public int createSSBO(String name, int binding) {
+		/*
+		*/
 		int ssbo = glGenBuffers();
-		
-		FloatBuffer buff = BufferUtils.createFloatBuffer(36);
-		
-		//Sphere(vec3(0.5,1.3,1.5),0.5 ,vec3(1.0,0.0,0.0)),
-		//Sphere(vec3(1.3,0.2,2.0)  ,0.7 ,vec3(0.0,1.0,0.0)),
-		//Sphere(vec3(-0.4,0.5,1.5) ,0.5 ,vec3(0.0,0.0,1.0)),
-		//buff.put(1.0f);
-		
-		//buff.put(new float[] {0.5f, 1.3f, 1.5f, 0.5f, 1.0f, 0.0f, 0.0f});
-		//buff.put(new float[] {1.3f, 0.2f, 2.0f, 0.7f, 0.0f, 1.0f, 0.0f});
-		//buff.put(new float[] {-0.4f, 0.5f, 1.5f, 0.5f, 0.0f, 0.0f, 1.0f});
-		
-		buff.put(new float[] {
-				 0.5f, 1.3f, 1.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.5f,0.0f,0.0f,0.0f,
-				 1.3f, 0.2f, 2.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.7f,0.0f,0.0f,0.0f,
-				-0.4f, 0.5f, 1.5f, 0.0f, 0.0f, 0.0f, 1.5f, 0.0f, 0.5f,0.0f,0.0f,0.0f
-				});
-		/*
-		buff.put(0.5f);
-		buff.put(1.3f);
-		buff.put(1.5f);
-		buff.put(0.5f);
-		buff.put(1.0f);
-		buff.put(0.0f);
-		buff.put(0.0f);
-		*/
-		
-		/*
-		buff.put(1.3f);
-		buff.put(0.2f);
-		buff.put(2.0f);
-		buff.put(0.7f);
-		buff.put(0.0f);
-		buff.put(1.0f);
-		buff.put(0.0f);
-		*/
-		/*
-		buff.put(-0.4f);
-		buff.put(0.5f);
-		buff.put(1.5f);
-		buff.put(0.5f);
-		buff.put(0.0f);
-		buff.put(0.0f);
-		buff.put(1.0f);
-		*/
-		buff.flip();
-
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-		System.out.println(glGetError());
-		
-		glBufferData(GL_SHADER_STORAGE_BUFFER, buff, GL_DYNAMIC_DRAW);
-		System.out.println(glGetError());
-		
-		IntBuffer b = BufferUtils.createIntBuffer(1);
-		glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_SIZE, b);
-		System.out.println("buffer size: " + b.get(0));
-		
-		/*
-		FloatBuffer a = BufferUtils.createFloatBuffer(21);
-		glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, a);
-		System.out.println();
-		for(int i = 0; i < a.capacity(); i++) {
-			System.out.print(a.get(i) + " ");
-		}System.out.println();
-		*/
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-		ssboID = ssbo;
+		SSBOs.put(name, ssbo);
+		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+		//glBufferData(GL_SHADER_STORAGE_BUFFER, buff, GL_DYNAMIC_DRAW);
+		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		
 		int block_index = glGetProgramResourceIndex(programID, GL_SHADER_STORAGE_BLOCK, "shader_data");
-		System.out.println(block_index);
+		System.out.println("block index: " + block_index);
 		
-		int ssbo_binding_point_index = 2;
+		int ssbo_binding_point_index = binding;
 		glShaderStorageBlockBinding(programID, block_index, ssbo_binding_point_index);
 		
 		
-		int binding_point_index = 2;
+		int binding_point_index = binding;
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point_index, ssbo);
 		
 		return ssbo;
+	}
+	
+	public void setSSBO(String name, FloatBuffer data, int usage) {
+		int id = SSBOs.get(name);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, id);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, data, usage);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 	
 	

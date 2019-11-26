@@ -111,6 +111,9 @@ public class Renderer {
     		System.out.println((int)Time.deltaTime);
     	}*/
     	
+    	if(shader.hasUniform("data_length")) {
+    		shader.setUniform("data_length", 3);
+    	}
     	
     	glDispatchCompute(tex.getWidth(), tex.getHeight(), 1);
     	GL46.glMemoryBarrier(GL46.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
