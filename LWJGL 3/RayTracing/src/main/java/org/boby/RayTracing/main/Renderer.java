@@ -1,5 +1,6 @@
 package org.boby.RayTracing.main;
 
+import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
 import static org.lwjgl.opengl.GL46.*;
 
 import java.nio.FloatBuffer;
@@ -111,32 +112,21 @@ public class Renderer {
     		System.out.println((int)Time.deltaTime);
     	}*/
     	
-    	if(shader.hasUniform("data_length")) {
-    		shader.setUniform("data_length", 3);
-    	}
+//    	System.out.println(Time.timeNow / 1000000000.0);
+    	Vector3f col = new Vector3f((float)Math.sin(Time.timeNow / 1000000000.0) / 2 + 0.5f,(float) Math.cos(Time.timeNow / 1000000000.0) / 2 + 0.5f, 0.0f);
+//    	System.out.println(col);
+    	FloatBuffer buff = BufferUtils.createFloatBuffer(36);
+		buff.put(new float[] {
+				 0.5f, 1.3f, 1.5f, 0.0f, col.x, col.y, col.z, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f,
+				 1.5f, col.x + 0.5f, 2.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f,
+				-0.6f, col.y + 0.5f, 1.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f
+				});
+		buff.flip();
+		shader.setSSBO("shader_data", buff, GL_DYNAMIC_DRAW);
     	
     	glDispatchCompute(tex.getWidth(), tex.getHeight(), 1);
     	GL46.glMemoryBarrier(GL46.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     	
     	shader.unbind();
     }
-    
-    
-	public static void UpdateViewPlane(float imageRatio, float fovRad)
-	{
-		
-		//float fieldOfView = 70;
-		//fovDeg *= Math.PI / 180;
-		float planeOffset = (float) (1/Math.tan(fovRad/2));
-		Vector3f camrot2 = new Vector3f(0,180,0);
-		projPlane[0] = (Vector3f) new Vector3f(- 1 * imageRatio, - 1, planeOffset).normalize();
-		projPlane[1] = (Vector3f) new Vector3f(+ 1 * imageRatio, - 1, planeOffset).normalize();
-		projPlane[2] = (Vector3f) new Vector3f(- 1 * imageRatio, + 1, planeOffset).normalize();
-		projPlane[3] = (Vector3f) new Vector3f(+ 1 * imageRatio, + 1, planeOffset).normalize();
-		//Matrix4f rotMat = transform.getWorldMatrix(new Vector3f(), new Vector3f(camrot2).mul((float) (Math.PI / 180)), 1);
-		projPlane[0] = Matrices.rotateVector(projPlane[0], (Vector3f) new Vector3f(camrot2).mul((float) (Math.PI / 180)));
-		projPlane[1] = Matrices.rotateVector(projPlane[1], (Vector3f) new Vector3f(camrot2).mul((float) (Math.PI / 180)));
-		projPlane[2] = Matrices.rotateVector(projPlane[2], (Vector3f) new Vector3f(camrot2).mul((float) (Math.PI / 180)));
-		projPlane[3] = Matrices.rotateVector(projPlane[3], (Vector3f) new Vector3f(camrot2).mul((float) (Math.PI / 180)));
-	}
 }
