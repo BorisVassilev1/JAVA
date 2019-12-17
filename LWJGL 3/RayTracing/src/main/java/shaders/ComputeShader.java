@@ -181,13 +181,8 @@ public abstract class ComputeShader {
 	
 	
 	public int createSSBO(String name, int binding) {
-		/*
-		*/
 		int ssbo = glGenBuffers();
 		SSBOs.put(name, ssbo);
-		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-		//glBufferData(GL_SHADER_STORAGE_BUFFER, buff, GL_DYNAMIC_DRAW);
-		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		
 		int block_index = glGetProgramResourceIndex(programID, GL_SHADER_STORAGE_BLOCK, "shader_data");
 		System.out.println("block index: " + block_index);
