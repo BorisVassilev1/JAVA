@@ -39,7 +39,7 @@ public class Main {
 		//Configuration.DEBUG.set(true);
 		System.out.println("LWJGL version: " + Version.getVersion());
 
-		window = new Window(1000, 800, "nqkva glupost bate");
+		window = new Window(800, 600, "nqkva glupost bate");
 		window.create();
 		
 		init();
