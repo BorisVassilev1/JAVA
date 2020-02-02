@@ -1,10 +1,11 @@
 package org.boby.RayTracing.objects;
 
 import org.boby.RayTracing.mesh.Mesh;
+import org.boby.RayTracing.shaders.Shader;
 
 public class Cube extends Object3d{
 
-	public Cube() {
+	public Cube(Shader shader) {
 		super(new Mesh(new float[] {
 				// VO
 			    -1.0f,  1.0f,  1.0f,
@@ -54,7 +55,7 @@ public class Cube extends Object3d{
 				0,0,
 				1,1,
 				0,1
-		}));
+		}),shader);
 		getPosition().set(0,0,-3);
 	}
 

@@ -1,5 +1,6 @@
-package org.boby.RayTracing.main;
+	package org.boby.RayTracing.main;
 
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
@@ -27,7 +28,9 @@ public class Window {
 		this.name = name;
 	}
 	
-	
+	/**
+	 * initializes the window.
+	 */
 	public void create() {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
@@ -89,7 +92,7 @@ public class Window {
 		glfwSwapBuffers(id);
 	}
 	/**
-	 * 
+	 * Checks if glfw requests the window to be closed.
 	 * @return is there a request for the window to be closed
 	 */
 	public boolean shouldClose()
@@ -97,7 +100,7 @@ public class Window {
 		return glfwWindowShouldClose(id);
 	}
 	/**
-	 * Should be used only if VSync is turned off.
+	 * Should be used only if VSync is turned off. Otherwise doesnt work. If 60fps is acceptable, turn VSync on.
 	 * @param fps - the maximum frames per second for the window to reach
 	 */
 	public void sync(int fps)
@@ -108,12 +111,18 @@ public class Window {
 			try {
 				Thread.sleep((int) (1000000000/fps - deltatime) / 1000000, (int) (1000000000/fps - deltatime) % 1000000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
 	
+	/**
+	 * destroys the window.
+	 */
+	public void delete() {
+		glfwFreeCallbacks(this.id);
+		glfwDestroyWindow(this.id);
+	}
 	
 	public long getId()
 	{

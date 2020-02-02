@@ -14,14 +14,13 @@ public class Transformation {
     }
 
     public final Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
-        float aspectRatio = width / height;        
-        projectionMatrix.identity();
-        projectionMatrix.perspective(fov, aspectRatio, zNear, zFar);
+        float aspectRatio = width / height;
+        projectionMatrix.setPerspective(fov, aspectRatio, zNear, zFar);
         return projectionMatrix;
     }
 
-    public Matrix4f getWorldMatrix(Vector3f offset, Vector3f rotation, float scale) {
-    	worldMatrix.identity().translate(offset).
+    public final Matrix4f getWorldMatrix(Vector3f offset, Vector3f rotation, float scale) {
+    	worldMatrix.translation(offset).
                 rotateX((float)Math.toRadians(rotation.x)).
                 rotateY((float)Math.toRadians(rotation.y)).
                 rotateZ((float)Math.toRadians(rotation.z)).

@@ -1,4 +1,4 @@
-package shaders;
+package org.boby.RayTracing.shaders;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -51,8 +51,6 @@ public abstract class Shader {
 			System.err.println("Error: Fragment Shader - " + GL20.glGetShaderInfoLog(fragmentShaderID));
 		}
 		
-		bindAllAttributes();
-		
 		GL20.glAttachShader(programID, vertexShaderID);
 		GL20.glAttachShader(programID, fragmentShaderID);
 		
@@ -68,26 +66,14 @@ public abstract class Shader {
 		
 		createUniforms();
 	}
-	/**
-	 * use bindAttribute() to pass parameters to the shader
-	 */
-	protected abstract void bindAllAttributes();
-	/**
-	 * use this to pass parameters to the shader
-	 * @param index - in which VBO is the data stored in
-	 * @param location - the name of the shader parameter this data should be passed to
-	 */
-	protected void  bindAttribute(int index, String location) {
-		GL20.glBindAttribLocation(programID, index, location);
-	}
 	
 	protected abstract void createUniforms();
 	
-	protected void createUniform(String uniformName) throws Exception {
+	protected void createUniform(String uniformName) {
 	    int uniformLocation = GL20.glGetUniformLocation(programID,
 	        uniformName);
 	    if (uniformLocation < 0) {
-	        throw new Exception("Could not find uniform:" +
+	        throw new RuntimeException("Could not find uniform:" +
 	            uniformName);
 	    }
 	    uniforms.put(uniformName, uniformLocation);
@@ -135,7 +121,7 @@ public abstract class Shader {
 		GL20.glUseProgram(0);
 	}
 	
-	public void remove()
+	public void delete()
 	{
 		GL20.glDetachShader(programID, vertexShaderID);
 		GL20.glDetachShader(programID, fragmentShaderID);
@@ -156,7 +142,6 @@ public abstract class Shader {
 				string.append(line).append("\n");
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return string.toString();

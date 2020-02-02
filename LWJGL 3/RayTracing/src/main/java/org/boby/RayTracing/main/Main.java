@@ -1,24 +1,22 @@
 package org.boby.RayTracing.main;
 
-import org.boby.RayTracing.objects.Cube;
-import org.boby.RayTracing.objects.Object3d;
 import org.boby.RayTracing.objects.Quad;
-import org.boby.RayTracing.objects.RenderingQuad;
+import org.boby.RayTracing.shaders.ComputeShader;
+import org.boby.RayTracing.shaders.RayMarchingComputeShader;
+import org.boby.RayTracing.shaders.RayTracingComputeShader;
+import org.boby.RayTracing.shaders.TextureOnScreenShader;
 import org.boby.RayTracing.utils.Input;
-import org.boby.RayTracing.utils.Texture;
+import org.boby.RayTracing.utils.Texture2D;
 import org.boby.RayTracing.utils.Time;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
-import shaders.BasicShader;
-import shaders.ComputeShader;
-import shaders.RayMarchingComputeShader;
-import shaders.RayTracingComputeShader;
-import shaders.TextureOnScreenShader;
-
 import java.nio.*;
+import java.util.function.Function;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -29,9 +27,9 @@ public class Main {
 
 	// The window handle
 	public static Window window;
-	static RenderingQuad renderingQuad;
-	static Texture tex;
-	static Texture renderTexture;
+	static Quad renderingQuad;
+	static Texture2D tex;
+	static Texture2D renderTexture;
 	
 	static ComputeShader comp = new RayTracingComputeShader();
 
@@ -45,10 +43,10 @@ public class Main {
 		init();
 		loop();
 
-		// Free the window callbacks and destroy the window
-		glfwFreeCallbacks(window.getId());
-		glfwDestroyWindow(window.getId());
-		renderingQuad.destroy();
+		
+		window.delete();
+		
+		renderingQuad.delete();
 		
 		// Terminate GLFW and free the error callback
 		glfwTerminate();
@@ -59,38 +57,40 @@ public class Main {
 		GL.createCapabilities();// create the opengl context
 		Renderer.init();
 		
+		//glEnable(GL_TEXTURE_2D);
+		//glEnable(GL_DEPTH_TEST);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
-		glEnable(GL_TEXTURE_2D);
-		System.out.println("error on glenable(GL_TEXTURE_2D): " + glGetError());
-		glEnable(GL_DEPTH_TEST);
+		tex = new Texture2D("./res/rubyblock.png");
 		
-		try {
-			tex = new Texture("./res/rubyblock.png");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		renderingQuad = new RenderingQuad();
-		renderTexture = new Texture(window.getWidth(), window.getHeight());
+		renderingQuad = new Quad(new TextureOnScreenShader());
+		renderTexture = new Texture2D(window.getWidth(), window.getHeight());
 		comp.create();
 	}
 
 	private void loop() {
-//		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0));
-//		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1));
-//		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2));
-//		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0));
-//		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1));
-//		System.out.println(GL46.glGetIntegeri(GL46.GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2));
-//		System.out.println(GL46.glGetInteger(GL46.GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS));
+		renderTexture.bind(GL_TEXTURE0);
     	
-		Renderer.Compute(comp, renderTexture);
+		comp.bind();
+		
+    	comp.setUniform("resolution", new Vector2f(Main.window.getWidth(), Main.window.getHeight()));
     	
+    	Matrix4f mat = Renderer.transform.getWorldMatrix(Renderer.camPos, Renderer.camRot , 1.0f);
+    	comp.setUniform("cameraMatrix", mat);
+    	
+    	comp.setUniform("fov", Renderer.FOV);
+    	
+    	comp.unbind();
+    	
+		Renderer.Compute(comp, renderTexture.getWidth(), renderTexture.getHeight(), 1);
+		
+    	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		while (!window.shouldClose()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			Time.updateTime();
 			Input.update();
-			// System.out.println(1/Time.deltaTime);
+			
 			glfwPollEvents();
 			
 			if(Input.isKeyPressed[GLFW_KEY_UP]) Renderer.camPos.y += 0.1;
@@ -100,16 +100,25 @@ public class Main {
 			if(Input.isKeyPressed[GLFW_KEY_W]) Renderer.camPos.z += 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_S]) Renderer.camPos.z -= 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_1]) {
-				//System.out.println("ASDF");
-				renderTexture.save("./res/kartinka lol.png");
+				renderTexture.save("./res/image");
 			}
 			
 			Renderer.camRot.x += Input.mouseD.y / 5;
 			Renderer.camRot.y -= Input.mouseD.x / 5;
 			
-			Renderer.Compute(comp, renderTexture);
-			///sasa
+			comp.bind();
+			
+	    	Matrix4f _mat = Renderer.transform.getWorldMatrix(Renderer.camPos, Renderer.camRot , 1.0f);
+	    	comp.setUniform("cameraMatrix", _mat);
+	    	
+	    	comp.unbind();
+	    	
+	    	renderTexture.bind(GL_TEXTURE0);
+	    	Renderer.Compute(comp, renderTexture.getWidth(), renderTexture.getHeight(), 1);
+			
+			
 			Renderer.draw(renderingQuad);
+			
 			window.swapBuffers();
 		}
 	}

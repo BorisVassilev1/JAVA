@@ -1,29 +1,29 @@
 package org.boby.RayTracing.objects;
 
-import org.boby.RayTracing.materials.Material;
 import org.boby.RayTracing.mesh.Mesh;
+import org.boby.RayTracing.shaders.Shader;
 import org.joml.Vector3f;
 public class Object3d {
 	
 	private Mesh mesh;
-	private Material material;
+	private Shader shader;
 	private Vector3f position;
 	private Vector3f rotation;
 	private float scale;
 	
-	public Object3d(Mesh mesh) {
+	public Object3d(Mesh mesh, Shader shader) {
 		this.mesh = mesh;
 		this.mesh.create();
-		material = new Material();
+		this.shader = shader;
 		position = new Vector3f();
 		rotation = new Vector3f();
 		scale = 1;
 	}
 	
-	public void destroy()
+	public void delete()
 	{
-		mesh.remove();
-		material.remove();
+		mesh.delete();
+		shader.delete();
 	}
 
 	public Vector3f getPosition() {
@@ -50,14 +50,13 @@ public class Object3d {
 		this.scale = scale;
 	}
 	
-	public Material getMaterial()
+	public Shader getShader()
 	{
-		return material;
+		return this.shader;
 	}
-	public void setMaterial(Material mat)
+	public void setShader(Shader shader)
 	{
-		material.remove();
-		this.material = mat;
+		this.shader = shader;
 	}
 	public Mesh getMesh()
 	{
@@ -65,7 +64,6 @@ public class Object3d {
 	}
 	public void setMesh(Mesh mesh)
 	{
-		mesh.remove();
 		this.mesh = mesh;
 	}
 }

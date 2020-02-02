@@ -1,15 +1,13 @@
 package org.boby.RayTracing.mesh;
 
+import static org.lwjgl.opengl.GL46.*;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 
-public class Mesh extends MeshBase{
+public class Mesh extends MeshBase {
 	private int VAOID;
 	private int vertexBufferID;
 	private int indicesBufferID;
@@ -19,9 +17,9 @@ public class Mesh extends MeshBase{
 	private float vertices[];
 	private int indicesCount;
 	private int indices[];
-	private float texCoords[]; 
+	private float texCoords[];
 	private float colors[];
-	
+
 	public Mesh(float[] vertices, int[] indices, float[] colors, float[] texCoords) {
 		this.vertices = vertices;
 		this.indices = indices;
@@ -30,26 +28,24 @@ public class Mesh extends MeshBase{
 		this.texCoords = texCoords;
 		this.colors = colors;
 	}
-	
-	public void create()
-	{
-    	VAOID = super.createVertexArray();
-    	indicesBufferID = super.bindIndicesBuffer(indices);
-        vertexBufferID = super.storeData(0, 3, vertices);
-        colorBufferID = super.storeData(1, 3, colors);
-        texCoordsBufferID = super.storeData(2, 2, texCoords);
+
+	public void create() {
+		VAOID = super.createVertexArray();
+		indicesBufferID = super.bindIndicesBuffer(indices);
+		vertexBufferID = super.storeData(0, 3, vertices);
+		colorBufferID = super.storeData(1, 3, colors);
+		texCoordsBufferID = super.storeData(2, 2, texCoords);
 		indicesCount = indices.length;
 		vertexCount = vertices.length;
-        GL30.glBindVertexArray(0);
+		glBindVertexArray(0);
 	}
-	
-	public void remove()
-	{
-		GL30.glDeleteVertexArrays(VAOID);
-		GL15.glDeleteBuffers(vertexBufferID);
-		GL15.glDeleteBuffers(indicesBufferID);
-		GL15.glDeleteBuffers(texCoordsBufferID);
-		GL15.glDeleteBuffers(colorBufferID);
+
+	public void delete() {
+		glDeleteVertexArrays(VAOID);
+		glDeleteBuffers(vertexBufferID);
+		glDeleteBuffers(indicesBufferID);
+		glDeleteBuffers(texCoordsBufferID);
+		glDeleteBuffers(colorBufferID);
 	}
 
 	public int getVAOID() {
@@ -59,33 +55,36 @@ public class Mesh extends MeshBase{
 	public int getVertexBufferID() {
 		return vertexBufferID;
 	}
-	
-	public int getIndicesBufferID()
-	{
+
+	public int getIndicesBufferID() {
 		return indicesBufferID;
+	}
+
+	public int getTexCoordsBufferID() {
+		return texCoordsBufferID;
+	}
+
+	public int getColorBufferID() {
+		return colorBufferID;
 	}
 
 	public int getVertexCount() {
 		return vertexCount;
 	}
-	public int getIndicesCount()
-	{
+
+	public int getIndicesCount() {
 		return indicesCount;
 	}
-	public FloatBuffer getVertexBuffer()
-	{
+
+	public FloatBuffer getVertexBuffer() {
 		FloatBuffer toReturn = BufferUtils.createFloatBuffer(vertexCount);
-		GL20.glGetBufferSubData(GL20.GL_ARRAY_BUFFER, 0, toReturn);
-//		for(int i = 0; i < toReturn.limit(); i ++)
-//		{
-//			System.out.print(toReturn.get(i) + " ");
-//		}
+		glGetBufferSubData(GL_ARRAY_BUFFER, 0, toReturn);
 		return toReturn;
 	}
-	public IntBuffer getIndicesBuffer()
-	{
+
+	public IntBuffer getIndicesBuffer() {
 		IntBuffer toReturn = BufferUtils.createIntBuffer(indicesCount);
-		GL20.glGetBufferSubData(GL20.GL_ELEMENT_ARRAY_BUFFER, 0, toReturn);
+		glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, toReturn);
 		return toReturn;
 	}
 }

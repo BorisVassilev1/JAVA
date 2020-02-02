@@ -29,8 +29,14 @@ layout(local_size_x = 1, local_size_y = 1) in;
 layout(rgba32f, binding = 0) uniform image2D img_output;
 
 
-layout(std430) buffer shader_data {
+layout(std430) buffer spheres {
 	Sphere sphs[];
+};
+
+layout(std430) buffer geometry {
+	int obj_count;
+	int vertex_array_lenghts[100]; // wtf this is bullshit
+	vec4 vertices[];
 };
 
 uniform mat4 cameraMatrix;
@@ -80,7 +86,7 @@ bool intersectGroundPlane(in Ray ray, in float PlaneHeight, inout RayHit hit) {
 		hit.distance = t;
 		if(ray.direction.y < PlaneHeight) hit.normal = normalize(vec3(0.0,1.0,0.0));
 		else hit.normal = normalize(vec3(0.0,-1.0,0.0));
-		hit.object = Sphere(vec4(0.0,0.0,0.0,0.0),vec4(1.0,1.0,1.0,0.0),0.0);
+		hit.object = Sphere(vec4(0.0,0.0,0.0,0.0),vec4(1.0,1.0,1.0,1.0),0.0);
 		return true;	
 	}
 	return false;
@@ -138,12 +144,12 @@ void main() {
 			}
 			
 			if(shadowHit.distance != 1.0/0.0) {
-				float shadowAngle = angleBetween(hit.normal, toLight.direction);
-				mult *= 0.0;
+				//float shadowAngle = angleBetween(hit.normal, toLight.direction);
+				mult = 0.0;
 			} 
 			else {
 				float angle = angleBetween(hit.normal,toLight.direction);
-				mult *= cos(angle);
+				mult *= abs(cos(angle));
 			}
 			if(i == 0) color = hit.object.color;
 			color = color * 0.5 + hit.object.color * 0.5;
@@ -152,6 +158,9 @@ void main() {
 		}
 		//else mult = 0.0;
 	}
-  	pixel = color * mult;
+  pixel = vec4(color.xyz * mult, color.w);
+
+  //if(pixel.x < 0.0|| pixel.y < 0.0 || pixel.y < 0.0) pixel = vec4(1.,1.,1.,1.);
+
   imageStore(img_output, pixel_coords, pixel);
 }
