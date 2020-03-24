@@ -3,6 +3,9 @@ package org.boby.RayTracing.objects;
 import org.boby.RayTracing.mesh.Mesh;
 import org.boby.RayTracing.shaders.Shader;
 
+/**
+ * @author Boby
+ */
 public class Quad extends Object3d{
 
 	public Quad(Shader shader) {

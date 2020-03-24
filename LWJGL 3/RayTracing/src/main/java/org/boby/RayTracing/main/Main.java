@@ -27,6 +27,7 @@ public class Main {
 
 	// The window handle
 	public static Window window;
+	static TextureOnScreenShader renderQuadShader;
 	static Quad renderingQuad;
 	static Texture2D tex;
 	static Texture2D renderTexture;
@@ -64,7 +65,9 @@ public class Main {
 		
 		tex = new Texture2D("./res/rubyblock.png");
 		
-		renderingQuad = new Quad(new TextureOnScreenShader());
+		renderQuadShader = new TextureOnScreenShader();
+		renderQuadShader.create();
+		renderingQuad = new Quad(renderQuadShader);
 		renderTexture = new Texture2D(window.getWidth(), window.getHeight());
 		comp.create();
 	}

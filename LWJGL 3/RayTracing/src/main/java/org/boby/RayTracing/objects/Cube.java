@@ -3,6 +3,12 @@ package org.boby.RayTracing.objects;
 import org.boby.RayTracing.mesh.Mesh;
 import org.boby.RayTracing.shaders.Shader;
 
+/**
+ * Cube
+ * 
+ * @author Boby
+ *
+ */
 public class Cube extends Object3d{
 
 	public Cube(Shader shader) {

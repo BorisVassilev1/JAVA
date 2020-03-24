@@ -19,7 +19,7 @@ public class Input {
 	public static Vector2f mouseD = new Vector2f();
 	
 	
-	public static boolean LockMouse = false;
+	public static boolean LockMouse = true;
 	
 	public static void initInput(long windowid)
 	{
@@ -44,10 +44,18 @@ public class Input {
 	
 	public static void update() {
 		glfwGetCursorPos(windowId, xpos, ypos);
+		
+		// Calculate mouse movement
 		mouseD = new Vector2f((float)xpos.get(0),(float)ypos.get(0)).sub(mousePos);
+		
+		// Set the local mouse position variable
 		mousePos.set((float)xpos.get(0),(float)ypos.get(0));
+		
+		
 		if(LockMouse) {
+			// Lock the mouse in the center of the screen
 			glfwSetCursorPos(windowId,Main.window.getWidth() / 2d, Main.window.getHeight() / 2d);
+			
 			mousePos.set(Main.window.getWidth() / 2, Main.window.getHeight() / 2);
 		}
 	}

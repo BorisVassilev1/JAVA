@@ -3,6 +3,11 @@ package org.boby.RayTracing.objects;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+/**
+ * a Factory for Matrix4f
+ * @author Boby
+ *
+ */
 public class Transformation {
 	private final Matrix4f projectionMatrix;
 

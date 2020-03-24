@@ -6,17 +6,11 @@ public class TextureOnScreenShader extends Shader{
 	
 	public TextureOnScreenShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected void createUniforms() {
-		// TODO Auto-generated method stub
-		try {
 			super.createUniform("texture_sampler");
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 }

@@ -3,6 +3,13 @@ package org.boby.RayTracing.objects;
 import org.boby.RayTracing.mesh.Mesh;
 import org.boby.RayTracing.shaders.Shader;
 import org.joml.Vector3f;
+
+/**
+ * Simple 3d object.
+ * 
+ * @author Boby
+ *
+ */
 public class Object3d {
 	
 	private Mesh mesh;

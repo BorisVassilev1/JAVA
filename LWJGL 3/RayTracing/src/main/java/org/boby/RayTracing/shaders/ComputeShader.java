@@ -20,7 +20,6 @@ import static org.lwjgl.opengl.GL46.*;
  * Uniforms, SSBO-s</h1>
  * 
  * @author Boby
- *
  */
 public abstract class ComputeShader {
 	private int computeShaderID;
@@ -91,35 +90,50 @@ public abstract class ComputeShader {
 		}
 		uniforms.put(uniformName, uniformLocation);
 	}
-
+	
+	/**
+	 * Get the Uniform Location.
+	 * @param uniformName
+	 * @return 
+	 * 
+	 * @throws RuntimeException if the uniform does not exist, is not used or has not been created.
+	 */
+	int getUniformId(String uniformName) {
+		if(!this.hasUniform(uniformName)) {
+			throw new RuntimeException("the uniform " + uniformName + " does not exist in this shader.");
+		}
+		int id = uniforms.get(uniformName);
+		return id;
+	}
+	
 	/**
 	 * Sets the specified uniform variable.
 	 * 
 	 * @param uniformName
-	 *            - name of an already created uniform variable. Will throw a
-	 *            NullPointerException if the uniform has not been created.
+	 *            - name of an already created uniform variable.
 	 * @param value
 	 *            - the value for the uniform variable to be set to.
+	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, int value) {
-		glUniform1i(uniforms.get(uniformName), value);
+		glUniform1i(getUniformId(uniformName), value);
 	}
 
 	/**
 	 * Sets the specified uniform variable.
 	 * 
 	 * @param uniformName
-	 *            - name of an already created uniform variable. Will throw a
-	 *            NullPointerException if the uniform has not been created.
+	 *            - name of an already created uniform variable.
 	 * @param value
 	 *            - the value for the uniform variable to be set to.
+	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, Matrix4f value) {
 		// Dump the matrix into a float buffer
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			FloatBuffer fb = stack.mallocFloat(16);
 			value.get(fb);
-			glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
+			glUniformMatrix4fv(getUniformId(uniformName), false, fb);
 		}
 	}
 
@@ -127,86 +141,88 @@ public abstract class ComputeShader {
 	 * Sets the specified uniform variable.
 	 * 
 	 * @param uniformName
-	 *            - name of an already created uniform variable. Will throw a
-	 *            NullPointerException if the uniform has not been created.
+	 *            - name of an already created uniform variable.
 	 * @param value
 	 *            - the value for the uniform variable to be set to.
+	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, FloatBuffer value) {
-		glUniform3fv(uniforms.get(uniformName), value);
+		glUniform3fv(getUniformId(uniformName), value);
 	}
 
 	/**
 	 * Sets the specified uniform variable.
 	 * 
 	 * @param uniformName
-	 *            - name of an already created uniform variable. Will throw a
-	 *            NullPointerException if the uniform has not been created.
+	 *            - name of an already created uniform variable.
 	 * @param value
 	 *            - the value for the uniform variable to be set to.
+	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, IntBuffer value) {
-		glUniform3iv(uniforms.get(uniformName), value);
+		glUniform3iv(getUniformId(uniformName), value);
 	}
 
 	/**
 	 * Sets the specified uniform variable.
 	 * 
 	 * @param uniformName
-	 *            - name of an already created uniform variable. Will throw a
-	 *            NullPointerException if the uniform has not been created.
+	 *            - name of an already created uniform variable.
 	 * @param value
 	 *            - the value for the uniform variable to be set to.
+	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, Vector3f value) {
-		glUniform3f(uniforms.get(uniformName), value.x, value.y, value.z);
+		glUniform3f(getUniformId(uniformName), value.x, value.y, value.z);
 	}
 
 	/**
 	 * Sets the specified uniform variable.
 	 * 
 	 * @param uniformName
-	 *            - name of an already created uniform variable. Will throw a
-	 *            NullPointerException if the uniform has not been created.
+	 *            - name of an already created uniform variable.
 	 * @param value
 	 *            - the value for the uniform variable to be set to.
+	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, Vector2f value) {
-		glUniform2f(uniforms.get(uniformName), value.x, value.y);
+		glUniform2f(getUniformId(uniformName), value.x, value.y);
 	}
 
 	/**
 	 * Sets the specified uniform variable.
 	 * 
 	 * @param uniformName
-	 *            - name of an already created uniform variable. Will throw a
-	 *            NullPointerException if the uniform has not been created.
+	 *            - name of an already created uniform variable.
 	 * @param value
 	 *            - the value for the uniform variable to be set to.
+	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, float value) {
-		glUniform1f(uniforms.get(uniformName), value);
+		glUniform1f(getUniformId(uniformName), value);
 	}
 
 	/**
 	 * Sets the specified uniform variable.
 	 * 
 	 * @param uniformName
-	 *            - name of an already created uniform variable. Will throw a
-	 *            NullPointerException if the uniform has not been created.
+	 *            - name of an already created uniform variable.
 	 * @param value
 	 *            - the value for the uniform variable to be set to.
+	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, double value) {
-		glUniform1d(uniforms.get(uniformName), value);
+		glUniform1d(getUniformId(uniformName), value);
 	}
 
 	/**
-	 * Checks if the shader has a definition for a uniform.
+	 * Sets the specified uniform variable.
 	 * 
 	 * @param uniformName
-	 *            - the name of the searched uniform
-	 * @return true if the uniform has already been defined, false if it is not.
+	 *            - name of an already created uniform variable.
+	 * @param value
+	 *            - the value for the uniform variable to be set to.
+	 * @throws RuntimeException just as getUniformId
 	 */
 	public boolean hasUniform(String uniformName) {
 		return uniforms.containsKey(uniformName);

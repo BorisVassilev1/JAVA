@@ -29,6 +29,7 @@ public class Texture2D {
 	private int id;
 	private int width;
 	private int height;
+	
 	/**
 	 * Loads a texture from a file.
 	 * @param filename - path to the file
@@ -70,6 +71,7 @@ public class Texture2D {
 	    stbi_image_free(buf);
 	    glBindTexture(GL_TEXTURE_2D, 0);
 	}
+	
 	/**
 	 * Creates a blank texture with the given width and height
 	 * @param width
