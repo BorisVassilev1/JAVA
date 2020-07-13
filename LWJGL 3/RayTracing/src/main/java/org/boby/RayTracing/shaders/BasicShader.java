@@ -11,6 +11,9 @@ public class BasicShader extends Shader{
 	@Override
 	public void createUniforms() {
 		super.createUniform("texture_sampler");
+		super.createUniform("worldMatrix");
+		super.createUniform("projectionMatrix");
+		super.createUniform("viewMatrix");
 	}
 	
 }

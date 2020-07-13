@@ -95,8 +95,8 @@ public abstract class Shader {
 	    int uniformLocation = glGetUniformLocation(programID,
 	        uniformName);
 	    if (uniformLocation < 0) {
-	        throw new RuntimeException("Could not find uniform:" +
-	            uniformName);
+	        throw new RuntimeException("Could not find uniform: " + uniformName);
+	    	//System.out.println("Could not find uniform: " + uniformName);
 	    }
 	    uniforms.put(uniformName, uniformLocation);
 	}

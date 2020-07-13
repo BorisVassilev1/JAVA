@@ -26,9 +26,9 @@ public class Transformation {
 
     public final Matrix4f getWorldMatrix(Vector3f offset, Vector3f rotation, float scale) {
     	worldMatrix.translation(offset).
-                rotateX((float)Math.toRadians(rotation.x)).
-                rotateY((float)Math.toRadians(rotation.y)).
-                rotateZ((float)Math.toRadians(rotation.z)).
+                rotateX(rotation.x).
+                rotateY(rotation.y).
+                rotateZ(rotation.z).
                 scale(scale);
         return worldMatrix;
     }

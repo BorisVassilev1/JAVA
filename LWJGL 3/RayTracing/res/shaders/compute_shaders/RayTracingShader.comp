@@ -44,16 +44,20 @@ uniform vec2 resolution;
 uniform float fov;
 uniform int deltaTime;
 
+
+float PI = 3.14159;
+
+
 vec3 cam_pos = vec3(0.0,0.0,0.0);
 
-vec3 light = vec3(1.5,2.6,0.4);
+vec3 light = vec3(1.5,2.6,3);
 
-float aspect = resolution.x / resolution.y;
+float aspect = resolution.y / resolution.x;
 
-vec3 v00 = vec3(-1.0 * aspect,-1.0, cos(fov/2));
-vec3 v01 = vec3(-1.0 * aspect, 1.0, cos(fov/2));
-vec3 v11 = vec3( 1.0 * aspect, 1.0, cos(fov/2));
-vec3 v10 = vec3( 1.0 * aspect,-1.0, cos(fov/2));
+vec3 v00 = vec3(-1.0, 1.0 * aspect, -1/tan(fov/2));
+vec3 v01 = vec3( 1.0, 1.0 * aspect, -1/tan(fov/2));
+vec3 v10 = vec3(-1.0,-1.0 * aspect, -1/tan(fov/2));
+vec3 v11 = vec3( 1.0,-1.0 * aspect, -1/tan(fov/2));
 
 Ray createRay(vec3 origin, vec3 direction) {
 	Ray ray = Ray(origin, direction);
@@ -94,8 +98,8 @@ bool intersectGroundPlane(in Ray ray, in float PlaneHeight, inout RayHit hit) {
 
 vec3 lerp4vec(vec3 v00, vec3 v10, vec3 v01, vec3 v11, float x, float y) {
 	return mix(
-	mix(v00,v10,x),
-	mix(v01,v11,x),
+	mix(v00,v01,x),
+	mix(v10,v11,x),
 	y
 	);
 }
@@ -108,21 +112,22 @@ void main() {
   vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);
   ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
   vec2 pixel_position = pixel_coords / resolution;
-  cam_pos = (cameraMatrix * vec4(0.0,0.0,0.0,1.0)).xyz;
+  cam_pos = -(cameraMatrix * vec4(0.0,0.0,0.0,1.0)).xyz;
   
-  v00 = (vec4(v00,0.0) * cameraMatrix).xyz;
-  v10 = (vec4(v10,0.0) * cameraMatrix).xyz;
-  v01 = (vec4(v01,0.0) * cameraMatrix).xyz;
-  v11 = (vec4(v11,0.0) * cameraMatrix).xyz;
+  v00 = (vec4(v00,1.0) * cameraMatrix).xyz;
+  v10 = (vec4(v10,1.0) * cameraMatrix).xyz;
+  v01 = (vec4(v01,1.0) * cameraMatrix).xyz;
+  v11 = (vec4(v11,1.0) * cameraMatrix).xyz;
   
   Ray ray = createRay(cam_pos, normalize( lerp4vec( v00, v10, v01, v11, pixel_position.x, pixel_position.y) ) );
-  ray.direction.y *= -1;
+  //ray.direction.y *= -1;
   
   
-	RayHit hit;
+  	RayHit hit;
 	float mult = 1.0;
 	vec4 color = vec4(1.0,1.0,1.0, 1.0);
 	for(int i = 0; i < 10; i ++) {
+
 		hit.distance = 1.0 / 0.0;
 		intersectGroundPlane(ray,0.0,hit);
 		for(int s = 0; s < sphs.length(); s ++) {

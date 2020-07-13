@@ -17,7 +17,7 @@ import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
 public class Renderer {
-	public static final float FOV = (float) Math.toRadians(70f);
+	public static float FOV = (float) Math.toRadians(70f);
 
 	public static final float Z_NEAR = 0.01f;
 
@@ -25,7 +25,7 @@ public class Renderer {
 
 	public static Transformation transform;
 
-	public static Vector3f camPos = new Vector3f(0.0f, 1.0f, 0.0f);
+	public static Vector3f camPos = new Vector3f(0.0f, 0.0f, 0.0f);
 	public static Vector3f camRot = new Vector3f(0.0f, 0.0f, 0.0f);
 
 	public static void init() {
@@ -56,6 +56,15 @@ public class Renderer {
 		if(sh.hasUniform("worldMatrix")) {
 			Matrix4f worldMatrix = transform.getWorldMatrix(obj.getPosition(), obj.getRotation(), obj.getScale());
 			sh.setUniform("worldMatrix", worldMatrix);
+		}
+		
+		if(sh.hasUniform("viewMatrix")) {
+			Matrix4f viewMatrix = new Matrix4f().identity()
+					.rotateX(camRot.x)
+					.rotateY(camRot.y)
+					.rotateZ(camRot.z)
+					.translate(new Vector3f(camPos).mul(-1));
+			sh.setUniform("viewMatrix", viewMatrix);
 		}
 
 		// Will use the texture bound to GL_TEXTURE0
