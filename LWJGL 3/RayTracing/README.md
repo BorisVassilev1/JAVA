@@ -21,6 +21,7 @@ Required software:
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+I am still not using versioning bcs I have no idea of it and I'm changing the API basically every day...
 
 ## Authors
 
@@ -31,3 +32,12 @@ See also the list of [contributors](https://github.com/your/project/contributors
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## TODO: 
+* shaders.Shader and shaders.ComputeShader must be merged. 
+* Think if utils.Loader is needed.
+* Organize the shaders package.
+* Instanced rendering might be needed some day. A Scene object may be a solution here. 
+* Add at least simple shading to the basic shader.
+
+* Should mesh generation be done with a geometry shader smh, or in a compute shader?

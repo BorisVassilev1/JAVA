@@ -102,8 +102,7 @@ public class Texture2D {
 		glBindTexture(GL_TEXTURE_2D, id);
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, buff);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		System.out.println("asdf");
-		
+				
 		BufferedImage img = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_ARGB);
 		
 		int[] pixels = new int[width * height];
@@ -113,15 +112,15 @@ public class Texture2D {
 			int B = (int)(buff.get(i * 4 + 2) * 255);
 			int A = (int)(buff.get(i * 4 + 3) * 255);
 			try {
-				pixels[i] = new Color(R,G,B,A).getRGB();
+				pixels[i] = new Color(R, G, B, A).getRGB();
 				img.setRGB(i % width, i / width, pixels[i]);
 			} catch(Exception e) {
-				System.out.println((i % width ) + " " + (i / width) + ": " + R + " " + G + " " + B + " " + A);
+				System.out.println("Error on pixel: " +  (i % width ) + " " + (i / width) + ": " + R + " " + G + " " + B + " " + A);
 			}
 		}
 		
 		try {
-			File of = new File(fileName + ".png");
+			File of = new File(fileName);
 			ImageIO.write(img, "png", of);
 		} catch(IOException e) {
 			e.printStackTrace();

@@ -69,7 +69,7 @@ public class Main {
 		Renderer.init();
 		
 		glEnable(GL_TEXTURE_2D);
-		//glEnable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST);
 		//glEnable(GL_BLEND);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
@@ -86,6 +86,7 @@ public class Main {
 		cubeShader.create();
 		cube = new Cube(cubeShader);
 		cube.setScale(0.5f);
+		renderingQuad.setPosition(new Vector3f(0.0f, 0.0f, -10.0f));
 	}
 
 	private void loop() {
@@ -103,7 +104,7 @@ public class Main {
     	comp.unbind();
     	
 		Renderer.Compute(comp, renderTexture.getWidth(), renderTexture.getHeight(), 1);
-		
+		Input.update();
 		
     	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		while (!window.shouldClose()) {
@@ -113,14 +114,14 @@ public class Main {
 			
 			glfwPollEvents();
 			
-			if(Input.isKeyPressed[GLFW_KEY_UP]) Renderer.camPos.y += 0.1;
-			if(Input.isKeyPressed[GLFW_KEY_DOWN]) Renderer.camPos.y -= 0.1;
+			if(Input.isKeyPressed[GLFW_KEY_SPACE]) Renderer.camPos.y += 0.1;
+			if(Input.isKeyPressed[GLFW_KEY_LEFT_SHIFT]) Renderer.camPos.y -= 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_A]) Renderer.camPos.x -= 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_D]) Renderer.camPos.x += 0.1;
-			if(Input.isKeyPressed[GLFW_KEY_W]) Renderer.camPos.z += 0.1;
-			if(Input.isKeyPressed[GLFW_KEY_S]) Renderer.camPos.z -= 0.1;
+			if(Input.isKeyPressed[GLFW_KEY_W]) Renderer.camPos.z -= 0.1;
+			if(Input.isKeyPressed[GLFW_KEY_S]) Renderer.camPos.z += 0.1;
 			if(Input.isKeyPressed[GLFW_KEY_1]) {
-				renderTexture.save("./res/image");
+				renderTexture.save("./res/image.png");
 			}
 			if(Input.isKeyPressed[GLFW_KEY_2]) {
 				comp.create();
@@ -128,8 +129,9 @@ public class Main {
 			
 			if(Input.isKeyPressed[GLFW_KEY_9]) Renderer.FOV += -0.01f;
 			if(Input.isKeyPressed[GLFW_KEY_0]) Renderer.FOV -= -0.01f;
-			//Renderer.camRot.x += Input.mouseD.y / 500;
-			//Renderer.camRot.y -= Input.mouseD.x / 500;
+			
+			Renderer.camRot.x += Input.mouseD.y / 500;
+			Renderer.camRot.y += Input.mouseD.x / 500;
 			
 			comp.bind();
 			
@@ -153,7 +155,7 @@ public class Main {
 			
 			//cube.setRotation(cube.getRotation().add(new Vector3f(0.001f, 0.001f, 0.001f)));
 			
-			System.out.println(Renderer.camPos);
+			//System.out.println(Renderer.camPos);
 			
 			
 			window.swapBuffers();

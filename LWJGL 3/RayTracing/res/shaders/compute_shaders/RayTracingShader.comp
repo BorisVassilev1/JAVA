@@ -4,6 +4,8 @@
 precision highp float;
 #endif
 
+#include <SimplexNoise.incl>
+#include <voronoise.incl>
 
 struct Sphere {
 	vec4 position;
@@ -42,7 +44,6 @@ layout(std430) buffer geometry {
 uniform mat4 cameraMatrix;
 uniform vec2 resolution;
 uniform float fov;
-uniform int deltaTime;
 
 
 float PI = 3.14159;
@@ -109,21 +110,21 @@ float angleBetween(vec3 v1, vec3 v2) {
 }
 
 void main() {
-  vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);
-  ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
-  vec2 pixel_position = pixel_coords / resolution;
-  cam_pos = -(cameraMatrix * vec4(0.0,0.0,0.0,1.0)).xyz;
-  
-  v00 = (vec4(v00,1.0) * cameraMatrix).xyz;
-  v10 = (vec4(v10,1.0) * cameraMatrix).xyz;
-  v01 = (vec4(v01,1.0) * cameraMatrix).xyz;
-  v11 = (vec4(v11,1.0) * cameraMatrix).xyz;
-  
-  Ray ray = createRay(cam_pos, normalize( lerp4vec( v00, v10, v01, v11, pixel_position.x, pixel_position.y) ) );
-  //ray.direction.y *= -1;
-  
-  
-  	RayHit hit;
+	vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);
+	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+	vec2 pixel_position = pixel_coords / resolution;
+	cam_pos = -(cameraMatrix * vec4(0.0,0.0,0.0,1.0)).xyz;
+
+	v00 = (vec4(v00,1.0) * cameraMatrix).xyz;
+	v10 = (vec4(v10,1.0) * cameraMatrix).xyz;
+	v01 = (vec4(v01,1.0) * cameraMatrix).xyz;
+	v11 = (vec4(v11,1.0) * cameraMatrix).xyz;
+
+	Ray ray = createRay(cam_pos, normalize( lerp4vec( v00, v10, v01, v11, pixel_position.x, pixel_position.y) ) );
+	//ray.direction.y *= -1;
+
+
+	RayHit hit;
 	float mult = 1.0;
 	vec4 color = vec4(1.0,1.0,1.0, 1.0);
 	for(int i = 0; i < 10; i ++) {
@@ -163,9 +164,14 @@ void main() {
 		}
 		//else mult = 0.0;
 	}
-  pixel = vec4(color.xyz * mult, color.w);
+  	pixel = vec4(color.xyz * mult, color.w);
 
-  //if(pixel.x < 0.0|| pixel.y < 0.0 || pixel.y < 0.0) pixel = vec4(1.,1.,1.,1.);
+//  	float a = snoise(vec4(pixel_coords.xy / 200.0, 0.0, 0.0)) / 2 + .5;
+//  	pixel = vec4(a, a, a, 1.0);
 
-  imageStore(img_output, pixel_coords, pixel);
+//  	float a = voronoi(vec2(pixel_coords.xy / 200.0)) / 2 + .5;
+//  	pixel = vec4(a, a, a, 1.0);
+
+  	imageStore(img_output, pixel_coords, pixel);
 }
+

@@ -45,11 +45,14 @@ public abstract class ComputeShader {
 		programID = glCreateProgram();
 
 		computeShaderID = glCreateShader(GL_COMPUTE_SHADER);
-		glShaderSource(computeShaderID, readFile(computeFile));
+		
+		String source = ShaderParser.ParseShaderFile(computeFile);
+		//System.out.println(source);
+		glShaderSource(computeShaderID, source);
 		glCompileShader(computeShaderID);
 
 		if (glGetShaderi(computeShaderID, GL_COMPILE_STATUS) == GL_FALSE) {
-			System.err.println("Error: Fragment Shader - " + glGetShaderInfoLog(computeShaderID));
+			System.err.println("Error: Compute Shader - " + glGetShaderInfoLog(computeShaderID));
 		}
 
 		glAttachShader(programID, computeShaderID);
