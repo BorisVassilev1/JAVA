@@ -2,19 +2,17 @@ package org.boby.RayTracing.main;
 
 import static org.lwjgl.opengl.GL46.*;
 
-import java.nio.FloatBuffer;
-import java.util.function.Function;
-
 import org.boby.RayTracing.objects.Object3d;
 import org.boby.RayTracing.objects.Transformation;
 import org.boby.RayTracing.shaders.ComputeShader;
 import org.boby.RayTracing.shaders.Shader;
+import org.boby.RayTracing.shaders.VFShader;
 import org.boby.RayTracing.utils.Texture2D;
 import org.boby.RayTracing.utils.Time;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
+import org.joml.*;
 import org.lwjgl.BufferUtils;
+
+import java.lang.Math;
 
 public class Renderer {
 	public static float FOV = (float) Math.toRadians(70f);
@@ -33,11 +31,11 @@ public class Renderer {
 	}
 	
 	/**
-	 * Draws a 3d object on the screen.
+	 * Draws an object on the screen, using the object's own shader.
 	 * @param obj
 	 */
 	public static void draw(Object3d obj) {
-		Shader sh = obj.getShader();
+		VFShader sh = obj.getShader();
 
 		// Check if the window has been resized and adjust the viewport
 		if (Main.window.isResized()) {
@@ -90,12 +88,10 @@ public class Renderer {
 	
 	/**
 	 * Executes a compute shader.
-	 * @param shader
-	 * @param num_groups_x
-	 * @param num_groups_y
-	 * @param num_groups_z
+	 * @param shader - the shader to be used
+	 * @param num_groups - dimensions of execution multithreading.
 	 */
-	public static void Compute(ComputeShader shader, int num_groups_x, int num_groups_y, int num_groups_z) {
+	public static void Compute(ComputeShader shader, int num_groups_x,  int num_groups_y,  int num_groups_z) {
 		shader.bind();
 
 		glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);

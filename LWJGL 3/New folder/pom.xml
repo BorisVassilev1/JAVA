@@ -1,0 +1,105 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.boby</groupId>
+  <artifactId>gdxtest</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>GDXTest</name>
+  
+  
+  <build>
+		<plugins>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-shade-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <goals>
+			                <goal>shade</goal>
+			            </goals>
+			            <configuration>
+			                <shadedArtifactAttached>true</shadedArtifactAttached>
+			                <transformers>
+			                    <transformer implementation=
+			                      "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+			                        <mainClass>org.boby.gdxTest.TestClassMain</mainClass>
+			                </transformer>
+			            </transformers>
+			        </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
+			<plugin>
+		        <artifactId>maven-resources-plugin</artifactId>
+		        <version>3.1.0</version>
+		        <executions>
+		          	<execution>
+		            	<id>copy-resources</id>
+		           		<!-- here the phase you need -->
+		            	<phase>validate</phase>
+		            	<goals>
+		              		<goal>copy-resources</goal>
+		            	</goals>
+		            	<configuration>
+		              		<outputDirectory>${basedir}/target/res</outputDirectory>
+		              		<resources>          
+		                		<resource>
+		                  			<directory>res</directory>
+		                  			<filtering>true</filtering>
+		                		</resource>
+		              		</resources>              
+		            	</configuration>            
+		        	</execution>
+		    	</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-backend-lwjgl -->
+		<dependency>
+		    <groupId>com.badlogicgames.gdx</groupId>
+		    <artifactId>gdx-backend-lwjgl</artifactId>
+		    <version>1.9.11</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-backend-android -->
+		<!--<dependency>
+		    <groupId>com.badlogicgames.gdx</groupId>
+		    <artifactId>gdx-backend-android</artifactId>
+		    <version>1.9.11</version>
+		</dependency>-->
+		
+		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-platform -->
+		<dependency>
+		    <groupId>com.badlogicgames.gdx</groupId>
+		    <artifactId>gdx-platform</artifactId>
+		    <version>1.9.11</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx -->
+		<dependency>
+		    <groupId>com.badlogicgames.gdx</groupId>
+		    <artifactId>gdx</artifactId>
+		    <version>1.9.11</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-bullet -->
+		<!--<dependency>
+    		<groupId>com.badlogicgames.gdx</groupId>
+    		<artifactId>gdx-bullet</artifactId>
+    		<version>1.9.11</version>
+		</dependency>-->
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>sample</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/gdx-natives.jar</systemPath>
+		</dependency>
+		
+	</dependencies>
+	
+	
+	
+</project>
