@@ -22,7 +22,6 @@ public class TestClassMain implements ApplicationListener{
 	public static void main(String[] args) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		new LwjglApplication(new TestClassMain(), config);
-
 	}
 	
 	public PerspectiveCamera cam;
@@ -31,9 +30,7 @@ public class TestClassMain implements ApplicationListener{
     public ModelInstance instance;
     public Environment environment;
     
-	
-	
-
+    
 	public void create() {
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));

@@ -55,48 +55,79 @@
 	</build>
 	
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-backend-lwjgl -->
-		<dependency>
-		    <groupId>com.badlogicgames.gdx</groupId>
-		    <artifactId>gdx-backend-lwjgl</artifactId>
-		    <version>1.9.11</version>
-		</dependency>
 		
-		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-backend-android -->
-		<!--<dependency>
-		    <groupId>com.badlogicgames.gdx</groupId>
-		    <artifactId>gdx-backend-android</artifactId>
-		    <version>1.9.11</version>
-		</dependency>-->
-		
-		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-platform -->
 		<dependency>
-		    <groupId>com.badlogicgames.gdx</groupId>
-		    <artifactId>gdx-platform</artifactId>
-		    <version>1.9.11</version>
-		</dependency>
-		
-		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx -->
-		<dependency>
-		    <groupId>com.badlogicgames.gdx</groupId>
+		    <groupId>com.sample</groupId>
 		    <artifactId>gdx</artifactId>
-		    <version>1.9.11</version>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx.jar</systemPath>
 		</dependency>
 		
-		<!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-bullet -->
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-natives</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-natives.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-backend-lwjgl</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-backend-lwjgl.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-backend-lwjgl-natives</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-backend-lwjgl-natives.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-backend-jglfw</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-backend-jglfw.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-backend-jglfw-natives</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-backend-jglfw-natives.jar</systemPath>
+		</dependency>
+		
 		<!--<dependency>
-    		<groupId>com.badlogicgames.gdx</groupId>
-    		<artifactId>gdx-bullet</artifactId>
-    		<version>1.9.11</version>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-backend-headless</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-backend-headless.jar</systemPath>
 		</dependency>-->
 		
 		<dependency>
 		    <groupId>com.sample</groupId>
-		    <artifactId>sample</artifactId>
+		    <artifactId>gdx-bullet</artifactId>
 		    <version>1.0</version>
 		    <scope>system</scope>
-		    <systemPath>${project.basedir}/gdx-natives.jar</systemPath>
+		    <systemPath>${project.basedir}/libs/gdx-bullet.jar</systemPath>
 		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-bullet-natives</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-bullet-natives.jar</systemPath>
+		</dependency>
+		
 		
 	</dependencies>
 	
