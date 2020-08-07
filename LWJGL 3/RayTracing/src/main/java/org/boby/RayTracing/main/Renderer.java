@@ -44,12 +44,15 @@ public class Renderer {
 		sh.bind();
 		
 		// Set uniforms
+		if(sh.hasUniform("projectionMatrix")) {
+			Matrix4f projectionMatrix = transform.getProjectionMatrix(FOV, Main.window.getWidth(), Main.window.getHeight(), Z_NEAR, Z_FAR);
+			sh.setUniform("projectionMatrix", projectionMatrix);
+		}
 		
-		Matrix4f projectionMatrix = transform.getProjectionMatrix(FOV, Main.window.getWidth(), Main.window.getHeight(), Z_NEAR, Z_FAR);
-		sh.setUniform("projectionMatrix", projectionMatrix);
-
-		Matrix4f worldMatrix = transform.getWorldMatrix(obj.getPosition(), obj.getRotation(), obj.getScale());
-		sh.setUniform("worldMatrix", worldMatrix);
+		if(sh.hasUniform("worldMatrix")) {
+			Matrix4f worldMatrix = transform.getWorldMatrix(obj.getPosition(), obj.getRotation(), obj.getScale());
+			sh.setUniform("worldMatrix", worldMatrix);
+		}
 
 		// Will use the texture bound to GL_TEXTURE0
 		sh.setUniform("texture_sampler", 0);
