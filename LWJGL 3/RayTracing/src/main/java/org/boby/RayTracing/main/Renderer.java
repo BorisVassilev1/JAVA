@@ -2,22 +2,20 @@ package org.boby.RayTracing.main;
 
 import static org.lwjgl.opengl.GL46.*;
 
-import java.nio.FloatBuffer;
-import java.util.function.Function;
-
 import org.boby.RayTracing.objects.Object3d;
 import org.boby.RayTracing.objects.Transformation;
 import org.boby.RayTracing.shaders.ComputeShader;
 import org.boby.RayTracing.shaders.Shader;
+import org.boby.RayTracing.shaders.VFShader;
 import org.boby.RayTracing.utils.Texture2D;
 import org.boby.RayTracing.utils.Time;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
+import org.joml.*;
 import org.lwjgl.BufferUtils;
 
+import java.lang.Math;
+
 public class Renderer {
-	public static final float FOV = (float) Math.toRadians(70f);
+	public static float FOV = (float) Math.toRadians(70f);
 
 	public static final float Z_NEAR = 0.01f;
 
@@ -25,15 +23,19 @@ public class Renderer {
 
 	public static Transformation transform;
 
-	public static Vector3f camPos = new Vector3f(0.0f, 1.0f, 0.0f);
+	public static Vector3f camPos = new Vector3f(0.0f, 0.0f, 0.0f);
 	public static Vector3f camRot = new Vector3f(0.0f, 0.0f, 0.0f);
 
 	public static void init() {
 		transform = new Transformation();
 	}
-
+	
+	/**
+	 * Draws an object on the screen, using the object's own shader.
+	 * @param obj
+	 */
 	public static void draw(Object3d obj) {
-		Shader sh = obj.getShader();
+		VFShader sh = obj.getShader();
 
 		// Check if the window has been resized and adjust the viewport
 		if (Main.window.isResized()) {
@@ -44,12 +46,24 @@ public class Renderer {
 		sh.bind();
 		
 		// Set uniforms
+		if(sh.hasUniform("projectionMatrix")) {
+			Matrix4f projectionMatrix = transform.getProjectionMatrix(FOV, Main.window.getWidth(), Main.window.getHeight(), Z_NEAR, Z_FAR);
+			sh.setUniform("projectionMatrix", projectionMatrix);
+		}
 		
-		Matrix4f projectionMatrix = transform.getProjectionMatrix(FOV, Main.window.getWidth(), Main.window.getHeight(), Z_NEAR, Z_FAR);
-		sh.setUniform("projectionMatrix", projectionMatrix);
-
-		Matrix4f worldMatrix = transform.getWorldMatrix(obj.getPosition(), obj.getRotation(), obj.getScale());
-		sh.setUniform("worldMatrix", worldMatrix);
+		if(sh.hasUniform("worldMatrix")) {
+			Matrix4f worldMatrix = transform.getWorldMatrix(obj.getPosition(), obj.getRotation(), obj.getScale());
+			sh.setUniform("worldMatrix", worldMatrix);
+		}
+		
+		if(sh.hasUniform("viewMatrix")) {
+			Matrix4f viewMatrix = new Matrix4f().identity()
+					.rotateX(camRot.x)
+					.rotateY(camRot.y)
+					.rotateZ(camRot.z)
+					.translate(new Vector3f(camPos).mul(-1));
+			sh.setUniform("viewMatrix", viewMatrix);
+		}
 
 		// Will use the texture bound to GL_TEXTURE0
 		sh.setUniform("texture_sampler", 0);
@@ -71,8 +85,13 @@ public class Renderer {
 		
 		sh.unbind();
 	}
-
-	public static void Compute(ComputeShader shader, int num_groups_x, int num_groups_y, int num_groups_z) {
+	
+	/**
+	 * Executes a compute shader.
+	 * @param shader - the shader to be used
+	 * @param num_groups - dimensions of execution multithreading.
+	 */
+	public static void Compute(ComputeShader shader, int num_groups_x,  int num_groups_y,  int num_groups_z) {
 		shader.bind();
 
 		glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);

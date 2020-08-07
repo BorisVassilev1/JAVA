@@ -7,7 +7,14 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
 
+/**
+ * Contains the geometry of a 3d object. 
+ * 
+ * @author Boby
+ *
+ */
 public class Mesh extends MeshBase {
+	
 	private int VAOID;
 	private int vertexBufferID;
 	private int indicesBufferID;

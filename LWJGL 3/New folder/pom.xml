@@ -1,0 +1,136 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.boby</groupId>
+  <artifactId>gdxtest</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>GDXTest</name>
+  
+  
+  <build>
+		<plugins>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-shade-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <goals>
+			                <goal>shade</goal>
+			            </goals>
+			            <configuration>
+			                <shadedArtifactAttached>true</shadedArtifactAttached>
+			                <transformers>
+			                    <transformer implementation=
+			                      "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+			                        <mainClass>org.boby.gdxTest.TestClassMain</mainClass>
+			                </transformer>
+			            </transformers>
+			        </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
+			<plugin>
+		        <artifactId>maven-resources-plugin</artifactId>
+		        <version>3.1.0</version>
+		        <executions>
+		          	<execution>
+		            	<id>copy-resources</id>
+		           		<!-- here the phase you need -->
+		            	<phase>validate</phase>
+		            	<goals>
+		              		<goal>copy-resources</goal>
+		            	</goals>
+		            	<configuration>
+		              		<outputDirectory>${basedir}/target/res</outputDirectory>
+		              		<resources>          
+		                		<resource>
+		                  			<directory>res</directory>
+		                  			<filtering>true</filtering>
+		                		</resource>
+		              		</resources>              
+		            	</configuration>            
+		        	</execution>
+		    	</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<dependencies>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-natives</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-natives.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-backend-lwjgl</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-backend-lwjgl.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-backend-lwjgl-natives</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-backend-lwjgl-natives.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-backend-jglfw</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-backend-jglfw.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-backend-jglfw-natives</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-backend-jglfw-natives.jar</systemPath>
+		</dependency>
+		
+		<!--<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-backend-headless</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-backend-headless.jar</systemPath>
+		</dependency>-->
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-bullet</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-bullet.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.sample</groupId>
+		    <artifactId>gdx-bullet-natives</artifactId>
+		    <version>1.0</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/gdx-bullet-natives.jar</systemPath>
+		</dependency>
+		
+		
+	</dependencies>
+	
+	
+	
+</project>

@@ -1,17 +1,24 @@
 package org.boby.RayTracing.objects;
 
 import org.boby.RayTracing.mesh.Mesh;
-import org.boby.RayTracing.shaders.Shader;
+import org.boby.RayTracing.shaders.VFShader;
 import org.joml.Vector3f;
+
+/**
+ * Simple 3d object.
+ * 
+ * @author Boby
+ *
+ */
 public class Object3d {
 	
 	private Mesh mesh;
-	private Shader shader;
+	private VFShader shader;
 	private Vector3f position;
 	private Vector3f rotation;
 	private float scale;
 	
-	public Object3d(Mesh mesh, Shader shader) {
+	public Object3d(Mesh mesh, VFShader shader) {
 		this.mesh = mesh;
 		this.mesh.create();
 		this.shader = shader;
@@ -50,11 +57,11 @@ public class Object3d {
 		this.scale = scale;
 	}
 	
-	public Shader getShader()
+	public VFShader getShader()
 	{
 		return this.shader;
 	}
-	public void setShader(Shader shader)
+	public void setShader(VFShader shader)
 	{
 		this.shader = shader;
 	}

@@ -453,6 +453,7 @@
 			<version>${lwjgl.version}</version>
 			<classifier>${lwjgl.natives}</classifier>
 		</dependency>
+		
+		
 	</dependencies>
-  
 </project>

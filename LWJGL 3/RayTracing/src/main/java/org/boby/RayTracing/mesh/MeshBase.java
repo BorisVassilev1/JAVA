@@ -8,6 +8,10 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+
+/*
+ * Contains base functonality of the Mesh class. Just a black box for now.
+ */
 public class MeshBase {
 	protected int createVertexArray() {
         int vertexArrayID = GL30.glGenVertexArrays();
