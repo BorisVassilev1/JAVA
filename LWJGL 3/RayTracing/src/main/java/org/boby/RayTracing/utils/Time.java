@@ -1,35 +1,32 @@
 package org.boby.RayTracing.utils;
 
-public class Time {// traces the time between updates
+public class Time {
 	/**
 	 * Time elapsed from previous updateTime() call in nanoseconds.
 	 */
-	public static long deltaTimeI;// in nanoseconds
+	public long deltaTimeI;// in nanoseconds
 	/**
 	 * Time elapsed from previous updateTime() call in seconds.
 	 */
-	public static double deltaTime;// in seconds
+	public double deltaTime;// in seconds
 	/**
 	 * System.nanoTime() at the last call of UpdateTime().
 	 */
-	public static long timeNow;
+	public long timeNow;
 	/**
 	 * System.nanoTime() at the previous call of UpdataTime().
 	 */
-	public static long timePrev;
+	public long timePrev;
 	/**
 	 * System.nanoTime() at the initTime() call.
 	 */
-	public static long startTime;
+	public long startTime;
 	/**
 	 * time elapsed from the initTime() call.
 	 */
-	public static long timeFromStart;
+	public long timeFromStart;
 	
-	/**
-	 * Initialize. Call once on program startup.
-	 */
-	public static void initTime()
+	public Time()
 	{
 		timeNow = System.nanoTime();
 		timePrev = timeNow;
@@ -40,7 +37,7 @@ public class Time {// traces the time between updates
 	/**
 	 * Update
 	 */
-	public static void updateTime()
+	public void updateTime()
 	{
 		timeNow = System.nanoTime();
 		deltaTimeI = timeNow - timePrev;

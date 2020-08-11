@@ -34,10 +34,11 @@ See also the list of [contributors](https://github.com/your/project/contributors
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## TODO: 
-* shaders.Shader and shaders.ComputeShader must be merged. 
 * Think if utils.Loader is needed.
-* Organize the shaders package.
 * Instanced rendering might be needed some day. A Scene object may be a solution here. 
 * Add at least simple shading to the basic shader.
+* **RENAME THE STORMING PROJECT TO SOMETHING MORE FITTING TO IT'S CURRENT PURPOSE AS A LIBRARY**
 
+For the far far future: 
 * Should mesh generation be done with a geometry shader smh, or in a compute shader?
+* Use libgdx's bindings for Bullet Physics

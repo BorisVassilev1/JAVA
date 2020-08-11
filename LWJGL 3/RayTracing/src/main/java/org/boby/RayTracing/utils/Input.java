@@ -4,31 +4,33 @@ import static org.lwjgl.glfw.GLFW.*;
 
 import java.nio.DoubleBuffer;
 
-import org.boby.RayTracing.main.Main;
+import org.boby.RayTracing.examples.CubeExample;
+import org.boby.RayTracing.main.Window;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
 public class Input {
 	
-	public static boolean[] isKeyPressed = new boolean[344];
+	public boolean[] isKeyPressed = new boolean[344];
 	
-	private static DoubleBuffer xpos, ypos;
+	private DoubleBuffer mouse_x_pos, ypos;
 	
-	public static Vector2f mousePos = new Vector2f();
-	private static long windowId;
-	public static Vector2f mouseD = new Vector2f();
+	public Vector2f mousePos = new Vector2f();
+	private Window window;
+	public Vector2f mouseD = new Vector2f();
 	
 	
-	public static boolean LockMouse = true;
+	public boolean LockMouse = true;
 	
-	public static void initInput(long windowid)
+	public Input(Window window)
 	{
-		windowId = windowid;
+		//windowId = windowid;
+		this.window = window;
 		// Setup a key callback. It will be called every time a key is pressed, repeated
 		// or released.
-		glfwSetKeyCallback(windowid, (window, key, scancode, action, mods) -> {
+		glfwSetKeyCallback(window.getId(), (windowId, key, scancode, action, mods) -> {
 			if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+				glfwSetWindowShouldClose(windowId, true); // We will detect this in the rendering loop
 			if(action == GLFW_PRESS) {
 				isKeyPressed[key] = true;
 			}
@@ -36,27 +38,31 @@ public class Input {
 				isKeyPressed[key] = false;
 			}
 		});
-		xpos = BufferUtils.createDoubleBuffer(1);
+		
+//		glfwSetKeyCallback(window.getId(), (windowId, key, scancode, action, mods) -> {
+//			if(key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
+//				glfwSetWindowShouldClose(windowId, true);
+//		});
+		mouse_x_pos = BufferUtils.createDoubleBuffer(1);
 		ypos = BufferUtils.createDoubleBuffer(1);
-		glfwGetCursorPos(windowid, xpos, ypos);
-		mousePos = new Vector2f((float)xpos.get(0),(float)ypos.get(0));
+		glfwGetCursorPos(window.getId(), mouse_x_pos, ypos);
+		mousePos = new Vector2f((float)mouse_x_pos.get(0),(float)ypos.get(0));
 	}
 	
-	public static void update() {
-		glfwGetCursorPos(windowId, xpos, ypos);
+	public void update() {
+		glfwGetCursorPos(window.getId(), mouse_x_pos, ypos);
 		
 		// Calculate mouse movement
-		mouseD = new Vector2f((float)xpos.get(0),(float)ypos.get(0)).sub(mousePos);
+		mouseD = new Vector2f((float)mouse_x_pos.get(0),(float)ypos.get(0)).sub(mousePos);
 		
 		// Set the local mouse position variable
-		mousePos.set((float)xpos.get(0),(float)ypos.get(0));
-		
+		mousePos.set((float)mouse_x_pos.get(0),(float)ypos.get(0));
 		
 		if(LockMouse) {
 			// Lock the mouse in the center of the screen
-			glfwSetCursorPos(windowId,Main.window.getWidth() / 2d, Main.window.getHeight() / 2d);
+			glfwSetCursorPos(window.getId(),window.getWidth() / 2d, window.getHeight() / 2d);
 			
-			mousePos.set(Main.window.getWidth() / 2, Main.window.getHeight() / 2);
+			mousePos.set(window.getWidth() / 2, window.getHeight() / 2);
 		}
 	}
 	

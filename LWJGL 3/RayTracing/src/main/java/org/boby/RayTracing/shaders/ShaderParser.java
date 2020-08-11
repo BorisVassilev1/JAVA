@@ -23,16 +23,17 @@ public class ShaderParser {
 		AtomicInteger libraryLines = new AtomicInteger();
 		AtomicInteger lines = new AtomicInteger();
 		
-			
-		libraryLines.incrementAndGet();
-		lines.incrementAndGet();
+		// TODO: line count must be kept track of because of possible future error tracking
+		// example: when you have 100 lines of includes and 200 lines of shader code, the compiler may throw an error on line 255 
+		// because the contents of the two files are just appended.
+		// TODO: it counts one line less when the file ends with an empty line. I have no idea how to fix it now.
 		ParseRecursively(parsed, file, 0, lines, libraryLines, uniform_names, ssbo_names);
 		
-		System.out.println("Successfully parsed " + lines + " lines of code with " + libraryLines + " lines of included code. Total " + (lines.get() + libraryLines.get()) + " lines.");
+//		System.out.println("Successfully parsed " + lines + " lines of code with " + libraryLines + " lines of included code. Total " + (lines.get() + libraryLines.get()) + " lines.");
 		
 		return parsed.toString();
 	}
-	// TODO: fix lines counting. it may be not working
+	
 	private static void ParseRecursively(StringBuilder parsed, String file, int depth, AtomicInteger lines, AtomicInteger libLines, ArrayList<String> uniform_names, ArrayList<String> ssbo_names) {
 		//String filePathPrefix = file.substring(0,file.lastIndexOf("/"));
 		BufferedReader reader = null;

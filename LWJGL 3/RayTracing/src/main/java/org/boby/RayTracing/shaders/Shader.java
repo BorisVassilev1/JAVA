@@ -326,6 +326,7 @@ public class Shader {
 		glDeleteProgram(programId);
 	}
 	
+	// TODO: this in not a propper json formatting. there are excess ",". Why am I doing this???
 	@Override
 	public String toString() {
 		String s = "Shader: {ProgramId: " + programId + ", Uniforms: {";

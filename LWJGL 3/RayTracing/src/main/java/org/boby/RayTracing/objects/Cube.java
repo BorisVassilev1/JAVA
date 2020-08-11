@@ -62,7 +62,6 @@ public class Cube extends Object3d{
 				1,1,
 				0,1
 		}),shader);
-		getPosition().set(0.5f, 1.3f, 1.5f);
 	}
 
 }
