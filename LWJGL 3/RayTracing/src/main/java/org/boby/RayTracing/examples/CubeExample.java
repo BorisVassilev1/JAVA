@@ -52,7 +52,6 @@ public class CubeExample {
 	private void init() {
 		window = new Window("nqkva glupost bate", 800, 600, true);
 		
-		GL.createCapabilities(); // create the opengl context
 		
 		time = new Time();
 		frm = new FramerateManager(time);
@@ -60,11 +59,9 @@ public class CubeExample {
 		camera = new Camera( (float)Math.toRadians(70f), window.getWidth() / window.getHeight(), 0.01f, 1000f);
 		
 		input = new Input(window);
-
-		glEnable(GL_TEXTURE_2D);
-		glEnable(GL_DEPTH_TEST);
-		// glEnable(GL_BLEND);
-		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		input.lockMouse = true;
+		input.hideMouse();
+		
 
 		tex = new Texture2D("./res/rubyblock.png");
 
@@ -77,7 +74,6 @@ public class CubeExample {
 	}
 
 	private void loop() {
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 		while (!window.shouldClose()) {
 			time.updateTime();
@@ -88,22 +84,23 @@ public class CubeExample {
 			glfwPollEvents();
 
 			Vector3f camPos = camera.getPosition();
-			if (input.isKeyPressed[GLFW_KEY_SPACE])
+			if(input.getKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
 				camPos.y += 0.1;
-			if (input.isKeyPressed[GLFW_KEY_LEFT_SHIFT])
+			}
+			if (input.getKey(GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 				camPos.y -= 0.1;
-			if (input.isKeyPressed[GLFW_KEY_A])
+			if (input.getKey(GLFW_KEY_A) == GLFW_PRESS)
 				camPos.x -= 0.1;
-			if (input.isKeyPressed[GLFW_KEY_D])
+			if (input.getKey(GLFW_KEY_D) == GLFW_PRESS)
 				camPos.x += 0.1;
-			if (input.isKeyPressed[GLFW_KEY_W])
+			if (input.getKey(GLFW_KEY_W) == GLFW_PRESS)
 				camPos.z -= 0.1;
-			if (input.isKeyPressed[GLFW_KEY_S])
+			if (input.getKey(GLFW_KEY_S) == GLFW_PRESS)
 				camPos.z += 0.1;
 
-			if (input.isKeyPressed[GLFW_KEY_9])
+			if (input.getKey(GLFW_KEY_9) == GLFW_PRESS)
 				camera.setFov(camera.getFov() + 0.01f);
-			if (input.isKeyPressed[GLFW_KEY_0])
+			if (input.getKey(GLFW_KEY_0) == GLFW_PRESS)
 				camera.setFov(camera.getFov() - 0.01f);
 
 			Vector3f camRot = camera.getRotation();
@@ -123,11 +120,7 @@ public class CubeExample {
 			tex.bind();
 			Renderer.draw(cube, camera);
 
-			// cube.setRotation(cube.getRotation().add(new Vector3f(0.001f, 0.001f,
-			// 0.001f)));
-
-			// System.out.println(Renderer.camPos);
-
+			// cube.setRotation(cube.getRotation().add(new Vector3f(0.001f, 0.001f, 0.001f)));
 			window.swapBuffers();
 
 			frm.update();

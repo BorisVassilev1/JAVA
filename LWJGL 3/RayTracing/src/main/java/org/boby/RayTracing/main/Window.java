@@ -10,6 +10,7 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 public class Window {
@@ -71,14 +72,22 @@ public class Window {
 
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(id);
-
+		
+		// create the opengl context
+		GL.createCapabilities(); 
+		
 		// Enable v-sync
 		if (this.vsync)
 			glfwSwapInterval(1);
 
 		// Make the window visible
 		glfwShowWindow(id);
-
+		
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glClearColor(0f, 0f, 0f, 1f);
 	}
 
 	/**
@@ -96,25 +105,6 @@ public class Window {
 	public boolean shouldClose() {
 		return glfwWindowShouldClose(id);
 	}
-
-	// /**
-	// * Should be used only if VSync is turned off. Otherwise doesnt work. If 60fps
-	// is acceptable, turn VSync on.
-	// * @param fps - the maximum frames per second for the window to reach
-	// */
-	// public void sync(int fps)
-	// {
-	// long deltatime = Time.deltaTimeI;
-	// if(deltatime < 1000000000/fps)
-	// {
-	// try {
-	// Thread.sleep((int) (1000000000/fps - deltatime) / 1000000, (int)
-	// (1000000000/fps - deltatime) % 1000000);
-	// } catch (InterruptedException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// }
 
 	/**
 	 * destroys the window.

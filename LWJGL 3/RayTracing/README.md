@@ -36,7 +36,8 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## TODO: 
 * Think if utils.Loader is needed.
 * Instanced rendering might be needed some day. A Scene object may be a solution here. 
-* Add at least simple shading to the basic shader.
+* Fix rendering. Normals are needed. Indexed system for normals, vertex color, UVs. Adequate implementation of materials.
+* Object3d contains only position and mesh. Something like GameObject is needed, with Transformation, Material, etc separated.
 * **RENAME THE STORMING PROJECT TO SOMETHING MORE FITTING TO IT'S CURRENT PURPOSE AS A LIBRARY**
 
 For the far far future: 

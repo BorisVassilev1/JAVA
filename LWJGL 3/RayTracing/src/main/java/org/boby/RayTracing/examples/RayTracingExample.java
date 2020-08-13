@@ -58,16 +58,14 @@ public class RayTracingExample {
 		GL.createCapabilities(); // create the opengl context
 		
 		input = new Input(window);
+		input.lockMouse = true;
+		input.hideMouse();
+		
 		time = new Time();
 		frm = new FramerateManager(time);
 		
 		camera = new Camera((float)Math.toRadians(70f), window.getWidth() / window.getHeight(), 0.01f, 1000f);
 		
-		glEnable(GL_TEXTURE_2D);
-		glEnable(GL_DEPTH_TEST);
-		// glEnable(GL_BLEND);
-		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		tex = new Texture2D("./res/rubyblock.png");
 
 		renderQuadShader = new VFShader("./res/shaders/verfrag_shaders/TextureOnScreenVertexShader.vs",
@@ -83,53 +81,50 @@ public class RayTracingExample {
 		// TODO: This should really be easier. Maybe make a class that holds everything
 		int glbuff = glGenBuffers();
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, glbuff);
-		glBufferData(GL_SHADER_STORAGE_BUFFER,
-				new float[] { 0.5f, 1.3f, 1.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.3f, 0.2f, 2.0f,
-						0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.7f, 0.0f, 0.0f, 0.0f, -0.4f, 0.5f, 1.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-						1.0f, 0.5f, 0.0f, 0.0f, 0.0f },
-				GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, new float[] { 
+						0.5f, 1.3f, 1.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f,
+						1.3f, 0.2f, 2.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.7f, 0.0f, 0.0f, 0.0f,
+						-0.4f, 0.5f, 1.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f
+						}, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		comp.setSSBO("spheres", glbuff);
 
 		System.out.println(comp.toString());
-		
-		// renderingQuad.setPosition(new Vector3f(0.0f, 0.0f, -1.0f));
 	}
 
 	private void loop() {
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-		// glfwSwapInterval(1);
-
+		
 		while (!window.shouldClose()) {
 			time.updateTime();
+			
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			input.update();
-
 			glfwPollEvents();
 			
+			input.update();
+			
 			Vector3f camPos = camera.getPosition();
-			if (input.isKeyPressed[GLFW_KEY_SPACE])
+			if(input.getKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
 				camPos.y += 0.1;
-			if (input.isKeyPressed[GLFW_KEY_LEFT_SHIFT])
+			}
+			if (input.getKey(GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 				camPos.y -= 0.1;
-			if (input.isKeyPressed[GLFW_KEY_A])
+			if (input.getKey(GLFW_KEY_A) == GLFW_PRESS)
 				camPos.x -= 0.1;
-			if (input.isKeyPressed[GLFW_KEY_D])
+			if (input.getKey(GLFW_KEY_D) == GLFW_PRESS)
 				camPos.x += 0.1;
-			if (input.isKeyPressed[GLFW_KEY_W])
+			if (input.getKey(GLFW_KEY_W) == GLFW_PRESS)
 				camPos.z -= 0.1;
-			if (input.isKeyPressed[GLFW_KEY_S])
+			if (input.getKey(GLFW_KEY_S) == GLFW_PRESS)
 				camPos.z += 0.1;
 
-			if (input.isKeyPressed[GLFW_KEY_1])
+			if (input.getKey(GLFW_KEY_1) == GLFW_PRESS)
 				renderTexture.save("./res/image.png");
 
-			if (input.isKeyPressed[GLFW_KEY_9])
+			
+			if (input.getKey(GLFW_KEY_9) == GLFW_PRESS)
 				camera.setFov(camera.getFov() + 0.01f);
-			if (input.isKeyPressed[GLFW_KEY_0])
+			if (input.getKey(GLFW_KEY_0) == GLFW_PRESS)
 				camera.setFov(camera.getFov() - 0.01f);
 
 			
@@ -141,14 +136,11 @@ public class RayTracingExample {
 			camera.UpdateViewMatrix();
 			
 			comp.bind();
-
-//TODO: finish this. ... and think of how to do it better;			
+			//TODO: finish this. ... and think of how to do it better;			
 			Matrix4f _mat = new Matrix4f().translate(new Vector3f(camera.getPosition()).mul(-1)).rotateX(camera.getRotation().x).rotateY(camera.getRotation().y).rotateZ(camera.getRotation().z);
 			comp.setUniform("cameraMatrix", _mat);
-
 			comp.setUniform("resolution", new Vector2f(window.getWidth(), window.getHeight()));
 			comp.setUniform("fov", camera.getFov());
-
 			comp.unbind();
 
 			renderTexture.bind(GL_TEXTURE0);
@@ -157,8 +149,6 @@ public class RayTracingExample {
 			Renderer.draw(renderingQuad, camera);
 
 			tex.bind();
-
-			// System.out.println(Renderer.camPos);
 
 			window.swapBuffers();
 
