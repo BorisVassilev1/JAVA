@@ -38,6 +38,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * Instanced rendering might be needed some day. A Scene object may be a solution here. 
 * Fix rendering. Normals are needed. Indexed system for normals, vertex color, UVs. Adequate implementation of materials.
 * Object3d contains only position and mesh. Something like GameObject is needed, with Transformation, Material, etc separated.
+* Light and shadows. smooth shading
+* Implement mesh shaders. Maybe Geometry shaders
+* Make more examples while doing al of this!
 * **RENAME THE STORMING PROJECT TO SOMETHING MORE FITTING TO IT'S CURRENT PURPOSE AS A LIBRARY**
 
 For the far far future: 
