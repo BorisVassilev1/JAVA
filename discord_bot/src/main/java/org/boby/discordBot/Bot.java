@@ -1,12 +1,14 @@
 package org.boby.discordBot;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
-import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.MessageBuilder;
@@ -16,8 +18,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -35,12 +35,22 @@ public class Bot extends ListenerAdapter {
 	
 	public static void main(String[] args) throws LoginException {
 
-		api = JDABuilder.createDefault("Njg4MTIzMzYzODg0OTI1MTAz.Xmvu0g.J83EBmLxeFhJuQoNPplCK-GRl0A")
+		BufferedReader reader;
+		String firstLine = null;
+		try {
+			reader = new BufferedReader(new FileReader(new File("./res/bot_token.txt")));
+			firstLine = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+
+		
+		api = JDABuilder.createDefault(firstLine)
 				.addEventListeners(new Bot()).setActivity(Activity.playing("Minecraft 2")).build();
 
 		User user = api.getUsers().get(0);
 		userId = user.getIdLong();
-		System.out.println(user.getId());
 		
 		music = ByteBuffer.allocate(960);
 		for(int i = 0; i < 960; i++) {
