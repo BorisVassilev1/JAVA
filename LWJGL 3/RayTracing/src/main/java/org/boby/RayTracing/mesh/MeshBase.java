@@ -4,18 +4,16 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
+import static org.lwjgl.opengl.GL46.*;
 
 /*
  * Contains base functonality of the Mesh class. Just a black box for now.
  */
 public class MeshBase {
+	
 	protected int createVertexArray() {
-        int vertexArrayID = GL30.glGenVertexArrays();
-        GL30.glBindVertexArray(vertexArrayID);
+        int vertexArrayID = glGenVertexArrays();
+        glBindVertexArray(vertexArrayID);
         return vertexArrayID;
     }
      
@@ -23,11 +21,11 @@ public class MeshBase {
     	FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
         buffer.put(data);
         buffer.flip();
-        int bufferID = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, bufferID);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_READ);
-        GL20.glVertexAttribPointer(attributeNumber, coordSize, GL11.GL_FLOAT, false, 0, 0);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        int bufferID = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+        glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_READ);
+        glVertexAttribPointer(attributeNumber, coordSize, GL_FLOAT, false, 0, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         return bufferID;
     }
      
@@ -35,10 +33,10 @@ public class MeshBase {
     	IntBuffer buffer = BufferUtils.createIntBuffer(indices.length);
         buffer.put(indices);
         buffer.flip();
-        int indicesBufferID = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBufferID);
-        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_READ);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        int indicesBufferID = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesBufferID);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer, GL_STATIC_READ);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         return indicesBufferID;
     }
 }

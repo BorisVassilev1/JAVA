@@ -12,6 +12,13 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
+/**
+ * Compiles, links, provides uniform and SSBO support for shader orpgrams.
+ * For now, it can work with vertex shaders, fragment shaders and compute shaders.
+ * 
+ * @author Boris
+ *
+ */
 public class Shader {
 	int programId;
 	int[] shaderIds;
@@ -23,6 +30,11 @@ public class Shader {
 	private ArrayList<String> uniform_names; 
 	private ArrayList<String> ssbo_names;
 	
+	/**
+	 * Prepares the shader to work with file_count shader files.
+	 * 
+	 * @param file_count - how many shader source files will be used in the shader.
+	 */
 	protected Shader(int file_count) {
 		uniforms = new HashMap<String, Integer>();
 		SSBOs = new HashMap<String, Integer>();
@@ -36,6 +48,9 @@ public class Shader {
 		programId = glCreateProgram();
 	}
 	
+	/**
+	 * Attaches, links the shader programs, then checks for errors, then creates the Uniforms and SSBOs the parser has found in the source code.
+	 */
 	protected void finishProgramCreation() {
 		attachShaders();
 		
@@ -47,6 +62,10 @@ public class Shader {
 		createSSBOs();
 	}
 	
+	/**
+	 * Sets the shader's source files to the provided file names later to be compiled and used.
+	 * @param source_files
+	 */
 	protected void setSourceFiles(String... source_files) {
 		if(source_files.length != fileNames.length) {
 			System.err.println("Error in shader creation: shader source files are too many or less than needed. ");
@@ -56,24 +75,38 @@ public class Shader {
 		}
 	}
 	
+	/**
+	 * Creates all the SSBOs the ShaderParser has found in the source code.
+	 */
 	private void createSSBOs() {
 		for(int i = 0; i < ssbo_names.size(); i++) {
 			createSSBO(ssbo_names.get(i), i);
 		}
 	}
 	
+	/**
+	 * Creates all the Uniforms the ShaderParser has found in the source code.
+	 */
 	private void createUniforms() {
 		for(String u_name: uniform_names) {
 			createUniform(u_name);
 		}
 	}
 	
+	/**
+	 * Attaches all the shader programs.
+	 */
 	private void attachShaders() {
 		for(int id: shaderIds) {
 			glAttachShader(programId, id);
 		}
 	}
 	
+	/**
+	 * Creates a shader program.
+	 * @param type accepts GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_COMPUTE_SHADER
+	 * @param target - which source file to use. This is the index of the file name, provided to setSourceFiles().
+	 */
 	protected void createShader(int type, int target) {
 		String file = fileNames[target];
 		String source = ShaderParser.ParseShaderFile(file, uniform_names, ssbo_names);
@@ -87,6 +120,9 @@ public class Shader {
 		checkCompileStatus(target);
 	}
 	
+	/**
+	 * Checks the shader for linking errors.
+	 */
 	private void checkLinkStatus() {
 		glLinkProgram(programId);
 		if(glGetProgrami(programId, GL_LINK_STATUS) == GL_FALSE) {
@@ -94,6 +130,9 @@ public class Shader {
 		}
 	}
 	
+	/**
+	 * Checks the shader for validation errors.
+	 */
 	private void checkValidateStatus() {
 		glValidateProgram(programId);
 		if(glGetProgrami(programId, GL_VALIDATE_STATUS) == GL_FALSE) {
@@ -101,6 +140,10 @@ public class Shader {
 		}
 	}
 	
+	/**
+	 * Checks the specified shader program for compilation errors.
+	 * @param target - the shader program. This is the index of the surce file name, provided to setSourceFiles()
+	 */
 	private void checkCompileStatus(int target) {
 		if(glGetShaderi(shaderIds[target], GL_COMPILE_STATUS) == GL_FALSE) {
 			System.err.println("Error: Shader Compilation - " + fileNames[target] + " - " + glGetShaderInfoLog(shaderIds[target]));

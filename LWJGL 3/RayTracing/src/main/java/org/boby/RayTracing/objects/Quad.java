@@ -1,6 +1,6 @@
 package org.boby.RayTracing.objects;
 
-import org.boby.RayTracing.mesh.Mesh;
+import org.boby.RayTracing.mesh.BasicMesh;
 import org.boby.RayTracing.shaders.VFShader;
 
 /**
@@ -9,7 +9,7 @@ import org.boby.RayTracing.shaders.VFShader;
 public class Quad extends Object3d{
 
 	public Quad(VFShader shader) {
-		super(new Mesh(
+		super(new BasicMesh(
 				new float[] {
 						-1.0f, +1.0f, 0,
 						+1.0f, +1.0f, 0,

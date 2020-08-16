@@ -1,35 +1,57 @@
 package org.boby.RayTracing.utils;
 
+import static org.lwjgl.glfw.GLFW.*;
+
+/** 
+ * Counts framerate, tracks time passed each update.
+ * @author boris
+ *
+ */
 public class FramerateManager {
 	
-	public int average_framerate = 0;
-	public float average_framerate_calc = 0;
-	public int current_framerate = 0;
-	public int frame_count = 0;
-	public int frame_offset = 60;
+	/**
+	 * how many nanoseconds has the previous frame taken
+	 */
+	public long nano_this_frame;
 	
-	int target_framerate = 120;
+	private double lastPrintTime;
+	private int frames_last_second;
 	
-	Time time;
+	private Time time;
 	
+	@FunctionalInterface
+	public interface OneSecondPassedCallback {
+		public void apply (long frames_this_second);
+	}
+	
+	private OneSecondPassedCallback callback;
+		
 	public FramerateManager(Time time) {
 		this.time = time;
+		lastPrintTime = glfwGetTime();
 	}
 	
+	/**
+	 * call this every iteration of the game loop
+	 */
 	public void update() {
-		//sync(target_framerate);
-		current_framerate = calculateFrameRate();
-		average_framerate_calc += current_framerate / (float)(frame_offset);
-		frame_count = (frame_count + 1) % frame_offset;
+		nano_this_frame = calculateNanoThisFrame();
 		
+		frames_last_second ++;
 		
-		if(frame_count == 0) { 
-			average_framerate = (int)Math.ceil(average_framerate_calc);
-//			System.out.println(average_framerate_calc);
-			average_framerate_calc = 0;
+		double glfwTimeNow = glfwGetTime();
+		if(glfwTimeNow - lastPrintTime > 1.0) {
+			if(callback != null)
+				callback.apply(frames_last_second);
+			
+			frames_last_second = 0;
+			lastPrintTime += 1;
 		}
 	}
-	
+	/**
+	 * call this at the end of each iteration of the game loop. Preferably, use it only if vsync is off.
+	 * @param FPS - desired framerate.
+	 */
 	public void sync(int FPS) {
 		long nanoseconds_per_frame = 1000000000 / FPS;
 		long offset = time.timeNow + nanoseconds_per_frame - System.nanoTime();
@@ -41,19 +63,21 @@ public class FramerateManager {
 				e.printStackTrace();
 			}
 		}
-		
-//		long endTime =  Time.timeNow + nanoseconds_per_frame;
-//		while(System.nanoTime() < endTime) {
-//			try {
-//				Thread.sleep(1);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
 	}
 	
+	/**
+	 * Calculates how many nanoseconds have passed from the beginning of the current iteration of the game loop.
+	 * @return the result of that calculation
+	 */
+	public long calculateNanoThisFrame() {
+		return System.nanoTime() - time.timeNow;
+	}
 	
-	public int calculateFrameRate() {
-		return (int)(1000000000 / (System.nanoTime() - time.timeNow));
+	/**
+	 * func will be called every second
+	 * @param func - the function to be called
+	 */
+	public void setSecondPassedCallback(OneSecondPassedCallback func) {
+		this.callback = func;
 	}
 }

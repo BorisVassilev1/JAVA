@@ -13,7 +13,7 @@ import org.lwjgl.system.MemoryStack;
 /**
  * A class that loads GLSL Shader Files and adds #include functionality
  * 
- * @author Boby
+ * @author Boris
  *
  */
 public class ShaderParser {

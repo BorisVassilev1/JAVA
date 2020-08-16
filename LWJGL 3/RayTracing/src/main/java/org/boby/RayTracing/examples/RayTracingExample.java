@@ -57,12 +57,6 @@ public class RayTracingExample {
 		
 		GL.createCapabilities(); // create the opengl context
 		
-		input = new Input(window);
-		input.lockMouse = true;
-		input.hideMouse();
-		
-		time = new Time();
-		frm = new FramerateManager(time);
 		
 		camera = new Camera((float)Math.toRadians(70f), window.getWidth() / window.getHeight(), 0.01f, 1000f);
 		
@@ -91,6 +85,18 @@ public class RayTracingExample {
 		comp.setSSBO("spheres", glbuff);
 
 		System.out.println(comp.toString());
+		
+		input = new Input(window);
+		input.lockMouse = true;
+		input.hideMouse();
+		
+		time = new Time();
+		frm = new FramerateManager(time);
+		
+		frm.setSecondPassedCallback((framerate) -> {
+			System.out.println("Framerate: " + framerate);
+		});
+		
 	}
 
 	private void loop() {
@@ -153,10 +159,6 @@ public class RayTracingExample {
 			window.swapBuffers();
 
 			frm.update();
-
-			if (frm.frame_count == 0)
-				System.out.println(frm.average_framerate);
-
 		}
 	}
 

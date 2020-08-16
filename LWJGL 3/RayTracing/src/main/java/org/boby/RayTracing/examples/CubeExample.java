@@ -7,14 +7,12 @@ import org.boby.RayTracing.rendering.Renderer;
 import org.boby.RayTracing.shaders.*;
 import org.boby.RayTracing.utils.*;
 import org.joml.Vector3f;
-//import org.joml.*;
 import org.lwjgl.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import java.nio.*;
 
-import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
 
@@ -52,16 +50,11 @@ public class CubeExample {
 	private void init() {
 		window = new Window("nqkva glupost bate", 800, 600, true);
 		
-		
-		time = new Time();
-		frm = new FramerateManager(time);
-		
 		camera = new Camera( (float)Math.toRadians(70f), window.getWidth() / window.getHeight(), 0.01f, 1000f);
 		
 		input = new Input(window);
 		input.lockMouse = true;
 		input.hideMouse();
-		
 
 		tex = new Texture2D("./res/rubyblock.png");
 
@@ -71,10 +64,18 @@ public class CubeExample {
 		
 		cube = new Cube(cubeShader);
 		cube.setScale(0.5f);
+		
+		time = new Time();
+		frm = new FramerateManager(time);
+		frm.setSecondPassedCallback((framerate) -> {
+			System.out.println("Framerate: " + framerate);
+		});
 	}
 
 	private void loop() {
-
+		// TODO: think of how to include this statically??? Also, just implement it in the Shader.
+//		System.out.println(NVMeshShader.GL_MESH_SHADER_NV);
+		
 		while (!window.shouldClose()) {
 			time.updateTime();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -120,14 +121,9 @@ public class CubeExample {
 			tex.bind();
 			Renderer.draw(cube, camera);
 
-			// cube.setRotation(cube.getRotation().add(new Vector3f(0.001f, 0.001f, 0.001f)));
 			window.swapBuffers();
 
 			frm.update();
-
-			if (frm.frame_count == 0)
-				System.out.println(frm.average_framerate);
-
 		}
 	}
 

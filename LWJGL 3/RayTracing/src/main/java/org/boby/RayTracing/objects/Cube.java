@@ -1,6 +1,6 @@
 package org.boby.RayTracing.objects;
 
-import org.boby.RayTracing.mesh.Mesh;
+import org.boby.RayTracing.mesh.BasicMesh;
 import org.boby.RayTracing.shaders.VFShader;
 
 /**
@@ -12,7 +12,7 @@ import org.boby.RayTracing.shaders.VFShader;
 public class Cube extends Object3d{
 
 	public Cube(VFShader shader) {
-		super(new Mesh(new float[] {
+		super(new BasicMesh(new float[] {
 				// VO
 			    -1.0f,  1.0f,  1.0f,
 			    // V1
