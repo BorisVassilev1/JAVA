@@ -24,7 +24,6 @@ public class Object3d {
 	
 	public Object3d(BasicMesh mesh, VFShader shader) {
 		this.mesh = mesh;
-		this.mesh.create();
 		this.shader = shader;
 		position = new Vector3f();
 		rotation = new Vector3f();

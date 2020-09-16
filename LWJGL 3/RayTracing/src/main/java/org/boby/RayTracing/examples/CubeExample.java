@@ -16,7 +16,7 @@ import java.nio.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
 
-public class CubeExample {
+public class CubeExample extends ApplicationBase{
 
 	// The window handle
 	public static Window window;
@@ -28,29 +28,14 @@ public class CubeExample {
 	Input input;
 	Time time;
 	FramerateManager frm;
-	
 
 	Camera camera;
 	
-	public void run() {
-//		Configuration.DEBUG.set(true);
-
-		System.out.println("LWJGL version: " + Version.getVersion());
-
-		init();
-		loop();
-
-		cleanup();
-
-		// Terminate GLFW and free the error callback
-		glfwTerminate();
-		glfwSetErrorCallback(null).free();
-	}
-
-	private void init() {
-		window = new Window("nqkva glupost bate", 800, 600, true);
+	public void init() {
+		window = new Window("nqkva glupost bate", 800, 600, true, true);
 		
-		camera = new Camera( (float)Math.toRadians(70f), window.getWidth() / window.getHeight(), 0.01f, 1000f);
+		camera = new Camera( (float)Math.toRadians(70f), window.getWidth() / (float)window.getHeight(), 0.01f, 1000f);
+		camera.CreateMatricesUBO();
 		
 		input = new Input(window);
 		input.lockMouse = true;
@@ -65,16 +50,23 @@ public class CubeExample {
 		cube = new Cube(cubeShader);
 		cube.setScale(0.5f);
 		
+		window.SetResizedCallback(() -> {
+			glViewport(0, 0, window.getWidth(), window.getHeight());
+			camera.setAspect(window.getWidth() / (float)window.getHeight());
+		});
+		
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		
 		time = new Time();
 		frm = new FramerateManager(time);
 		frm.setSecondPassedCallback((framerate) -> {
 			System.out.println("Framerate: " + framerate);
 		});
+		
+		
 	}
 
-	private void loop() {
-		// TODO: think of how to include this statically??? Also, just implement it in the Shader.
-//		System.out.println(NVMeshShader.GL_MESH_SHADER_NV);
+	public void loop() {
 		
 		while (!window.shouldClose()) {
 			time.updateTime();
@@ -108,15 +100,10 @@ public class CubeExample {
 
 			camRot.x += input.mouseD.y / 500;
 			camRot.y += input.mouseD.x / 500;
-
-			if(window.isResized()) {
-				glViewport(0, 0, window.getWidth(), window.getHeight());
-				camera.setAspect(window.getWidth() / (float)window.getHeight());
-				window.setResized(false);
-			}
 			
 			camera.UpdateProjectionMatrix();
 			camera.UpdateViewMatrix();
+			camera.UpdateMatricesUBO();
 			
 			tex.bind();
 			Renderer.draw(cube, camera);
@@ -127,7 +114,7 @@ public class CubeExample {
 		}
 	}
 
-	private void cleanup() {
+	public void cleanup() {
 		window.delete();
 		cube.delete();
 		cubeShader.delete();

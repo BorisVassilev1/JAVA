@@ -19,10 +19,16 @@ public class Window {
 	private int height;
 	private String name;
 	private long id;
-	private boolean resized;
 	private boolean vsync;
 
-	public Window(String name, int width, int height, boolean vsync) {
+	@FunctionalInterface
+	public interface ResizeCallback {
+		public void apply();
+	}
+	
+	ResizeCallback onResize;
+	
+	public Window(String name, int width, int height, boolean resizable, boolean vsync) {
 		this.width = width;
 		this.height = height;
 		this.name = name;
@@ -39,7 +45,11 @@ public class Window {
 		// Configure GLFW
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
+		if(resizable)
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+		else
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will not be 
+		
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -52,8 +62,8 @@ public class Window {
 		glfwSetFramebufferSizeCallback(id, (window, _width, _height) -> {
 			this.width = _width;
 			this.height = _height;
-			this.resized = true;
-			// glViewport(0, 0, width, height);
+			if(onResize != null)
+			onResize.apply();
 		});
 		// Get the thread stack and push a new frame
 		try (MemoryStack stack = stackPush()) {
@@ -112,6 +122,14 @@ public class Window {
 	public void delete() {
 		glfwFreeCallbacks(this.id);
 		glfwDestroyWindow(this.id);
+		
+		// Terminate GLFW and free the error callback
+		glfwTerminate();
+		glfwSetErrorCallback(null).free();
+	}
+	
+	public void SetResizedCallback(ResizeCallback onresize) {
+		this.onResize = onresize;
 	}
 
 	public long getId() {
@@ -124,14 +142,6 @@ public class Window {
 
 	public int getHeight() {
 		return height;
-	}
-
-	public boolean isResized() {
-		return resized;
-	}
-
-	public void setResized(boolean resized) {
-		this.resized = resized;
 	}
 	
 	public String getName() {

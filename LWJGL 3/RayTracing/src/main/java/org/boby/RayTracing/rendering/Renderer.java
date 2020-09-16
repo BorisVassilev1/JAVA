@@ -18,35 +18,20 @@ public class Renderer {
 		sh.bind();
 		
 		// Set uniforms
-		if(sh.hasUniform("projectionMatrix")) {
-			sh.setUniform("projectionMatrix", cam.getProjectionMatrix());
-		}
-		
 		if(sh.hasUniform("worldMatrix")) {
 			sh.setUniform("worldMatrix", obj.getWorldMatrix());
 		}
 		
-		if(sh.hasUniform("viewMatrix")) {
-			sh.setUniform("viewMatrix", cam.getViewMatrix());
-		}
-
 		// Will use the texture bound to GL_TEXTURE0
-		sh.setUniform("texture_sampler", 0);
+		if(sh.hasUniform("texture_sampler"))
+			sh.setUniform("texture_sampler", 0);
 
 		// bind VAO
-		glBindVertexArray(obj.getMesh().getVAOID());
-		
-		// Enable VBOs: vertices, colors, texCoords
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
+		obj.getMesh().bind();
 		
 		glDrawElements(GL_TRIANGLES, obj.getMesh().getIndicesCount(), GL_UNSIGNED_INT, 0);
 		
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
-		glBindVertexArray(0);
+		obj.getMesh().unbind();
 		
 		sh.unbind();
 	}

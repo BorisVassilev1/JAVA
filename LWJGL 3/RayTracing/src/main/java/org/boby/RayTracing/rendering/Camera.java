@@ -1,11 +1,25 @@
 package org.boby.RayTracing.rendering;
 
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
+import static org.lwjgl.opengl.GL43.*;
+
+import java.nio.FloatBuffer;
+
+import org.boby.RayTracing.shaders.Shader;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryStack;
 
 public class Camera {
-	Matrix4f projectionMatrix;
-	Matrix4f viewMatrix;
+	private Matrix4f projectionMatrix;
+	private Matrix4f viewMatrix;
+	
+	int uboMatrices;
 	
 	float ASPECT;
 	
@@ -32,13 +46,6 @@ public class Camera {
 		rotation = new Vector3f();
 	}
 	
-//	public Camera() {
-//		this((float) Math.toRadians(70f), )
-//		this.FOV = (float) Math.toRadians(70f);
-//		this.Z_NEAR = 0.01f;
-//		this.Z_FAR = 1000f;
-//	}
-	
 	public void UpdateProjectionMatrix() {
 		projectionMatrix.identity().setPerspective(this.FOV, this.ASPECT, this.Z_NEAR, this.Z_FAR);
 	}
@@ -49,6 +56,30 @@ public class Camera {
 				.rotateY(this.rotation.y)
 				.rotateZ(this.rotation.z)
 				.translate(new Vector3f(this.position).mul(-1));
+	}
+	
+	public void CreateMatricesUBO() {
+		uboMatrices = glGenBuffers();
+	    
+	    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+	    glBufferData(GL_UNIFORM_BUFFER, BufferUtils.createFloatBuffer(2 * 16), GL_STATIC_DRAW);
+	    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	    
+	    Shader.setUBO(uboMatrices, 0);
+	}
+	
+	public void UpdateMatricesUBO() {
+		glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+		try(MemoryStack stack = MemoryStack.stackPush()) {
+			FloatBuffer buff1 = stack.mallocFloat(16);
+			projectionMatrix.get(buff1);
+			glBufferSubData(GL_UNIFORM_BUFFER, 0, buff1);
+			
+			FloatBuffer buff2 = stack.mallocFloat(16);
+			viewMatrix.get(buff2);
+			glBufferSubData(GL_UNIFORM_BUFFER, 16 * 4, buff2);
+		}
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 	
 	public float getFov() {

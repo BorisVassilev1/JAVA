@@ -26,6 +26,7 @@ public class Shader {
 	
 	private final HashMap<String, Integer> uniforms; // uniform name and uniform location
 	private final HashMap<String, Integer> SSBOs; // ssbo name and ssbo binding
+	private final HashMap<String, Integer> UBOs;
 	
 	private ArrayList<String> uniform_names; 
 	private ArrayList<String> ssbo_names;
@@ -38,6 +39,7 @@ public class Shader {
 	protected Shader(int file_count) {
 		uniforms = new HashMap<String, Integer>();
 		SSBOs = new HashMap<String, Integer>();
+		UBOs = new HashMap<String, Integer>();
 		
 		uniform_names = new ArrayList<String>();
 		ssbo_names = new ArrayList<String>();
@@ -89,7 +91,11 @@ public class Shader {
 	 */
 	private void createUniforms() {
 		for(String u_name: uniform_names) {
-			createUniform(u_name);
+			try {
+				createUniform(u_name);
+			} catch (Exception e) {
+				System.out.println("uniform: " + u_name + " was not found");
+			}
 		}
 	}
 	
@@ -323,8 +329,7 @@ public class Shader {
 
 		// Sets the shader to look for the data in that buffer on the correct location.
 		// Can be skipped if "layout (std430, binding=<something>)" is used
-		int ssbo_binding_point_index = binding;
-		glShaderStorageBlockBinding(programId, block_index, ssbo_binding_point_index);
+		glShaderStorageBlockBinding(programId, block_index, binding);
 	}
 
 	/**
@@ -338,10 +343,48 @@ public class Shader {
 	 *            - the usage parameter of glBufferData()
 	 */
 	public void setSSBO(String name, int bufferId) {//https://www.geeks3d.com/20140704/tutorial-introduction-to-opengl-4-3-shader-storage-buffers-objects-ssbo-demo/
-		int binding_point_index = SSBOs.get(name);
+		int binding_point_index = getSSBOBinding(name);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point_index, bufferId);
 	}
+	
+	// TODO: write the javadoc for the next methods
+	public static void setSSBO(int bufferId, int binding) {
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, bufferId);
+	}
 
+	public void createUBO(String name, int binding) {
+		UBOs.put(name, binding);
+		
+		int block_index = glGetUniformBlockIndex(programId, name);
+		
+		glUniformBlockBinding(programId, block_index, binding);
+	}
+	
+	public void setUBO(String name, int bufferId) {
+		int binding_point_index = getUBOBinding(name);
+		glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, bufferId);
+	}
+	
+	public static void setUBO(int bufferId, int binding) {
+		glBindBufferBase(GL_UNIFORM_BUFFER, binding, bufferId);
+	}
+	
+	public int getSSBOBinding(String name) {
+		Integer binding = SSBOs.get(name);
+		if(binding == null) {
+			throw new RuntimeException("This SSBO does not exist or has not been created: " + name);
+		}
+		return binding;
+	}
+	
+	public int getUBOBinding(String name) {
+		Integer binding = UBOs.get(name);
+		if(binding == null) {
+			throw new RuntimeException("This UBO does not exist or has not been created: " + name);
+		}
+		return binding;
+	}
+	
 	/**
 	 * the shader will be used after this line till it is either unbound or another
 	 * shader is bound.
@@ -369,7 +412,7 @@ public class Shader {
 		glDeleteProgram(programId);
 	}
 	
-	// TODO: this in not a propper json formatting. there are excess ",". Why am I doing this???
+	// TODO: this in not a proper JSON formatting. there are excess ",". Why am I doing this???
 	@Override
 	public String toString() {
 		String s = "Shader: {ProgramId: " + programId + ", Uniforms: {";

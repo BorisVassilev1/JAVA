@@ -1,7 +1,11 @@
 package org.boby.RayTracing.objects;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 import org.boby.RayTracing.mesh.BasicMesh;
 import org.boby.RayTracing.shaders.VFShader;
+import org.lwjgl.BufferUtils;
 
 /**
  * Cube
@@ -12,13 +16,14 @@ import org.boby.RayTracing.shaders.VFShader;
 public class Cube extends Object3d{
 
 	public Cube(VFShader shader) {
-		super(new BasicMesh(new float[] {
+		super(new BasicMesh(
+			(FloatBuffer) BufferUtils.createFloatBuffer(3 * 8).put(new float[] {
 				// VO
 			    -1.0f,  1.0f,  1.0f,
 			    // V1
 			    -1.0f, -1.0f,  1.0f,
 			    // V2
-			    1.0f, -1.0f,  1.0f,
+			     1.0f, -1.0f,  1.0f,
 			    // V3
 			     1.0f,  1.0f,  1.0f,
 			    // V4
@@ -29,8 +34,18 @@ public class Cube extends Object3d{
 			    -1.0f, -1.0f, -1.0f,
 			    // V7
 			     1.0f, -1.0f, -1.0f,
-				
-		}, new int[] {
+			}).flip(), 
+			(FloatBuffer) BufferUtils.createFloatBuffer(3 * 8).put(new float[] {
+				-0.5773502691896258f,  0.5773502691896258f,  0.5773502691896258f,
+				-0.5773502691896258f, -0.5773502691896258f,  0.5773502691896258f,
+				 0.5773502691896258f, -0.5773502691896258f,  0.5773502691896258f,
+				 0.5773502691896258f,  0.5773502691896258f,  0.5773502691896258f,
+				-0.5773502691896258f,  0.5773502691896258f, -0.5773502691896258f,
+				 0.5773502691896258f,  0.5773502691896258f, -0.5773502691896258f,
+				-0.5773502691896258f, -0.5773502691896258f, -0.5773502691896258f,
+				 0.5773502691896258f, -0.5773502691896258f, -0.5773502691896258f
+			}).flip(), 
+			(IntBuffer) BufferUtils.createIntBuffer(36).put( new int[] {
 				// Front face
 			    0, 1, 3, 3, 1, 2,
 			    // Top Face
@@ -43,25 +58,8 @@ public class Cube extends Object3d{
 			    2, 1, 6, 2, 6, 7,
 			    // Back face
 			    7, 6, 4, 7, 4, 5,
-		}, new float[] {
-				1.0f, 0.0f, 0.0f,
-			    0.0f, 1.0f, 0.0f,
-			    0.0f, 0.0f, 1.0f,
-			    0.0f, 0.5f, 1.0f,
-			    1.0f, 0.0f, 0.0f,
-			    0.0f, 1.0f, 0.0f,
-			    0.0f, 0.0f, 1.0f,
-			    0.0f, 1.0f, 1.0f,
-		}, new float[] {
-				0,0,
-				0,1,
-				1,1,
-				1,0,
-				1,0,
-				0,0,
-				1,1,
-				0,1
-		}),shader);
+			}).flip()),
+			shader);
 	}
 
 }

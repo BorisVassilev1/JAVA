@@ -27,7 +27,7 @@ I am still not using versioning bcs I have no idea of it and I'm changing the AP
 
 * **Boris Vassilev** - *Initial work* - [BorisVassilev1](https://github.com/BorisVassilev1)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/BorisVassilev1/JAVA/tree/master/LWJGL%203/RayTracing/contributors) who participated in this project.
 
 ## License
 
@@ -36,11 +36,11 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## TODO: 
 * Think if utils.Loader is needed.
 * Instanced rendering might be needed some day. A Scene object may be a solution here. 
-* Fix rendering. Normals are needed. Indexed system for normals, vertex color, UVs. Adequate implementation of materials.
+* Fix rendering. Normals are needed. Indexed system for normals, vertex color, UVs. Adequate implementation of materials. - working on it
 * Object3d contains only position and mesh. Something like GameObject is needed, with Transformation, Material, etc separated.
-* Light and shadows. smooth shading
-* Implement mesh shaders. Maybe Geometry shaders
-* Make more examples while doing al of this!
+* Light and shadows. smooth shading - working on it
+* Geometry shaders - they should just work.
+* Make more examples while doing all of this!
 * **RENAME THE STORMING PROJECT TO SOMETHING MORE FITTING TO IT'S CURRENT PURPOSE AS A LIBRARY**
 
 For the far far future: 

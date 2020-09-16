@@ -9,23 +9,19 @@ import org.boby.RayTracing.utils.*;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-//import org.joml.*;
-import org.lwjgl.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import java.nio.*;
 
-import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
 
-public class RayTracingExample {
+public class RayTracingExample extends ApplicationBase{
 
 	public static Window window;
 	static VFShader renderQuadShader;
 	static Object3d renderingQuad;
-	static Texture2D tex;
 	static Texture2D renderTexture;
 
 	static ComputeShader comp;
@@ -36,32 +32,13 @@ public class RayTracingExample {
 	Time time;
 	FramerateManager frm;
 	
-	public void run() {
-		// Configuration.DEBUG.set(true);
-
-		System.out.println("LWJGL version: " + Version.getVersion());
-
-		init();
-		loop();
-
-		cleanup();
-		
-
-		// Terminate GLFW and free the error callback
-		glfwTerminate();
-		glfwSetErrorCallback(null).free();
-	}
-
-	private void init() {
-		window = new Window("nqkva glupost bate", 800, 600, true);
-		
-		GL.createCapabilities(); // create the opengl context
-		
+	@Override
+	public void init() {
+		window = new Window("nqkva glupost bate", 800, 600, false, true);
 		
 		camera = new Camera((float)Math.toRadians(70f), window.getWidth() / window.getHeight(), 0.01f, 1000f);
+		//camera.UpdateMatricesUBO();
 		
-		tex = new Texture2D("./res/rubyblock.png");
-
 		renderQuadShader = new VFShader("./res/shaders/verfrag_shaders/TextureOnScreenVertexShader.vs",
 				"./res/shaders/verfrag_shaders/TextureOnScreenFragmentShader.fs");
 		
@@ -99,7 +76,8 @@ public class RayTracingExample {
 		
 	}
 
-	private void loop() {
+	@Override
+	public void loop() {
 		
 		while (!window.shouldClose()) {
 			time.updateTime();
@@ -137,9 +115,10 @@ public class RayTracingExample {
 			Vector3f camRot = camera.getRotation();
 			camRot.x += input.mouseD.y / 500;
 			camRot.y += input.mouseD.x / 500;
-
+			
 			camera.UpdateProjectionMatrix();
 			camera.UpdateViewMatrix();
+			//camera.UpdateMatricesUBO();
 			
 			comp.bind();
 			//TODO: finish this. ... and think of how to do it better;			
@@ -154,20 +133,18 @@ public class RayTracingExample {
 
 			Renderer.draw(renderingQuad, camera);
 
-			tex.bind();
-
 			window.swapBuffers();
 
 			frm.update();
 		}
 	}
 
-	private void cleanup() {
+	@Override
+	public void cleanup() {
 		window.delete();
 		renderingQuad.delete();
 		renderQuadShader.delete();
 		comp.delete();
-		tex.delete();
 		renderTexture.delete();
 	}
 	
