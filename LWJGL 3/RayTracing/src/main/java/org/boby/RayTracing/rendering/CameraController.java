@@ -28,12 +28,12 @@ public class CameraController {
 	
 	public void update() {
 		
-		Vector3f camRot = camera.getRotation();
+		Vector3f camRot = camera.transform.getRotation();
 
 		camRot.x += input.mouseD.y / 500;
 		camRot.y += input.mouseD.x / 500;
 		
-		Vector3f camPos = camera.getPosition();
+		Vector3f camPos = camera.transform.getPosition();
 		
 		Matrix4f rotationMatrix = new Matrix4f().rotateX(-camRot.x).rotateY(-camRot.y).rotateZ(-camRot.z);
 		
@@ -68,8 +68,10 @@ public class CameraController {
 			camera.setFov(camera.getFov() + 0.01f);
 		if (input.getKey(GLFW_KEY_0) == GLFW_PRESS)
 			camera.setFov(camera.getFov() - 0.01f);
-
-		camera.UpdateViewMatrix();
-		camera.UpdateProjectionMatrix();
+		
+		camera.transform.setPosition(camPos);
+		camera.transform.setRotation(camRot);
+		
+		camera.updateMatrices();
 	}
 }

@@ -54,6 +54,7 @@ public class ModelLoader {
 		// process normals
 		FloatBuffer normals = MemoryUtil.memCallocFloat(vertices_count * 3);
 		AIVector3D.Buffer aiNormals = aiMesh.mNormals();
+//		if(aiNormals != null)
 		while (aiNormals.remaining() > 0) {
 			AIVector3D aiNormal = aiNormals.get();
 			normals.put(aiNormal.x());

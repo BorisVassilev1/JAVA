@@ -3,6 +3,7 @@ package org.boby.RayTracing.examples;
 import org.boby.RayTracing.main.*;
 import org.boby.RayTracing.objects.*;
 import org.boby.RayTracing.rendering.Camera;
+import org.boby.RayTracing.rendering.CameraController;
 import org.boby.RayTracing.rendering.Renderer;
 import org.boby.RayTracing.shaders.*;
 import org.boby.RayTracing.utils.*;
@@ -31,6 +32,8 @@ public class RayTracingExample extends ApplicationBase{
 	Input input;
 	Time time;
 	FramerateManager frm;
+	
+	CameraController controller;
 	
 	@Override
 	public void init() {
@@ -73,6 +76,8 @@ public class RayTracingExample extends ApplicationBase{
 		frm.setSecondPassedCallback((framerate) -> {
 			System.out.println("Framerate: " + framerate);
 		});
+			
+		controller = new CameraController(input, camera);
 		
 	}
 
@@ -86,8 +91,9 @@ public class RayTracingExample extends ApplicationBase{
 			glfwPollEvents();
 			
 			input.update();
+			controller.update();
 			
-			Vector3f camPos = camera.getPosition();
+			Vector3f camPos = camera.transform.getPosition();
 			if(input.getKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
 				camPos.y += 0.1;
 			}
@@ -112,22 +118,20 @@ public class RayTracingExample extends ApplicationBase{
 				camera.setFov(camera.getFov() - 0.01f);
 
 			
-			Vector3f camRot = camera.getRotation();
+			Vector3f camRot = camera.transform.getRotation();
 			camRot.x += input.mouseD.y / 500;
 			camRot.y += input.mouseD.x / 500;
 			
-			camera.UpdateProjectionMatrix();
-			camera.UpdateViewMatrix();
-			//camera.UpdateMatricesUBO();
+			camera.updateMatrices();
 			
 			comp.bind();
 			//TODO: finish this. ... and think of how to do it better;			
-			Matrix4f _mat = new Matrix4f().translate(new Vector3f(camera.getPosition()).mul(-1)).rotateX(camera.getRotation().x).rotateY(camera.getRotation().y).rotateZ(camera.getRotation().z);
-			comp.setUniform("cameraMatrix", _mat);
+			Matrix4f _mat = new Matrix4f().translate(new Vector3f(camera.transform.getPosition()).mul(-1)).rotateX(camera.transform.getRotation().x).rotateY(camera.transform.getRotation().y).rotateZ(camera.transform.getRotation().z);
+			comp.setUniform("cameraMatrix", camera.transform.getWorldMatrix());
 			comp.setUniform("resolution", new Vector2f(window.getWidth(), window.getHeight()));
 			comp.setUniform("fov", camera.getFov());
 			comp.unbind();
-
+			
 			renderTexture.bind(GL_TEXTURE0);
 			Renderer.Compute(comp, renderTexture.getWidth(), renderTexture.getHeight(), 1);
 

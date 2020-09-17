@@ -17,6 +17,7 @@ uniform mat4 worldMatrix;
 layout (std140) uniform Matrices {
 	mat4 projectionMatrix;
 	mat4 viewMatrix;
+	mat4 cameraWorldMatrix;
 };
 
 void main() {

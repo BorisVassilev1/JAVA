@@ -10,6 +10,7 @@ import static org.lwjgl.opengl.GL43.*;
 import java.nio.FloatBuffer;
 
 import org.boby.RayTracing.shaders.Shader;
+import org.boby.RayTracing.utils.Transformation;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -29,9 +30,7 @@ public class Camera {
 
 	final float Z_FAR;
 	
-	Vector3f position;
-
-	Vector3f rotation;
+	public Transformation transform;
 	
 	public Camera(float FOV, float ASPECT, float Z_NEAR, float Z_FAR) {
 		this.FOV = FOV;
@@ -42,20 +41,23 @@ public class Camera {
 		projectionMatrix = new Matrix4f().setPerspective(this.FOV, this.ASPECT, this.Z_NEAR, this.Z_FAR);
 		viewMatrix = new Matrix4f();
 		
-		position = new Vector3f();
-		rotation = new Vector3f();
+		transform = new Transformation();
 	}
 	
 	public void UpdateProjectionMatrix() {
 		projectionMatrix.identity().setPerspective(this.FOV, this.ASPECT, this.Z_NEAR, this.Z_FAR);
 	}
 	
-	public void UpdateViewMatrix() {
+	public void updateMatrices() {
+		this.transform.updateWorldMatrix();
+//		this.viewMatrix.set(this.transform.getWorldMatrix().invert());
 		viewMatrix.identity()
-				.rotateX(this.rotation.x)
-				.rotateY(this.rotation.y)
-				.rotateZ(this.rotation.z)
-				.translate(new Vector3f(this.position).mul(-1));
+		.rotateX(this.transform.getRotation().x)
+		.rotateY(this.transform.getRotation().y)
+		.rotateZ(this.transform.getRotation().z)
+		.translate(new Vector3f(this.transform.getPosition()).mul(-1));
+		this.UpdateProjectionMatrix();
+		this.UpdateMatricesUBO();
 	}
 	
 	public void CreateMatricesUBO() {
@@ -71,13 +73,15 @@ public class Camera {
 	public void UpdateMatricesUBO() {
 		glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
 		try(MemoryStack stack = MemoryStack.stackPush()) {
-			FloatBuffer buff1 = stack.mallocFloat(16);
-			projectionMatrix.get(buff1);
-			glBufferSubData(GL_UNIFORM_BUFFER, 0, buff1);
+			FloatBuffer buff = stack.mallocFloat(16);
+			projectionMatrix.get(buff);
+			glBufferSubData(GL_UNIFORM_BUFFER, 0, buff);
 			
-			FloatBuffer buff2 = stack.mallocFloat(16);
-			viewMatrix.get(buff2);
-			glBufferSubData(GL_UNIFORM_BUFFER, 16 * 4, buff2);
+			viewMatrix.get(buff);
+			glBufferSubData(GL_UNIFORM_BUFFER, 16 * 4, buff);
+//			
+//			this.transform.getWorldMatrix().get(buff);
+//			glBufferSubData(GL_UNIFORM_BUFFER, 2 * 16 * 4, buff);
 		}
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
@@ -89,15 +93,7 @@ public class Camera {
 	public void setFov(float fOV) {
 		FOV = fOV;
 	}
-
-	public Vector3f getPosition() {
-		return position;
-	}
-
-	public void setPosition(Vector3f position) {
-		this.position = position;
-	}
-
+	
 	public Matrix4f getProjectionMatrix() {
 		return projectionMatrix;
 	}
@@ -116,14 +112,6 @@ public class Camera {
 
 	public float getZNear() {
 		return Z_NEAR;
-	}
-
-	public Vector3f getRotation() {
-		return rotation;
-	}
-
-	public void setRotation(Vector3f rotation) {
-		this.rotation = rotation;
 	}
 
 	public float getZFar() {

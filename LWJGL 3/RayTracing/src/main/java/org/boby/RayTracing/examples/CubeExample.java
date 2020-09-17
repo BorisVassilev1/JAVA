@@ -48,7 +48,7 @@ public class CubeExample extends ApplicationBase{
 		System.out.println(cubeShader.toString());
 		
 		cube = new Cube(cubeShader);
-		cube.setScale(0.5f);
+		cube.transform.setScale(0.5f);
 		
 		window.SetResizedCallback(() -> {
 			glViewport(0, 0, window.getWidth(), window.getHeight());
@@ -76,7 +76,7 @@ public class CubeExample extends ApplicationBase{
 
 			glfwPollEvents();
 
-			Vector3f camPos = camera.getPosition();
+			Vector3f camPos = camera.transform.getPosition();
 			if(input.getKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
 				camPos.y += 0.1;
 			}
@@ -96,14 +96,12 @@ public class CubeExample extends ApplicationBase{
 			if (input.getKey(GLFW_KEY_0) == GLFW_PRESS)
 				camera.setFov(camera.getFov() - 0.01f);
 
-			Vector3f camRot = camera.getRotation();
+			Vector3f camRot = camera.transform.getRotation();
 
 			camRot.x += input.mouseD.y / 500;
 			camRot.y += input.mouseD.x / 500;
 			
-			camera.UpdateProjectionMatrix();
-			camera.UpdateViewMatrix();
-			camera.UpdateMatricesUBO();
+			camera.updateMatrices();
 			
 			tex.bind();
 			Renderer.draw(cube, camera);

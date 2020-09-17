@@ -40,8 +40,11 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * Object3d contains only position and mesh. Something like GameObject is needed, with Transformation, Material, etc separated.
 * Light and shadows. smooth shading - working on it
 * Geometry shaders - they should just work.
-* Make more examples while doing all of this!
-* **RENAME THE STORMING PROJECT TO SOMETHING MORE FITTING TO IT'S CURRENT PURPOSE AS A LIBRARY**
+* Make more examples while doing all of this! -> CubeExample does not have lights
+* Make a Scene obect to store everything.
+* materials
+* everything should be passed to the shaders through UBOs. Make automatic parsing to FloatBuffer. 
+* **RENAME THE PROJECT TO SOMETHING MORE FITTING TO IT'S CURRENT PURPOSE AS A LIBRARY**
 
 For the far far future: 
 * Should mesh generation be done with a geometry shader smh, or in a compute shader?

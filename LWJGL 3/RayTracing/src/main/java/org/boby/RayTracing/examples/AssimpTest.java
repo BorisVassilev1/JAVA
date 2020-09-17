@@ -69,20 +69,20 @@ public class AssimpTest extends ApplicationBase{
 	    
 	    BasicMesh lightMesh = ModelLoader.load("./res/cube.obj");
 	    light = new Object3d(lightMesh, shader);
-	    light.setPosition(lightPos);
-	    light.setScale(.3f);
-	    light.updateWorldMatrix();
+	    light.transform.setPosition(lightPos);
+	    light.transform.setScale(.3f);
+	    light.transform.updateWorldMatrix();
 	    
 	    BasicMesh cubeMesh = ModelLoader.load("./res/cube.obj");
 	    cube = new Object3d(cubeMesh, shader);
-	    cube.setPosition(new Vector3f(0f, 4f, 0f));
-	    cube.setScale(.5f);
-	    cube.updateWorldMatrix();
+	    cube.transform.setPosition(new Vector3f(0f, 4f, 0f));
+	    cube.transform.setScale(.5f);
+	    cube.transform.updateWorldMatrix();
 	    
 	    BasicMesh dragonMesh = ModelLoader.load("./res/dragon.obj"); 
 	    dragon = new Object3d(dragonMesh, shader);
-	    dragon.setScale(10);
-	    dragon.updateWorldMatrix();
+	    dragon.transform.setScale(10);
+	    dragon.transform.updateWorldMatrix();
 	    
 	    time = new Time();
 	    
@@ -115,22 +115,15 @@ public class AssimpTest extends ApplicationBase{
 			input.update();
 			controller.update();
 			
-//			Matrix4f mat = new Matrix4f().rotateY(0.01f);
-//			lightPos.mulDirection(mat);
-			
-			
-			//lightPos.x = (float) (Math.sin(glfwGetTime()) * 7);
+//			lightPos.x = (float) (Math.sin(glfwGetTime()) * 7);
 			shader.bind();
 			if(shader.hasUniform("lightPosition"));
 			shader.setUniform("lightPosition", lightPos);
 			shader.unbind();
-			light.setPosition(lightPos);
-			light.updateWorldMatrix();
+			light.transform.setPosition(lightPos);
+			light.transform.updateWorldMatrix();
 			
-			cam.UpdateMatricesUBO();
-			
-//			System.out.println(cam.getPosition());
-//			System.out.println(cam.getViewMatrix().invert().toString());
+			cam.updateMatrices();
 			
 		    Renderer.draw(dragon, cam);
 		    Renderer.draw(light, cam);

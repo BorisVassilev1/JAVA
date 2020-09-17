@@ -113,7 +113,7 @@ void main() {
 	vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);
 	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
 	vec2 pixel_position = pixel_coords / resolution;
-	cam_pos = -(cameraMatrix * vec4(0.0,0.0,0.0,1.0)).xyz;
+	cam_pos = (cameraMatrix * vec4(0.0,0.0,0.0,1.0)).xyz;
 
 	v00 = (vec4(v00,1.0) * cameraMatrix).xyz;
 	v10 = (vec4(v10,1.0) * cameraMatrix).xyz;
@@ -121,13 +121,12 @@ void main() {
 	v11 = (vec4(v11,1.0) * cameraMatrix).xyz;
 
 	Ray ray = createRay(cam_pos, normalize( lerp4vec( v00, v10, v01, v11, pixel_position.x, pixel_position.y) ) );
-	//ray.direction.y *= -1;
 
 
 	RayHit hit;
 	float mult = 1.0;
 	vec4 color = vec4(1.0,1.0,1.0, 1.0);
-	for(int i = 0; i < 10; i ++) {
+	for(int i = 0; i < 4; i ++) {
 
 		hit.distance = 1.0 / 0.0;
 		intersectGroundPlane(ray,0.0,hit);
