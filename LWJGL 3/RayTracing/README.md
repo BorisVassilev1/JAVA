@@ -44,6 +44,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * Make a Scene obect to store everything.
 * materials
 * everything should be passed to the shaders through UBOs. Make automatic parsing to FloatBuffer. 
+* add sprite rendering support
 * **RENAME THE PROJECT TO SOMETHING MORE FITTING TO IT'S CURRENT PURPOSE AS A LIBRARY**
 
 For the far far future: 

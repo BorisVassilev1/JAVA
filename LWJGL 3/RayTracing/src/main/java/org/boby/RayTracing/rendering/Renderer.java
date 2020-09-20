@@ -19,7 +19,7 @@ public class Renderer {
 		
 		// Set uniforms
 		if(sh.hasUniform("worldMatrix")) {
-			sh.setUniform("worldMatrix", obj.getWorldMatrix());
+			sh.setUniform("worldMatrix", obj.transform.getWorldMatrix());
 		}
 		
 		// Will use the texture bound to GL_TEXTURE0

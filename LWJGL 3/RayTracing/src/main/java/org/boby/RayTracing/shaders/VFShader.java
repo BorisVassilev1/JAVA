@@ -21,6 +21,11 @@ public class VFShader extends Shader{
 		createShader(GL_FRAGMENT_SHADER, 1);
 		
 		finishProgramCreation();
+		
+		ShaderParser.findBlockUniforms(this.programId);
+		
+		System.out.println();
+		ShaderParser.getNonBlockUniforms(this.programId);
 	}
 	
 }

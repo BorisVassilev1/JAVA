@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.opengl.GLXARBGetProcAddress;
+import static org.lwjgl.opengl.GL46.*;
 
 /**
  * A class that loads GLSL Shader Files and adds #include functionality
@@ -78,5 +80,65 @@ public class ShaderParser {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	static void findBlockUniforms(int program) {
+		int _numBlocks[] = new int[1];
+		glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, _numBlocks);
+		int numBlocks = _numBlocks[0];
+
+		int blockProperties[] = { GL_NUM_ACTIVE_VARIABLES };
+		int activeUnifProp[] = { GL_ACTIVE_VARIABLES };
+		int unifProperties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
+
+		for (int blockIx = 0; blockIx < numBlocks; ++blockIx) {
+			String name1;
+			name1 = glGetProgramResourceName(program, GL_UNIFORM_BLOCK, blockIx);
+			System.out.println(name1);
+
+			int _numActiveUnifs[] = { 0 };
+			glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, blockIx, blockProperties, null, _numActiveUnifs);
+			int numActiveUnifs = _numActiveUnifs[0];
+
+			if (numActiveUnifs == 0) {
+				continue;
+			}
+
+			int blockUnifs[] = new int[numActiveUnifs];
+			glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, blockIx, activeUnifProp, _numActiveUnifs, blockUnifs);
+
+			for (int unifIx = 0; unifIx < numActiveUnifs; ++unifIx) {
+				int values[] = new int[3];
+
+				glGetProgramResourceiv(program, GL_UNIFORM, blockUnifs[unifIx], unifProperties, null, values);
+
+				String name;
+				name = glGetProgramResourceName(program, GL_UNIFORM, blockUnifs[unifIx]);
+				System.out.println("\t" + name);
+			}
+		}
+	}
+	
+	static void getNonBlockUniforms(int program) {
+		int _numUniforms[] = new int[1];
+		glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, _numUniforms);
+		int numUniforms = _numUniforms[0];
+		int properties[] = {GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION};
+		
+		for(int unif = 0; unif < numUniforms; ++unif)
+		{
+			int values[] = new int[4];
+			glGetProgramResourceiv(program, GL_UNIFORM, unif, properties, null, values);
+			
+			if(values[0] != -1) {
+				continue;
+			}
+			
+			String name;
+			name = glGetProgramResourceName(program, GL_UNIFORM, unif);
+			System.out.println(name);
+		}
+		
+		
 	}
 }

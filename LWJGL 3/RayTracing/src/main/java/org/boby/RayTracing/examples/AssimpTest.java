@@ -41,6 +41,7 @@ public class AssimpTest extends ApplicationBase{
 		new AssimpTest().run();
 	}
 	
+	// TODO: move this elsewhere!
 	public static double getAllocatedMemory() {
 		return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (double) (1024 * 1024);
 	}
