@@ -16,6 +16,7 @@ public class Scene{
 	private	ArrayList<Transformation> transformations;
 	private ArrayList<Shader> shaders;
 	private ArrayList<Light> lights;
+	private ArrayList<Camera> cameras;
 	
 	public Scene() {
 		this.gameObjects = new ArrayList<GameObject>();
@@ -25,6 +26,7 @@ public class Scene{
 		this.transformations = new ArrayList<Transformation>();
 		this.shaders = new ArrayList<Shader>();
 		this.lights = new ArrayList<Light>();
+		this.cameras = new ArrayList<Camera>();
 	}
 	private class Registerer <T> {
 		public int registerUniqueField(T obj, ArrayList<T> list) {
@@ -65,6 +67,10 @@ public class Scene{
 	
 	public int registerLight(Light light) {
 		return new Registerer<Light>().registerUniqueField(light, lights);
+	}
+	
+	public int registerCamera(Camera camera) {
+		return new Registerer<Camera>().registerUniqueField(camera, cameras);
 	}
 	
 }
