@@ -5,7 +5,7 @@ import static org.lwjgl.assimp.Assimp.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import org.boby.RayTracing.mesh.BasicMesh;
+import org.boby.RayTracing.data.mesh.BasicMesh;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMesh;

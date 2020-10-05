@@ -1,8 +1,8 @@
 package org.boby.RayTracing.objects;
 
-import org.boby.RayTracing.mesh.BasicMesh;
+import org.boby.RayTracing.data.Transformation;
+import org.boby.RayTracing.data.mesh.BasicMesh;
 import org.boby.RayTracing.shaders.VFShader;
-import org.boby.RayTracing.utils.Transformation;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -28,7 +28,7 @@ public class Object3d {
 	public void delete()
 	{
 		mesh.delete();
-		shader.delete();
+		//shader.delete();
 	}
 	
 	public VFShader getShader()

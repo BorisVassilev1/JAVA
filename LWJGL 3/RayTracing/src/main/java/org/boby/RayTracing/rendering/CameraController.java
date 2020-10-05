@@ -30,12 +30,12 @@ public class CameraController {
 		
 		Vector3f camRot = camera.transform.getRotation();
 
-		camRot.x += input.mouseD.y / 500;
-		camRot.y += input.mouseD.x / 500;
+		camRot.x -= input.mouseD.y / 500;
+		camRot.y -= input.mouseD.x / 500;
 		
 		Vector3f camPos = camera.transform.getPosition();
 		
-		Matrix4f rotationMatrix = new Matrix4f().rotateX(-camRot.x).rotateY(-camRot.y).rotateZ(-camRot.z);
+		Matrix4f rotationMatrix = new Matrix4f().rotateX(camRot.x).rotateY(camRot.y).rotateZ(camRot.z);
 		
 		Vector3f forward = new Vector3f(0f, 0f, 1f).mulDirection(rotationMatrix);
 		Vector3f forwardXZ = new Vector3f(forward.x, 0f, forward.z).normalize();

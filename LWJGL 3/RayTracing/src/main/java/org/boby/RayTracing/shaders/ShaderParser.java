@@ -36,7 +36,7 @@ public class ShaderParser {
 		return parsed.toString();
 	}
 	
-	private static void ParseRecursively(StringBuilder parsed, String file, int depth, AtomicInteger lines, AtomicInteger libLines, ArrayList<String> uniform_names, ArrayList<String> ssbo_names) {
+	public static void ParseRecursively(StringBuilder parsed, String file, int depth, AtomicInteger lines, AtomicInteger libLines, ArrayList<String> uniform_names, ArrayList<String> ssbo_names) {
 		//String filePathPrefix = file.substring(0,file.lastIndexOf("/"));
 		BufferedReader reader = null;
 		
@@ -82,21 +82,21 @@ public class ShaderParser {
 		}
 	}
 
-	static void findBlockUniforms(int program) {
+	public static void findBlockUniforms(int program) {
 		int _numBlocks[] = new int[1];
 		glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, _numBlocks);
 		int numBlocks = _numBlocks[0];
 
 		int blockProperties[] = { GL_NUM_ACTIVE_VARIABLES };
 		int activeUnifProp[] = { GL_ACTIVE_VARIABLES };
-		int unifProperties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
+		int unifProperties[] = { GL_TYPE, GL_LOCATION, GL_OFFSET};
 
 		for (int blockIx = 0; blockIx < numBlocks; ++blockIx) {
-			String name1;
-			name1 = glGetProgramResourceName(program, GL_UNIFORM_BLOCK, blockIx);
-			System.out.println(name1);
+			String blockName;
+			blockName = glGetProgramResourceName(program, GL_UNIFORM_BLOCK, blockIx);
+			System.out.println(blockName + " " + blockIx);
 
-			int _numActiveUnifs[] = { 0 };
+			int _numActiveUnifs[] = new int[1];
 			glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, blockIx, blockProperties, null, _numActiveUnifs);
 			int numActiveUnifs = _numActiveUnifs[0];
 
@@ -114,12 +114,12 @@ public class ShaderParser {
 
 				String name;
 				name = glGetProgramResourceName(program, GL_UNIFORM, blockUnifs[unifIx]);
-				System.out.println("\t" + name);
+				System.out.println("\t" + name + " " + values[0] + " " + values[2]);
 			}
 		}
 	}
 	
-	static void getNonBlockUniforms(int program) {
+	public static void getNonBlockUniforms(int program) {
 		int _numUniforms[] = new int[1];
 		glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, _numUniforms);
 		int numUniforms = _numUniforms[0];
@@ -136,9 +136,43 @@ public class ShaderParser {
 			
 			String name;
 			name = glGetProgramResourceName(program, GL_UNIFORM, unif);
-			System.out.println(name);
+			System.out.println(name + " " + values[1] + " " + values[3]);
 		}
+	}
+	
+	public static void getSSBOs(int program) {
+		int _numSSBOs[] = new int[1];
+		glGetProgramInterfaceiv(program, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, _numSSBOs);
+		//System.out.println(_numSSBOs[0]);
 		
+		int blockProperties[] = {GL_NUM_ACTIVE_VARIABLES};
+		int activeUnifProp[] = { GL_ACTIVE_VARIABLES };
+		int unifProperties[] = { GL_TYPE};
 		
+		for(int block = 0; block < _numSSBOs[0]; block ++) {
+			
+			
+			String blockName;
+			blockName = glGetProgramResourceName(program, GL_SHADER_STORAGE_BLOCK, block);
+			System.out.println(blockName + " " + block);
+			
+			int _numActiveVariables[] = new int[1];
+			glGetProgramResourceiv(program, GL_SHADER_STORAGE_BLOCK, block, blockProperties, null, _numActiveVariables);
+			
+			//System.out.println(_numActiveVariables[0]);
+			
+			int blockUnifs[] = new int[_numActiveVariables[0]];
+			glGetProgramResourceiv(program, GL_SHADER_STORAGE_BLOCK, block, activeUnifProp, _numActiveVariables, blockUnifs);
+			
+			for(int i = 0; i < _numActiveVariables[0]; i ++) {
+				int values[] = new int[1];
+
+				glGetProgramResourceiv(program, GL_BUFFER_VARIABLE, blockUnifs[i], unifProperties, null, values);
+				
+				String variableName;
+				variableName = glGetProgramResourceName(program, GL_BUFFER_VARIABLE, blockUnifs[i]);
+				System.out.println("\t" + variableName + " " + " " + values[0] );
+			}
+		}
 	}
 }

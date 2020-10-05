@@ -18,6 +18,8 @@ import java.nio.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
 
+// TODO: this throws some opengl errors every frame. Fix it!
+
 public class RayTracingExample extends ApplicationBase{
 
 	public static Window window;
@@ -69,6 +71,12 @@ public class RayTracingExample extends ApplicationBase{
 		input = new Input(window);
 		input.lockMouse = true;
 		input.hideMouse();
+		
+		ShaderParser.findBlockUniforms(comp.getProgramId());
+		
+		System.out.println();
+		ShaderParser.getNonBlockUniforms(comp.getProgramId());
+		ShaderParser.getSSBOs(comp.getProgramId());
 		
 		time = new Time();
 		frm = new FramerateManager(time);

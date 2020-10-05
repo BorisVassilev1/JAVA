@@ -4,8 +4,8 @@
 precision highp float;
 #endif
 
-#include <SimplexNoise.incl>
-//#include <voronoise.incl>
+#include <SimplexNoise.glincl>
+//#include <voronoise.glincl>
 
 struct Sphere {
 	vec4 position;

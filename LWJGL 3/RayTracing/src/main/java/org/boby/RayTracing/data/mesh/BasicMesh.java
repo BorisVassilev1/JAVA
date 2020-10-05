@@ -1,4 +1,4 @@
-package org.boby.RayTracing.mesh;
+package org.boby.RayTracing.data.mesh;
 
 import static org.lwjgl.opengl.GL46.*;
 

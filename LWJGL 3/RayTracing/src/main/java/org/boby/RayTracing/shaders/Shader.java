@@ -326,7 +326,6 @@ public class Shader {
 		SSBOs.put(name, binding);
 		
 		int block_index = glGetProgramResourceIndex(programId, GL_SHADER_STORAGE_BLOCK, name);
-
 		// Sets the shader to look for the data in that buffer on the correct location.
 		// Can be skipped if "layout (std430, binding=<something>)" is used
 		glShaderStorageBlockBinding(programId, block_index, binding);
@@ -383,6 +382,10 @@ public class Shader {
 			throw new RuntimeException("This UBO does not exist or has not been created: " + name);
 		}
 		return binding;
+	}
+	
+	public int getProgramId() {
+		return this.programId;
 	}
 	
 	/**

@@ -2,15 +2,19 @@ package org.boby.RayTracing.main;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryStack.stackPush;
-import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.opengl.GL46.*;
+import static org.lwjgl.system.MemoryStack.*;
+import static org.lwjgl.system.MemoryUtil.*;
 
 import java.nio.IntBuffer;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL46;
+import org.lwjgl.opengl.GLDebugMessageCallback;
+import org.lwjgl.opengl.GLUtil;
+import org.lwjgl.system.Callback;
 import org.lwjgl.system.MemoryStack;
 
 public class Window {
@@ -85,6 +89,8 @@ public class Window {
 		
 		// create the opengl context
 		GL.createCapabilities(); 
+		Callback debugProc = GLUtil.setupDebugMessageCallback();
+		nglDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_OTHER, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, false);
 		
 		// Enable v-sync
 		if (this.vsync)
@@ -93,11 +99,22 @@ public class Window {
 		// Make the window visible
 		glfwShowWindow(id);
 		
-		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glClearColor(0f, 0f, 0f, 1f);
+		
+		//glEnable(GL_DEBUG_OUTPUT);
+		/*glDebugMessageCallback(new GLDebugMessageCallback() {
+			
+			@Override
+			public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
+				String msg = getMessage(length, message);
+				System.err.printf("GL ERROR CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
+			            type, severity, msg);
+				
+			}
+		}, 0);*/
 	}
 
 	/**
@@ -120,8 +137,8 @@ public class Window {
 	 * destroys the window.
 	 */
 	public void delete() {
-		glfwFreeCallbacks(this.id);
-		glfwDestroyWindow(this.id);
+		glfwFreeCallbacks(id);
+		glfwDestroyWindow(id);
 		
 		// Terminate GLFW and free the error callback
 		glfwTerminate();

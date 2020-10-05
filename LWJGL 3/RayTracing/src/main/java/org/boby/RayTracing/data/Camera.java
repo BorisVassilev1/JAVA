@@ -1,13 +1,16 @@
-package org.boby.RayTracing.rendering;
+package org.boby.RayTracing.data;
 
-import static org.lwjgl.opengl.GL43.*;
+import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glBufferSubData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
 
 import java.nio.FloatBuffer;
 
-import org.boby.RayTracing.data.Transformation;
 import org.boby.RayTracing.shaders.Shader;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryStack;
 

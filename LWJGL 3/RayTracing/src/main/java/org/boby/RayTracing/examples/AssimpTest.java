@@ -6,13 +6,14 @@ import static org.lwjgl.opengl.GL46.*;
 import java.lang.instrument.Instrumentation;
 import java.nio.FloatBuffer;
 
+import org.boby.RayTracing.data.mesh.BasicMesh;
 import org.boby.RayTracing.main.Window;
-import org.boby.RayTracing.mesh.BasicMesh;
 import org.boby.RayTracing.objects.Object3d;
 import org.boby.RayTracing.rendering.Camera;
 import org.boby.RayTracing.rendering.CameraController;
 import org.boby.RayTracing.rendering.Renderer;
 import org.boby.RayTracing.shaders.Shader;
+import org.boby.RayTracing.shaders.ShaderParser;
 import org.boby.RayTracing.shaders.VFShader;
 import org.boby.RayTracing.utils.FramerateManager;
 import org.boby.RayTracing.utils.Input;
@@ -56,16 +57,18 @@ public class AssimpTest extends ApplicationBase{
 	    shader.bind();
 	    
 	    if(shader.hasUniform("textureWeight"))
-	    shader.setUniform("textureWeight", 0.0f);
+	    	shader.setUniform("textureWeight", 0.0f);
 	    if(shader.hasUniform("colorWeight"))
-	    shader.setUniform("colorWeight", 1.0f);
+	    	shader.setUniform("colorWeight", 1.0f);
 	    if(shader.hasUniform("lightPosition"))
-	    shader.setUniform("lightPosition", lightPos);
+	    	shader.setUniform("lightPosition", lightPos);
+	    
 	    shader.unbind();
 	    
 	    shader.createUBO("Matrices", 0);
 	    
 	    cam.CreateMatricesUBO();
+	    
 	    
 	    
 	    BasicMesh lightMesh = ModelLoader.load("./res/cube.obj");
@@ -74,22 +77,32 @@ public class AssimpTest extends ApplicationBase{
 	    light.transform.setScale(.3f);
 	    light.transform.updateWorldMatrix();
 	    
+	    
+	    
 	    BasicMesh cubeMesh = ModelLoader.load("./res/cube.obj");
 	    cube = new Object3d(cubeMesh, shader);
 	    cube.transform.setPosition(new Vector3f(0f, 4f, 0f));
 	    cube.transform.setScale(.5f);
 	    cube.transform.updateWorldMatrix();
 	    
+	    
 	    BasicMesh dragonMesh = ModelLoader.load("./res/dragon.obj"); 
 	    dragon = new Object3d(dragonMesh, shader);
 	    dragon.transform.setScale(10);
 	    dragon.transform.updateWorldMatrix();
+	    
 	    
 	    time = new Time();
 	    
 	    input = new Input(window);
 	    input.hideMouse();
 	    input.lockMouse = true;
+	    
+	    
+		ShaderParser.findBlockUniforms(shader.getProgramId());
+		
+		System.out.println();
+		ShaderParser.getNonBlockUniforms(shader.getProgramId());
 	    
 	    fm = new FramerateManager(time);
 	    fm.setSecondPassedCallback((framerate) -> {
@@ -116,7 +129,6 @@ public class AssimpTest extends ApplicationBase{
 			input.update();
 			controller.update();
 			
-//			lightPos.x = (float) (Math.sin(glfwGetTime()) * 7);
 			shader.bind();
 			if(shader.hasUniform("lightPosition"));
 			shader.setUniform("lightPosition", lightPos);
@@ -137,10 +149,11 @@ public class AssimpTest extends ApplicationBase{
 
 	@Override
 	public void cleanup() {
-		dragon.delete();
-		cube.delete();
-		light.delete();
+		dragon.getMesh().delete();
+		cube.getMesh().delete();
+		light.getMesh().delete();
 		shader.delete();
+		
 		window.delete();
 	}
 	

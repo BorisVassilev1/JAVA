@@ -1,0 +1,48 @@
+struct PointLight {
+	vec3 position;
+	vec3 color;
+	float intensity;
+};
+
+struct DirectionalLight {
+	vec3 direction;
+	vec3 color;
+	float intensity;
+};
+
+struct AmbientLight {
+ 	vec3 color;
+	float intensity;
+};
+
+struct Material {
+	//sampler2D texture;
+	vec3 color;
+	bool use_texture;
+	
+	float diffuse_power;
+	float specular_power;
+	float specular_exponent;
+};
+
+layout (std140) uniform Matrices {
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+	mat4 cameraWorldMatrix;
+};
+
+ uniform Materials {
+	Material mat[2];
+};
+
+layout(std140) uniform PointLights {
+	PointLight pointLights[];
+};
+
+layout(std140) uniform AmbientLights{
+	AmbientLight ambientLigths[];
+};
+
+layout(std140) uniform DirectionLights {
+	DirectionalLight directionalLights[];
+};

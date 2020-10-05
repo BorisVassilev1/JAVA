@@ -1,4 +1,4 @@
-package org.boby.RayTracing.utils;
+package org.boby.RayTracing.data;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -25,11 +25,11 @@ public class Transformation {
 	}
 	
 	public Vector3f getPosition() {
-		return new Vector3f(this.position);
+		return this.position;
 	}
 	
 	public Vector3f getRotation() {
-		return new Vector3f(this.rotation);
+		return this.rotation;
 	}
 	
 	public float getScale() {
@@ -41,10 +41,14 @@ public class Transformation {
 	}
 	
 	public Matrix4f getWorldMatrix() {
-		return new Matrix4f(this.worldMatrix);
+		return worldMatrix;
 	}
 	
 	public void updateWorldMatrix() {
-		this.worldMatrix.translation(this.position).rotateX(this.rotation.x).rotateY(this.rotation.y).rotateZ(this.rotation.z).scale(this.scale);
+		this.worldMatrix.translation(this.position)
+			.rotateZ(this.rotation.z)
+			.rotateY(this.rotation.y)
+			.rotateX(this.rotation.x)
+			.scale(this.scale);
 	}
 }
