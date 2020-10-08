@@ -28,8 +28,6 @@ public class Camera {
 
 	final float Z_FAR;
 	
-	public Transformation transform;
-	
 	public Camera(float FOV, float ASPECT, float Z_NEAR, float Z_FAR) {
 		this.FOV = FOV;
 		this.ASPECT = ASPECT;
@@ -38,22 +36,16 @@ public class Camera {
 		
 		projectionMatrix = new Matrix4f().setPerspective(this.FOV, this.ASPECT, this.Z_NEAR, this.Z_FAR);
 		viewMatrix = new Matrix4f();
-		
-		transform = new Transformation();
 	}
 	
 	public void UpdateProjectionMatrix() {
 		projectionMatrix.identity().setPerspective(this.FOV, this.ASPECT, this.Z_NEAR, this.Z_FAR);
 	}
 	
-	public void updateMatrices() {
-		transform.updateWorldMatrix();
-		
-		transform.getWorldMatrix().invert(viewMatrix);
-		
-		this.UpdateProjectionMatrix();
-		this.UpdateMatricesUBO();
+	public void updateViewMatrix(Matrix4f worldMatrix) {
+		worldMatrix.invert(viewMatrix);
 	}
+	
 	
 	public void CreateMatricesUBO() {
 		uboMatrices = glGenBuffers();
@@ -65,7 +57,7 @@ public class Camera {
 	    Shader.setUBO(uboMatrices, 0);
 	}
 	
-	public void UpdateMatricesUBO() {
+	public void UpdateMatricesUBO(Matrix4f worldMatrix) {
 		glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
 		try(MemoryStack stack = MemoryStack.stackPush()) {
 			FloatBuffer buff = stack.mallocFloat(16);
@@ -75,7 +67,7 @@ public class Camera {
 			viewMatrix.get(buff);
 			glBufferSubData(GL_UNIFORM_BUFFER, 16 * 4, buff);
 			
-			transform.getWorldMatrix().get(buff);
+			worldMatrix.get(buff);
 			glBufferSubData(GL_UNIFORM_BUFFER, 2 * 16 * 4, buff);
 		}
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);

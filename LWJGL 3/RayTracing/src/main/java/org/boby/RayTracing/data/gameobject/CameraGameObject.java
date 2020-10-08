@@ -10,6 +10,7 @@ public class CameraGameObject extends GameObject{
 	
 	public CameraGameObject(Camera camera) {
 		this.camera = camera;
+		camera.CreateMatricesUBO();
 	}
 
 	public Camera getCamera() {
@@ -17,8 +18,16 @@ public class CameraGameObject extends GameObject{
 	}
 	
 	@Override
-	void register(Scene scene) {
+	public void register(Scene scene) {
 		super.register(scene);
 		cameraId = scene.registerCamera(camera);
+	}
+	
+	@Override
+	public void update() {
+		super.update();
+		camera.UpdateProjectionMatrix();
+		camera.updateViewMatrix(transform.getWorldMatrix());
+		camera.UpdateMatricesUBO(transform.getWorldMatrix());
 	}
 }

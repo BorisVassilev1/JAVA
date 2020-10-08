@@ -14,9 +14,13 @@ public class GameObject {
 		isInScene = false;
 	}
 	
-	void register(Scene scene) {
+	public void register(Scene scene) {
 		transformationId = scene.registerTransformation(transform);
 		scene.regsiterGameObject(this);
 		isInScene = true;
+	}
+	
+	public void update() {
+		transform.updateWorldMatrix();
 	}
 }

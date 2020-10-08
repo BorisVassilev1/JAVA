@@ -12,7 +12,7 @@ public class MeshedGameObject extends GameObject{
 	int materialId;
 	
 	@Override
-	void register(Scene scene) {
+	public void register(Scene scene) {
 		super.register(scene);
 		
 		meshId = scene.registerMesh(mesh);

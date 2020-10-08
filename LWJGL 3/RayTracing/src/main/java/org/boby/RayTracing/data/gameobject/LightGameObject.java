@@ -10,7 +10,7 @@ public class LightGameObject extends GameObject{
 	int lightId;
 	
 	@Override
-	void register(Scene scene) {
+	public void register(Scene scene) {
 		super.register(scene);
 		
 		lightId = scene.registerLight(light);
