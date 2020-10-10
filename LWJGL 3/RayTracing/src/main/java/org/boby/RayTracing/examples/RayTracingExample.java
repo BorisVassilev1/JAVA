@@ -72,11 +72,11 @@ public class RayTracingExample extends ApplicationBase{
 		input.lockMouse = true;
 		input.hideMouse();
 		
-		ShaderParser.findBlockUniforms(comp.getProgramId());
+		ShaderParser.findBlockUniforms(comp);
 		
 		System.out.println();
-		ShaderParser.getNonBlockUniforms(comp.getProgramId());
-		ShaderParser.getSSBOs(comp.getProgramId());
+		ShaderParser.getNonBlockUniforms(comp);
+		ShaderParser.getSSBOs(comp);
 		
 		time = new Time();
 		frm = new FramerateManager(time);

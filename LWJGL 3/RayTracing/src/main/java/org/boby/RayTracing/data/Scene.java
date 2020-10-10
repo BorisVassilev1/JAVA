@@ -72,7 +72,7 @@ public class Scene {
 		return registerUniqueField(camera, cameras);
 	}
 	
-	public void createUBOs() {
+	public void createUBOs(Shader defaultShader) {
 		//TODO: create UBOs where the data should be stored.
 	}
 	

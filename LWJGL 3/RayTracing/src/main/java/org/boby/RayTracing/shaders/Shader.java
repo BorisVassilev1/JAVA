@@ -20,9 +20,9 @@ import org.lwjgl.system.MemoryStack;
  *
  */
 public class Shader {
-	int programId;
-	int[] shaderIds;
-	String[] fileNames;
+	private int programId;
+	private int[] shaderIds;
+	private String[] fileNames;
 	
 	private final HashMap<String, Integer> uniforms; // uniform name and uniform location
 	private final HashMap<String, Integer> SSBOs; // ssbo name and ssbo binding

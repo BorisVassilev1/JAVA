@@ -99,10 +99,10 @@ public class AssimpTest extends ApplicationBase{
 	    input.lockMouse = true;
 	    
 	    
-		ShaderParser.findBlockUniforms(shader.getProgramId());
+		ShaderParser.findBlockUniforms(shader);
 		
 		System.out.println();
-		ShaderParser.getNonBlockUniforms(shader.getProgramId());
+		ShaderParser.getNonBlockUniforms(shader);
 	    
 	    fm = new FramerateManager(time);
 	    fm.setSecondPassedCallback((framerate) -> {
@@ -112,7 +112,6 @@ public class AssimpTest extends ApplicationBase{
 	    controller = new CameraController(input, cam);
 	    
 	    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	    
 	    
 	}
 	

@@ -82,7 +82,9 @@ public class ShaderParser {
 		}
 	}
 
-	public static void findBlockUniforms(int program) {
+	public static void findBlockUniforms(Shader shader) {
+		int program = shader.getProgramId();
+		
 		int _numBlocks[] = new int[1];
 		glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, _numBlocks);
 		int numBlocks = _numBlocks[0];
@@ -92,9 +94,12 @@ public class ShaderParser {
 		int unifProperties[] = { GL_TYPE, GL_LOCATION, GL_OFFSET};
 
 		for (int blockIx = 0; blockIx < numBlocks; ++blockIx) {
+			
 			String blockName;
 			blockName = glGetProgramResourceName(program, GL_UNIFORM_BLOCK, blockIx);
 			System.out.println(blockName + " " + blockIx);
+			
+			//shader.createUBO(blockName, binding);
 
 			int _numActiveUnifs[] = new int[1];
 			glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, blockIx, blockProperties, null, _numActiveUnifs);
@@ -119,7 +124,9 @@ public class ShaderParser {
 		}
 	}
 	
-	public static void getNonBlockUniforms(int program) {
+	public static void getNonBlockUniforms(Shader shader) {
+		int program = shader.getProgramId();
+		
 		int _numUniforms[] = new int[1];
 		glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, _numUniforms);
 		int numUniforms = _numUniforms[0];
@@ -137,10 +144,15 @@ public class ShaderParser {
 			String name;
 			name = glGetProgramResourceName(program, GL_UNIFORM, unif);
 			System.out.println(name + " " + values[1] + " " + values[3]);
+			
+			shader.createUniform(name);
+			
 		}
 	}
 	
-	public static void getSSBOs(int program) {
+	public static void getSSBOs(Shader shader) {
+		int program = shader.getProgramId();
+		
 		int _numSSBOs[] = new int[1];
 		glGetProgramInterfaceiv(program, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, _numSSBOs);
 		//System.out.println(_numSSBOs[0]);

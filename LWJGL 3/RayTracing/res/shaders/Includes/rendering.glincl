@@ -31,8 +31,8 @@ layout (std140) uniform Matrices {
 	mat4 cameraWorldMatrix;
 };
 
- uniform Materials {
-	Material mat[2];
+layout(std140) uniform Materials {
+	Material mat[];
 };
 
 layout(std140) uniform PointLights {
