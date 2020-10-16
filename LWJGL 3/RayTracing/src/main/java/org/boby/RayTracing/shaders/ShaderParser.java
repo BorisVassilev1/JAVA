@@ -89,7 +89,7 @@ public class ShaderParser {
 		glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, _numBlocks);
 		int numBlocks = _numBlocks[0];
 
-		int blockProperties[] = { GL_NUM_ACTIVE_VARIABLES };
+		int blockProperties[] = { GL_NUM_ACTIVE_VARIABLES, GL_BUFFER_BINDING };
 		int activeUnifProp[] = { GL_ACTIVE_VARIABLES };
 		int unifProperties[] = { GL_TYPE, GL_LOCATION, GL_OFFSET};
 
@@ -98,13 +98,14 @@ public class ShaderParser {
 			String blockName;
 			blockName = glGetProgramResourceName(program, GL_UNIFORM_BLOCK, blockIx);
 			System.out.println(blockName + " " + blockIx);
-			
-			//shader.createUBO(blockName, binding);
 
-			int _numActiveUnifs[] = new int[1];
+			int _numActiveUnifs[] = new int[2];
 			glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, blockIx, blockProperties, null, _numActiveUnifs);
 			int numActiveUnifs = _numActiveUnifs[0];
-
+			int buffer_binding = _numActiveUnifs[1];
+			
+			shader.createUBO(blockName, buffer_binding);
+			
 			if (numActiveUnifs == 0) {
 				continue;
 			}

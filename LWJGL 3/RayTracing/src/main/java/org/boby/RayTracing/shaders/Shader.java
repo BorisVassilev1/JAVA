@@ -171,7 +171,11 @@ public class Shader {
 		if (uniformLocation < 0) {
 			throw new RuntimeException("Could not find uniform: " + uniformName);
 		}
-		uniforms.put(uniformName, uniformLocation);
+		registerUniform(uniformName, uniformLocation);
+	}
+	
+	protected void registerUniform(String name, int location) {
+		uniforms.put(name, location);
 	}
 	
 	/**
@@ -181,7 +185,7 @@ public class Shader {
 	 * 
 	 * @throws RuntimeException if the uniform does not exist, is not used or has not been created.
 	 */
-	int getUniformId(String uniformName) {
+	int getUniformLocation(String uniformName) {
 		if(!this.hasUniform(uniformName)) {
 			throw new RuntimeException("the uniform " + uniformName + " does not exist in this shader.");
 		}
@@ -199,7 +203,7 @@ public class Shader {
 	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, int value) {
-		glUniform1i(getUniformId(uniformName), value);
+		glUniform1i(getUniformLocation(uniformName), value);
 	}
 
 	/**
@@ -216,7 +220,7 @@ public class Shader {
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			FloatBuffer fb = stack.mallocFloat(16);
 			value.get(fb);
-			glUniformMatrix4fv(getUniformId(uniformName), false, fb);
+			glUniformMatrix4fv(getUniformLocation(uniformName), false, fb);
 		}
 	}
 
@@ -230,7 +234,7 @@ public class Shader {
 	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, FloatBuffer value) {
-		glUniform3fv(getUniformId(uniformName), value);
+		glUniform3fv(getUniformLocation(uniformName), value);
 	}
 
 	/**
@@ -243,7 +247,7 @@ public class Shader {
 	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, IntBuffer value) {
-		glUniform3iv(getUniformId(uniformName), value);
+		glUniform3iv(getUniformLocation(uniformName), value);
 	}
 
 	/**
@@ -256,7 +260,7 @@ public class Shader {
 	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, Vector3f value) {
-		glUniform3f(getUniformId(uniformName), value.x, value.y, value.z);
+		glUniform3f(getUniformLocation(uniformName), value.x, value.y, value.z);
 	}
 
 	/**
@@ -269,7 +273,7 @@ public class Shader {
 	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, Vector2f value) {
-		glUniform2f(getUniformId(uniformName), value.x, value.y);
+		glUniform2f(getUniformLocation(uniformName), value.x, value.y);
 	}
 
 	/**
@@ -282,7 +286,7 @@ public class Shader {
 	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, float value) {
-		glUniform1f(getUniformId(uniformName), value);
+		glUniform1f(getUniformLocation(uniformName), value);
 	}
 
 	/**
@@ -295,7 +299,7 @@ public class Shader {
 	 * @throws RuntimeException just as getUniformId
 	 */
 	public void setUniform(String uniformName, double value) {
-		glUniform1d(getUniformId(uniformName), value);
+		glUniform1d(getUniformLocation(uniformName), value);
 	}
 
 	/**

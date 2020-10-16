@@ -15,6 +15,13 @@ struct AmbientLight {
 	float intensity;
 };
 
+struct Light {
+	mat4 transform;
+	vec3 color;
+	float intensity;
+	int type;
+};
+
 struct Material {
 	//sampler2D texture;
 	vec3 color;
@@ -25,24 +32,16 @@ struct Material {
 	float specular_exponent;
 };
 
-layout (std140) uniform Matrices {
+layout (std140, binding=0) uniform Matrices {
 	mat4 projectionMatrix;
 	mat4 viewMatrix;
 	mat4 cameraWorldMatrix;
 };
 
-layout(std140) uniform Materials {
+layout(std140, binding=1) uniform Materials {
 	Material mat[];
 };
 
-layout(std140) uniform PointLights {
-	PointLight pointLights[];
-};
-
-layout(std140) uniform AmbientLights{
-	AmbientLight ambientLigths[];
-};
-
-layout(std140) uniform DirectionLights {
-	DirectionalLight directionalLights[];
+layout(std140, binding=2) uniform Lights{
+	Light lights[];
 };

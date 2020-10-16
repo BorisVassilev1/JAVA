@@ -25,4 +25,9 @@ public class LightGameObject extends GameObject{
 		super();
 		this.light = new Light(type, color, intensity);
 	}
+	
+	public Light getLight() {
+		return light;
+	}
+	
 }

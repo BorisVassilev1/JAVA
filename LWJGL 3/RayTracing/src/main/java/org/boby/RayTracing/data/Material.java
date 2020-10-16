@@ -1,9 +1,11 @@
 package org.boby.RayTracing.data;
 
+import java.nio.ByteBuffer;
+
 import org.boby.RayTracing.utils.Texture2D;
 import org.joml.Vector3f;
 
-public class Material  {
+public class Material implements GameObjectProperty{
 	
 	Vector3f color;
 	boolean use_texture;
@@ -32,8 +34,25 @@ public class Material  {
 		this.specular_exponent = 20.0f;
 	}
 	
-	
-	
-	
-	// TODO: this must be sent to the shader. Note the need of GL_OFFSET query!!
+	public Material() {
+	}
+
+	@Override
+	public void writeToBuffer(ByteBuffer buff, int offset) {
+		buff.putFloat(color.x);
+		buff.putFloat(color.y);
+		buff.putFloat(color.z);
+		
+		//buff.put(use_texture);
+		buff.putFloat(0f);
+		buff.putFloat(0f);
+		buff.putFloat(0f);
+		buff.putFloat(0f);
+		
+	}
+
+	@Override
+	public int getSize() {
+		return 32;
+	}
 }

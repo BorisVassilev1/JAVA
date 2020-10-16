@@ -1,5 +1,7 @@
 package org.boby.RayTracing.data.gameobject;
 
+import java.nio.FloatBuffer;
+
 import org.boby.RayTracing.data.Scene;
 import org.boby.RayTracing.data.Transformation;
 

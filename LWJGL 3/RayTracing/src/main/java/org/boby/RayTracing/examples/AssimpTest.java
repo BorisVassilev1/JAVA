@@ -6,6 +6,7 @@ import static org.lwjgl.opengl.GL46.*;
 import java.lang.instrument.Instrumentation;
 import java.nio.FloatBuffer;
 
+import org.boby.RayTracing.data.Scene;
 import org.boby.RayTracing.data.mesh.BasicMesh;
 import org.boby.RayTracing.main.Window;
 import org.boby.RayTracing.objects.Object3d;
@@ -112,6 +113,8 @@ public class AssimpTest extends ApplicationBase{
 	    controller = new CameraController(input, cam);
 	    
 	    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	    
+	    Scene sc = new Scene(shader);
 	    
 	}
 	
