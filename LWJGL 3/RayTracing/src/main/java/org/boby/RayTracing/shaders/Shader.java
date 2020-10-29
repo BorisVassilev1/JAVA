@@ -28,9 +28,6 @@ public class Shader {
 	private final HashMap<String, Integer> SSBOs; // ssbo name and ssbo binding
 	private final HashMap<String, Integer> UBOs;
 	
-	private ArrayList<String> uniform_names; 
-	private ArrayList<String> ssbo_names;
-	
 	/**
 	 * Prepares the shader to work with file_count shader files.
 	 * 
@@ -40,9 +37,6 @@ public class Shader {
 		uniforms = new HashMap<String, Integer>();
 		SSBOs = new HashMap<String, Integer>();
 		UBOs = new HashMap<String, Integer>();
-		
-		uniform_names = new ArrayList<String>();
-		ssbo_names = new ArrayList<String>();
 		
 		shaderIds = new int[file_count];
 		fileNames = new String[file_count];
@@ -60,8 +54,9 @@ public class Shader {
 		
 		checkValidateStatus();
 		
-		createUniforms();
-		createSSBOs();
+		ShaderParser.getBlockUniforms(this);
+		ShaderParser.getNonBlockUniforms(this);
+		ShaderParser.getSSBOs(this);
 	}
 	
 	/**
@@ -74,28 +69,6 @@ public class Shader {
 		}
 		for(int i = 0; i < fileNames.length; i++) {
 			fileNames[i] = source_files[i];
-		}
-	}
-	
-	/**
-	 * Creates all the SSBOs the ShaderParser has found in the source code.
-	 */
-	private void createSSBOs() {
-		for(int i = 0; i < ssbo_names.size(); i++) {
-			createSSBO(ssbo_names.get(i), i);
-		}
-	}
-	
-	/**
-	 * Creates all the Uniforms the ShaderParser has found in the source code.
-	 */
-	private void createUniforms() {
-		for(String u_name: uniform_names) {
-			try {
-				createUniform(u_name);
-			} catch (Exception e) {
-				System.out.println("uniform: " + u_name + " was not found");
-			}
 		}
 	}
 	
@@ -115,7 +88,7 @@ public class Shader {
 	 */
 	protected void createShader(int type, int target) {
 		String file = fileNames[target];
-		String source = ShaderParser.ParseShaderFile(file, uniform_names, ssbo_names);
+		String source = ShaderParser.ParseShaderFile(file);
 //		System.out.println("\"" + source + "\"") ;
 		
 		int id = glCreateShader(type);
@@ -132,7 +105,8 @@ public class Shader {
 	private void checkLinkStatus() {
 		glLinkProgram(programId);
 		if(glGetProgrami(programId, GL_LINK_STATUS) == GL_FALSE) {
-			System.err.println("Error: Program Linking - \n" + glGetShaderInfoLog(programId,1024));
+			System.err.println("Error: Program Linking - \n" + glGetShaderInfoLog(programId));
+			System.err.println(glGetProgramInfoLog(programId));
 		}
 	}
 	
@@ -142,7 +116,8 @@ public class Shader {
 	private void checkValidateStatus() {
 		glValidateProgram(programId);
 		if(glGetProgrami(programId, GL_VALIDATE_STATUS) == GL_FALSE) {
-			System.err.println("Error: Program Validation - \n" + glGetShaderInfoLog(programId,1024));
+			System.err.println("Error: Program Validation - \n" + glGetShaderInfoLog(programId));
+			System.err.println(glGetProgramInfoLog(programId));
 		}
 	}
 	

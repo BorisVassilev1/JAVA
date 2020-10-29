@@ -20,7 +20,6 @@ public class CameraGameObject extends GameObject{
 	@Override
 	public void register(Scene scene) {
 		super.register(scene);
-		cameraId = scene.registerCamera(camera);
 	}
 	
 	@Override

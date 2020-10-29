@@ -10,16 +10,15 @@ in vec3 mvVertexPos;
 out vec4 fragColor;
 
 uniform sampler2D texture_sampler;
-uniform float textureWeight;
-uniform float colorWeight;
 
 float attenuationExponent = 2.0;
 
-
 uniform vec3 lightPosition;
 
-vec3 calcLight(PointLight light, in vec3 fragmentColor, in vec3 position, in vec3 normal, in float attenuationExp) {
-	vec3 toLight = light.position - position;
+vec3 calcLight(Light light, in vec3 position, in vec3 normal, in float attenuationExp, Material mat) {
+	vec3 lightPosition = (light.transform * vec4(0.0,0.0,0.0,1.0)).xyz;
+	
+	vec3 toLight = lightPosition - position;
 	float dist = length(toLight);
 	
 	
@@ -28,13 +27,13 @@ vec3 calcLight(PointLight light, in vec3 fragmentColor, in vec3 position, in vec
 	{
 		diffuse = max(dot(normalize(toLight), normal), 0.0);
 		
-		diffuseColor = diffuse * fragmentColor * light.color * light.intensity;
+		diffuseColor = diffuse * mat.color * light.color * light.intensity;
 	}
 	
 	{
 		vec3 cameraPos = cameraWorldMatrix[3].xyz;
 		vec3 toCamera = normalize(cameraPos - position);
-		vec3 fromLight = normalize(position - light.position);
+		vec3 fromLight = normalize(position - lightPosition);
 		
 		float face_hit = dot(fromLight, normal);
 		vec3 reflected = normalize(reflect(fromLight, normal));
@@ -43,17 +42,14 @@ vec3 calcLight(PointLight light, in vec3 fragmentColor, in vec3 position, in vec
 		
 		float specularPower = 20.0; // not good!!!
 		
-		specular = pow(specular, specularPower);
+		specular = pow(specular, mat.specular_exponent);
 		
 		specularColor = specular * light.color * light.intensity;
 	}
 	
 	float att = pow(dist, attenuationExponent);
 	
-	float diffuseEffect = 1.0; 
-	float specularEffect = 1.0;
-	
-	return (diffuseColor * diffuseEffect + specularColor * specularEffect) / att;
+	return (diffuseColor * mat.diffuse_power + specularColor * mat.specular_power) / att;
 }
 
 vec3 calcLight(DirectionalLight light, in vec3 fragmentColor, in vec3 position, in vec3 normal) {
@@ -67,9 +63,12 @@ vec3 calcLight(DirectionalLight light, in vec3 fragmentColor, in vec3 position, 
 }
 
 void main()
-{
-	vec3 color = vec3(1.0, 0.0, 0.0);
-	PointLight light = PointLight(lightPosition, vec3(1.0, 1.0, 1.0), 30.0);
+{	
+	//Light light = lights[0];
+	vec3 light = vec3(0);
+	for(int i = 0; i < lights.length(); i ++) {
+		light += calcLight(lights[i], mvVertexPos, mvVertexNormal, 2.0, materials[material_index]);
+	}
 	
-	fragColor = vec4(calcLight(light, color, mvVertexPos, mvVertexNormal, 2.0), 1.0);
+	fragColor = vec4(light, 1.0);
 }

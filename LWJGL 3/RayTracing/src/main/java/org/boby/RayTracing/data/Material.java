@@ -39,16 +39,14 @@ public class Material implements GameObjectProperty{
 
 	@Override
 	public void writeToBuffer(ByteBuffer buff, int offset) {
-		buff.putFloat(color.x);
-		buff.putFloat(color.y);
-		buff.putFloat(color.z);
+		buff.putFloat(offset,  color.x);
+		buff.putFloat(offset + 4, color.y);
+		buff.putFloat(offset + 8, color.z);
 		
-		//buff.put(use_texture);
-		buff.putFloat(0f);
-		buff.putFloat(0f);
-		buff.putFloat(0f);
-		buff.putFloat(0f);
-		
+		buff.put(offset + 12, use_texture ? (byte)1 : (byte)0);
+		buff.putFloat(offset + 16, diffuse_power);
+		buff.putFloat(offset + 20, specular_power);
+		buff.putFloat(offset + 24, specular_exponent);
 	}
 
 	@Override

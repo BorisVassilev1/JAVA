@@ -1,14 +1,11 @@
 package org.boby.RayTracing.data.gameobject;
 
-import java.nio.FloatBuffer;
-
 import org.boby.RayTracing.data.Scene;
 import org.boby.RayTracing.data.Transformation;
 
 public class GameObject {
 	
-	Transformation transform;
-	int transformationId;
+	public Transformation transform;
 	boolean isInScene;
 	
 	public GameObject() {
@@ -17,7 +14,6 @@ public class GameObject {
 	}
 	
 	public void register(Scene scene) {
-		transformationId = scene.registerTransformation(transform);
 		scene.regsiterGameObject(this);
 		isInScene = true;
 	}

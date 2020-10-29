@@ -16,6 +16,8 @@ import java.nio.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
 
+// TODO: make this work. It must use a texture and ignore lighting
+
 public class CubeExample extends ApplicationBase{
 
 	// The window handle
@@ -104,7 +106,7 @@ public class CubeExample extends ApplicationBase{
 			camera.updateMatrices();
 			
 			tex.bind();
-			Renderer.draw(cube, camera);
+			Renderer.draw(cube);
 
 			window.swapBuffers();
 

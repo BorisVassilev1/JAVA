@@ -3,13 +3,8 @@ package org.boby.RayTracing.shaders;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.opengl.GLXARBGetProcAddress;
 import static org.lwjgl.opengl.GL46.*;
 
 /**
@@ -19,7 +14,7 @@ import static org.lwjgl.opengl.GL46.*;
  *
  */
 public class ShaderParser {
-	public static String ParseShaderFile(String file, ArrayList<String> uniform_names, ArrayList<String> ssbo_names) {
+	public static String ParseShaderFile(String file) {
 		StringBuilder parsed = new StringBuilder();
 		
 		AtomicInteger libraryLines = new AtomicInteger();
@@ -29,15 +24,14 @@ public class ShaderParser {
 		// example: when you have 100 lines of includes and 200 lines of shader code, the compiler may throw an error on line 255 
 		// because the contents of the two files are just appended.
 		// TODO: it counts one line less when the file ends with an empty line. I have no idea how to fix it now.
-		ParseRecursively(parsed, file, 0, lines, libraryLines, uniform_names, ssbo_names);
+		ParseRecursively(parsed, file, 0, lines, libraryLines);
 		
 //		System.out.println("Successfully parsed " + lines + " lines of code with " + libraryLines + " lines of included code. Total " + (lines.get() + libraryLines.get()) + " lines.");
 		
 		return parsed.toString();
 	}
 	
-	public static void ParseRecursively(StringBuilder parsed, String file, int depth, AtomicInteger lines, AtomicInteger libLines, ArrayList<String> uniform_names, ArrayList<String> ssbo_names) {
-		//String filePathPrefix = file.substring(0,file.lastIndexOf("/"));
+	public static void ParseRecursively(StringBuilder parsed, String file, int depth, AtomicInteger lines, AtomicInteger libLines) {
 		BufferedReader reader = null;
 		
 		try {
@@ -45,30 +39,13 @@ public class ShaderParser {
 			reader = new BufferedReader(new FileReader(file));
 			while((line = reader.readLine()) != null)
 			{
-				//System.out.println(line);
 				if(depth == 0) {
 					lines.incrementAndGet();
 				}
 				if(line.startsWith("#include ")) {
 					String fileToInclude = line.substring(10, line.length() - 1);
 					parsed.append("//").append(line).append("\n");
-					ParseRecursively(parsed, "./res/shaders/includes/" + fileToInclude, depth + 1, lines, libLines, uniform_names, ssbo_names);
-				}
-				else if(depth == 0 && line.startsWith("uniform ")) {
-					parsed.append(line).append("\n");
-					int word_begin = line.substring(8).indexOf(' ') + 1 + 8;
-					int word_end = line.indexOf(';');
-					String uniform_name = line.substring(word_begin, word_end);
-					//System.out.println("\"" + uniform_name + "\"");
-					uniform_names.add(uniform_name);
-				}
-				else if(depth == 0 && line.startsWith("layout(std430) buffer") ) {
-					parsed.append(line).append("\n");
-					int word_begin = 22;
-					int word_end = line.substring(22).indexOf(' ') + 22;
-					String ssbo_name = line.substring(word_begin, word_end);
-//					System.out.println("\"" + ssbo_name + "\"");
-					ssbo_names.add(ssbo_name);
+					ParseRecursively(parsed, "./res/shaders/includes/" + fileToInclude, depth + 1, lines, libLines);
 				}
 				else {
 					parsed.append(line).append("\n");
@@ -82,7 +59,7 @@ public class ShaderParser {
 		}
 	}
 
-	public static void findBlockUniforms(Shader shader) {
+	public static void getBlockUniforms(Shader shader) {
 		int program = shader.getProgramId();
 		
 		int _numBlocks[] = new int[1];
@@ -97,7 +74,7 @@ public class ShaderParser {
 			
 			String blockName;
 			blockName = glGetProgramResourceName(program, GL_UNIFORM_BLOCK, blockIx);
-			System.out.println(blockName + " " + blockIx);
+			//System.out.println(blockName + " " + blockIx);
 
 			int _numActiveUnifs[] = new int[2];
 			glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, blockIx, blockProperties, null, _numActiveUnifs);
@@ -120,7 +97,7 @@ public class ShaderParser {
 
 				String name;
 				name = glGetProgramResourceName(program, GL_UNIFORM, blockUnifs[unifIx]);
-				System.out.println("\t" + name + " " + values[0] + " " + values[2]);
+				//System.out.println("\t" + name + " " + values[0] + " " + values[2]);
 			}
 		}
 	}
@@ -144,7 +121,7 @@ public class ShaderParser {
 			
 			String name;
 			name = glGetProgramResourceName(program, GL_UNIFORM, unif);
-			System.out.println(name + " " + values[1] + " " + values[3]);
+			//System.out.println(name + " " + values[1] + " " + values[3]);
 			
 			shader.createUniform(name);
 			
@@ -156,35 +133,31 @@ public class ShaderParser {
 		
 		int _numSSBOs[] = new int[1];
 		glGetProgramInterfaceiv(program, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, _numSSBOs);
-		//System.out.println(_numSSBOs[0]);
 		
-		int blockProperties[] = {GL_NUM_ACTIVE_VARIABLES};
-		int activeUnifProp[] = { GL_ACTIVE_VARIABLES };
-		int unifProperties[] = { GL_TYPE};
+		int blockProperties[] = { GL_NUM_ACTIVE_VARIABLES, GL_BUFFER_BINDING };
+		int activeUnifProp[] = { GL_ACTIVE_VARIABLES};
+		int unifProperties[] = { GL_TYPE, GL_OFFSET};
 		
 		for(int block = 0; block < _numSSBOs[0]; block ++) {
-			
-			
 			String blockName;
 			blockName = glGetProgramResourceName(program, GL_SHADER_STORAGE_BLOCK, block);
-			System.out.println(blockName + " " + block);
 			
-			int _numActiveVariables[] = new int[1];
-			glGetProgramResourceiv(program, GL_SHADER_STORAGE_BLOCK, block, blockProperties, null, _numActiveVariables);
+			int blockInfo[] = new int[2];
+			glGetProgramResourceiv(program, GL_SHADER_STORAGE_BLOCK, block, blockProperties, null, blockInfo);
 			
-			//System.out.println(_numActiveVariables[0]);
+			//System.out.println(blockName + " " + block + " " + blockInfo[1]);
+			shader.createSSBO(blockName, blockInfo[1]);
 			
-			int blockUnifs[] = new int[_numActiveVariables[0]];
-			glGetProgramResourceiv(program, GL_SHADER_STORAGE_BLOCK, block, activeUnifProp, _numActiveVariables, blockUnifs);
+			int blockUnifs[] = new int[blockInfo[0]];
+			glGetProgramResourceiv(program, GL_SHADER_STORAGE_BLOCK, block, activeUnifProp, blockInfo, blockUnifs);
 			
-			for(int i = 0; i < _numActiveVariables[0]; i ++) {
-				int values[] = new int[1];
-
+			for(int i = 0; i < blockInfo[0]; i ++) {
+				int values[] = new int[2];
 				glGetProgramResourceiv(program, GL_BUFFER_VARIABLE, blockUnifs[i], unifProperties, null, values);
 				
 				String variableName;
 				variableName = glGetProgramResourceName(program, GL_BUFFER_VARIABLE, blockUnifs[i]);
-				System.out.println("\t" + variableName + " " + " " + values[0] );
+				//System.out.println("\t" + variableName + " " + " " + values[0] + " " + values[1]);
 			}
 		}
 	}

@@ -1,5 +1,7 @@
 package org.boby.RayTracing.data.gameobject;
 
+import java.nio.ByteBuffer;
+
 import org.boby.RayTracing.data.Scene;
 import org.boby.RayTracing.data.light.Light;
 import org.boby.RayTracing.data.light.LightType;
@@ -7,13 +9,10 @@ import org.joml.Vector3f;
 
 public class LightGameObject extends GameObject{
 	Light light;
-	int lightId;
 	
 	@Override
 	public void register(Scene scene) {
 		super.register(scene);
-		
-		lightId = scene.registerLight(light);
 	}
 	
 	public LightGameObject(Light light) {
@@ -28,6 +27,11 @@ public class LightGameObject extends GameObject{
 	
 	public Light getLight() {
 		return light;
+	}
+	
+	public void writeToBuffer(ByteBuffer buff, int offset) {
+		transform.getWorldMatrix().get(offset, buff);
+		light.writeToBuffer(buff, offset + 64);
 	}
 	
 }

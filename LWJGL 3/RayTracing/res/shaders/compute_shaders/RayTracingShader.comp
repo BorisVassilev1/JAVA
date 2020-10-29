@@ -4,7 +4,7 @@
 precision highp float;
 #endif
 
-#include <SimplexNoise.glincl>
+//#include <SimplexNoise.glincl>
 //#include <voronoise.glincl>
 
 struct Sphere {
@@ -45,9 +45,7 @@ uniform mat4 cameraMatrix;
 uniform vec2 resolution;
 uniform float fov;
 
-
 float PI = 3.14159;
-
 
 vec3 cam_pos = vec3(0.0,0.0,0.0);
 
@@ -59,11 +57,6 @@ vec3 v00 = vec3(-1.0, 1.0 * aspect, -1/tan(fov/2));
 vec3 v01 = vec3( 1.0, 1.0 * aspect, -1/tan(fov/2));
 vec3 v10 = vec3(-1.0,-1.0 * aspect, -1/tan(fov/2));
 vec3 v11 = vec3( 1.0,-1.0 * aspect, -1/tan(fov/2));
-
-Ray createRay(vec3 origin, vec3 direction) {
-	Ray ray = Ray(origin, direction);
-	return ray;
-}
 
 bool intersectSphere(in Ray ray, in Sphere sphere, inout RayHit hit) {
 	// Calculate distance along the ray where the sphere is intersected
@@ -115,12 +108,12 @@ void main() {
 	vec2 pixel_position = pixel_coords / resolution;
 	cam_pos = (cameraMatrix * vec4(0.0,0.0,0.0,1.0)).xyz;
 
-	v00 = (vec4(v00,1.0) * cameraMatrix).xyz;
-	v10 = (vec4(v10,1.0) * cameraMatrix).xyz;
-	v01 = (vec4(v01,1.0) * cameraMatrix).xyz;
-	v11 = (vec4(v11,1.0) * cameraMatrix).xyz;
+	v00 = (vec4(v00,0.0) * cameraMatrix).xyz;
+	v10 = (vec4(v10,0.0) * cameraMatrix).xyz;
+	v01 = (vec4(v01,0.0) * cameraMatrix).xyz;
+	v11 = (vec4(v11,0.0) * cameraMatrix).xyz;
 
-	Ray ray = createRay(cam_pos, normalize( lerp4vec( v00, v10, v01, v11, pixel_position.x, pixel_position.y) ) );
+	Ray ray = Ray(cam_pos, normalize( lerp4vec( v00, v10, v01, v11, pixel_position.x, pixel_position.y) ) );
 
 
 	RayHit hit;

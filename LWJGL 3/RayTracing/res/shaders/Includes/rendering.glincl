@@ -32,16 +32,18 @@ struct Material {
 	float specular_exponent;
 };
 
-layout (std140, binding=0) uniform Matrices {
+layout(std140, binding=0) uniform Matrices {
 	mat4 projectionMatrix;
 	mat4 viewMatrix;
 	mat4 cameraWorldMatrix;
 };
 
-layout(std140, binding=1) uniform Materials {
-	Material mat[];
+layout(std140, binding=0) buffer Materials {
+	Material materials[];
 };
 
-layout(std140, binding=2) uniform Lights{
-	Light lights[];
+layout(std140, binding=1) buffer Lights{
+	Light lights[2];
 };
+
+uniform int material_index = 0;

@@ -2,18 +2,12 @@ package org.boby.RayTracing.examples;
 
 import org.boby.RayTracing.main.*;
 import org.boby.RayTracing.objects.*;
-import org.boby.RayTracing.rendering.Camera;
-import org.boby.RayTracing.rendering.CameraController;
+import org.boby.RayTracing.data.Camera;
+import org.boby.RayTracing.data.Transformation;
 import org.boby.RayTracing.rendering.Renderer;
 import org.boby.RayTracing.shaders.*;
 import org.boby.RayTracing.utils.*;
-import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
-
-import java.nio.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
@@ -30,19 +24,20 @@ public class RayTracingExample extends ApplicationBase{
 	static ComputeShader comp;
 	
 	static Camera camera;
+	static Transformation cameraTransform;
 	
 	Input input;
 	Time time;
 	FramerateManager frm;
 	
-	CameraController controller;
+	TransformController controller;
 	
 	@Override
 	public void init() {
 		window = new Window("nqkva glupost bate", 800, 600, false, true);
 		
 		camera = new Camera((float)Math.toRadians(70f), window.getWidth() / window.getHeight(), 0.01f, 1000f);
-		//camera.UpdateMatricesUBO();
+		cameraTransform = new Transformation();
 		
 		renderQuadShader = new VFShader("./res/shaders/verfrag_shaders/TextureOnScreenVertexShader.vs",
 				"./res/shaders/verfrag_shaders/TextureOnScreenFragmentShader.fs");
@@ -72,12 +67,6 @@ public class RayTracingExample extends ApplicationBase{
 		input.lockMouse = true;
 		input.hideMouse();
 		
-		ShaderParser.findBlockUniforms(comp);
-		
-		System.out.println();
-		ShaderParser.getNonBlockUniforms(comp);
-		ShaderParser.getSSBOs(comp);
-		
 		time = new Time();
 		frm = new FramerateManager(time);
 		
@@ -85,8 +74,7 @@ public class RayTracingExample extends ApplicationBase{
 			System.out.println("Framerate: " + framerate);
 		});
 			
-		controller = new CameraController(input, camera);
-		
+		controller = new TransformController(input, cameraTransform);
 	}
 
 	@Override
@@ -100,23 +88,8 @@ public class RayTracingExample extends ApplicationBase{
 			
 			input.update();
 			controller.update();
-			
-			Vector3f camPos = camera.transform.getPosition();
-			if(input.getKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
-				camPos.y += 0.1;
-			}
-			if (input.getKey(GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-				camPos.y -= 0.1;
-			if (input.getKey(GLFW_KEY_A) == GLFW_PRESS)
-				camPos.x -= 0.1;
-			if (input.getKey(GLFW_KEY_D) == GLFW_PRESS)
-				camPos.x += 0.1;
-			if (input.getKey(GLFW_KEY_W) == GLFW_PRESS)
-				camPos.z -= 0.1;
-			if (input.getKey(GLFW_KEY_S) == GLFW_PRESS)
-				camPos.z += 0.1;
 
-			if (input.getKey(GLFW_KEY_1) == GLFW_PRESS)
+			if (input.getKey(GLFW_KEY_2) == GLFW_PRESS)
 				renderTexture.save("./res/image.png");
 
 			
@@ -124,18 +97,12 @@ public class RayTracingExample extends ApplicationBase{
 				camera.setFov(camera.getFov() + 0.01f);
 			if (input.getKey(GLFW_KEY_0) == GLFW_PRESS)
 				camera.setFov(camera.getFov() - 0.01f);
-
 			
-			Vector3f camRot = camera.transform.getRotation();
-			camRot.x += input.mouseD.y / 500;
-			camRot.y += input.mouseD.x / 500;
-			
-			camera.updateMatrices();
+			camera.UpdateProjectionMatrix();
 			
 			comp.bind();
 			//TODO: finish this. ... and think of how to do it better;			
-			Matrix4f _mat = new Matrix4f().translate(new Vector3f(camera.transform.getPosition()).mul(-1)).rotateX(camera.transform.getRotation().x).rotateY(camera.transform.getRotation().y).rotateZ(camera.transform.getRotation().z);
-			comp.setUniform("cameraMatrix", camera.transform.getWorldMatrix());
+			comp.setUniform("cameraMatrix", cameraTransform.getWorldMatrix());
 			comp.setUniform("resolution", new Vector2f(window.getWidth(), window.getHeight()));
 			comp.setUniform("fov", camera.getFov());
 			comp.unbind();
@@ -143,7 +110,7 @@ public class RayTracingExample extends ApplicationBase{
 			renderTexture.bind(GL_TEXTURE0);
 			Renderer.Compute(comp, renderTexture.getWidth(), renderTexture.getHeight(), 1);
 
-			Renderer.draw(renderingQuad, camera);
+			Renderer.draw(renderingQuad);
 
 			window.swapBuffers();
 

@@ -21,16 +21,15 @@ public class Light implements GameObjectProperty{
 	
 	@Override
 	public int getSize() {
-		return 32;
+		return 96;
 	}
 
 	@Override
 	public void writeToBuffer(ByteBuffer buff, int offset) {
-		buff.putFloat(color.x);
-		buff.putFloat(color.y);
-		buff.putFloat(color.z);
-		
-		//buff.putFloat(value)
-		//buff.put(f)
+		buff.putFloat(offset + 0, color.x);
+		buff.putFloat(offset + 4, color.y);
+		buff.putFloat(offset + 8, color.z);
+		buff.putFloat(offset + 12, intensity);
+		buff.putInt(offset + 16, type.id);
 	}
 }

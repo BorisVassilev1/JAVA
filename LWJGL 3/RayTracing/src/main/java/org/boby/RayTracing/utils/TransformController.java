@@ -1,39 +1,34 @@
-package org.boby.RayTracing.rendering;
+package org.boby.RayTracing.utils;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_0;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_9;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.*;
 
-import org.boby.RayTracing.utils.Input;
+import org.boby.RayTracing.data.Transformation;
+import org.boby.RayTracing.rendering.Camera;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public class CameraController {
-	
+public class TransformController {
 	Input input;
-	Camera camera;
+	Transformation transform;
 	
 	public float speed = 0.1f;
 	
-	public CameraController(Input input, Camera camera) {
+	public TransformController(Input input, Transformation transform) {
 		this.input = input;
-		this.camera = camera;
+		this.transform = transform;
 	}
 	
 	public void update() {
+		if(!input.isActive()) {
+			return;
+		}
 		
-		Vector3f camRot = camera.transform.getRotation();
+		Vector3f camRot = transform.getRotation();
 
 		camRot.x -= input.mouseD.y / 500;
 		camRot.y -= input.mouseD.x / 500;
 		
-		Vector3f camPos = camera.transform.getPosition();
+		Vector3f camPos = transform.getPosition();
 		
 		Matrix4f rotationMatrix = new Matrix4f().rotateX(camRot.x).rotateY(camRot.y).rotateZ(camRot.z);
 		
@@ -63,15 +58,10 @@ public class CameraController {
 		if (input.getKey(GLFW_KEY_S) == GLFW_PRESS) {
 			camPos.add(forwardXZ);
 		}
-
-		if (input.getKey(GLFW_KEY_9) == GLFW_PRESS)
-			camera.setFov(camera.getFov() + 0.01f);
-		if (input.getKey(GLFW_KEY_0) == GLFW_PRESS)
-			camera.setFov(camera.getFov() - 0.01f);
 		
-		camera.transform.setPosition(camPos);
-		camera.transform.setRotation(camRot);
+		transform.setPosition(camPos);
+		transform.setRotation(camRot);
 		
-		camera.updateMatrices();
+		transform.updateWorldMatrix();
 	}
 }

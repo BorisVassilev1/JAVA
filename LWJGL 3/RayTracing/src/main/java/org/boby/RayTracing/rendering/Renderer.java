@@ -2,6 +2,9 @@ package org.boby.RayTracing.rendering;
 
 import static org.lwjgl.opengl.GL46.*;
 
+import org.boby.RayTracing.data.Scene;
+import org.boby.RayTracing.data.gameobject.GameObject;
+import org.boby.RayTracing.data.gameobject.MeshedGameObject;
 import org.boby.RayTracing.objects.Object3d;
 import org.boby.RayTracing.shaders.ComputeShader;
 import org.boby.RayTracing.shaders.VFShader;
@@ -13,11 +16,10 @@ public class Renderer {
 	 * Draws an object on the screen, using the object's own shader.
 	 * @param obj
 	 */
-	public static void draw(Object3d obj, Camera cam) {
+	public static void draw(Object3d obj) {
 		VFShader sh = obj.getShader();
 		sh.bind();
 		
-		// Set uniforms
 		if(sh.hasUniform("worldMatrix")) {
 			sh.setUniform("worldMatrix", obj.transform.getWorldMatrix());
 		}
@@ -32,6 +34,30 @@ public class Renderer {
 		glDrawElements(GL_TRIANGLES, obj.getMesh().getIndicesCount(), GL_UNSIGNED_INT, 0);
 		
 		obj.getMesh().unbind();
+		
+		sh.unbind();
+	}
+	
+	public static void draw(MeshedGameObject obj, VFShader sh) { 
+		sh.bind();
+		
+		// Set uniforms
+		if(sh.hasUniform("worldMatrix")) {
+			sh.setUniform("worldMatrix", obj.transform.getWorldMatrix());
+		}
+		
+		if(sh.hasUniform("material_index")) {
+			sh.setUniform("material_index", obj.getMaterialId());
+		}
+		
+		if(sh.hasUniform("texture_sampler"))
+			sh.setUniform("texture_sampler", 0);
+		
+		obj.mesh.bind();
+		
+		glDrawElements(GL_TRIANGLES, obj.mesh.getIndicesCount(), GL_UNSIGNED_INT, 0); 
+		
+		obj.mesh.unbind();
 		
 		sh.unbind();
 	}

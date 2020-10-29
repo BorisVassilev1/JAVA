@@ -3,28 +3,31 @@ package org.boby.RayTracing.data;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
+import org.boby.RayTracing.data.gameobject.CameraGameObject;
 import org.boby.RayTracing.data.gameobject.GameObject;
+import org.boby.RayTracing.data.gameobject.LightGameObject;
+import org.boby.RayTracing.data.gameobject.MeshedGameObject;
 import org.boby.RayTracing.data.light.Light;
-import org.boby.RayTracing.data.mesh.Mesh;
+import org.boby.RayTracing.rendering.Renderer;
 import org.boby.RayTracing.shaders.Shader;
+import org.boby.RayTracing.shaders.VFShader;
 import org.lwjgl.BufferUtils;
+
 import static org.lwjgl.opengl.GL46.*;
 
 public class Scene {
 
 	private ArrayList<GameObject> gameObjects;
 
-	private ArrayList<Mesh> meshes;
 	private ArrayList<Material> materials;
-	private ArrayList<Transformation> transformations; // just why???
 	private ArrayList<Shader> shaders; //  TODO: store the default shader so that buffers can be created
-	private ArrayList<Light> lights; // TODO: there is no point in this being stored here
-	private ArrayList<Camera> cameras; // TODO: store only the active camera separately
+	private CameraGameObject activeCamera;
+	
+	public SceneBuffersHolder buffHolder;
+	
+	private VFShader defaultShader;
 	
 	public class SceneBuffersHolder {
-		public int cameraInfoBuffer;
-		public int cameraInfoBufferSize;
-		
 		public int materialsBuffer;
 		public int materialsBufferSize;
 		
@@ -33,53 +36,77 @@ public class Scene {
 		
 		public Scene scene;
 		
-		public SceneBuffersHolder(Scene scene, Shader defaultShader) {
+		public SceneBuffersHolder(Scene scene, VFShader defaultShader) {
 			this.scene = scene;
 			createBuffers(defaultShader);
 		}
 		
-		public void createBuffers(Shader defaultShader) {
-			cameraInfoBuffer = glGenBuffers();
+		public void createBuffers(VFShader defaultShader) {
 			materialsBuffer = glGenBuffers();
 			lightsBuffer = glGenBuffers();
 			
-			// TODO: this currently breaks everything because the buffer is null
-			//defaultShader.setUBO("Matrices", cameraInfoBuffer);
-			defaultShader.setUBO("Materials", materialsBuffer);
-			
-			defaultShader.setUBO("Lights", lightsBuffer);
+			defaultShader.setSSBO("Materials", materialsBuffer);
+			defaultShader.setSSBO("Lights", lightsBuffer);
 		}
 		
 		public void updateBuffersLength() {
-			int matSize = new Material().getSize() * materials.size();
+			materialsBufferSize = new Material().getSize() * materials.size();;
+			/*
+			glBindBuffer(GL_ARRAY_BUFFER, materialsBuffer);
+			glBufferData(GL_ARRAY_BUFFER, BufferUtils.createByteBuffer(materialsBufferSize), GL_STATIC_DRAW);
+			*/
 			
-			glBufferData(materialsBuffer, BufferUtils.createByteBuffer(matSize), GL_DYNAMIC_COPY);
+			int lightsCount = 0;
+			for(GameObject go : gameObjects) {
+				if(go instanceof LightGameObject) {
+					lightsCount ++;
+				}
+			}
 			
-			int lightSize = new Light().getSize() * lights.size();
-			glBufferData(lightsBuffer, BufferUtils.createByteBuffer(lightSize), GL_DYNAMIC_COPY);
+			lightsBufferSize = new Light().getSize() * lightsCount;
+			/*
+			glBindBuffer(GL_ARRAY_BUFFER, lightsBuffer);
+			glBufferData(GL_ARRAY_BUFFER, BufferUtils.createByteBuffer(lightsBufferSize), GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			*/
 		}
 		
 		public void updateBuffers() {
+			int offset;
+			
 			ByteBuffer matBuff = BufferUtils.createByteBuffer(materialsBufferSize);
-			// TODO: fill the buffers!!!
+			offset = 0;
+			for(Material m : materials) {
+				m.writeToBuffer(matBuff, offset);
+				offset += m.getSize();
+			}
+			glBindBuffer(GL_ARRAY_BUFFER, materialsBuffer);
+			glBufferData(GL_ARRAY_BUFFER, matBuff, GL_STATIC_DRAW);
+			
 			
 			ByteBuffer lightBuff = BufferUtils.createByteBuffer(lightsBufferSize);
-			
+			offset = 0;
+			for(GameObject go : gameObjects) {
+				if(go instanceof LightGameObject) {
+					LightGameObject l = (LightGameObject) go;
+					l.writeToBuffer(lightBuff, offset);
+					offset += l.getLight().getSize();
+				}
+			}
+			glBindBuffer(GL_ARRAY_BUFFER, lightsBuffer);
+			glBufferData(GL_ARRAY_BUFFER, lightBuff, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 	}
 	
-	private SceneBuffersHolder buffHolder;
-	
-	public Scene(Shader defaultShader) {
+	public Scene(VFShader defaultShader) {
 		this.gameObjects = new ArrayList<GameObject>();
 
-		this.meshes = new ArrayList<Mesh>();
 		this.materials = new ArrayList<Material>();
-		this.transformations = new ArrayList<Transformation>();
 		this.shaders = new ArrayList<Shader>();
-		this.lights = new ArrayList<Light>();
-		this.cameras = new ArrayList<Camera>();
+		this.activeCamera = null;
 		
+		this.defaultShader = defaultShader;
 		this.buffHolder = new SceneBuffersHolder(this, defaultShader);
 	}
 
@@ -102,14 +129,6 @@ public class Scene {
 		return registerField(go, gameObjects);
 	}
 
-	public int registerTransformation(Transformation transform) {
-		return registerField(transform, transformations);
-	}
-
-	public int registerMesh(Mesh mesh) {
-		return registerUniqueField(mesh, meshes);
-	}
-
 	public int registerMaterial(Material material) {
 		return registerUniqueField(material, materials);
 	}
@@ -118,13 +137,21 @@ public class Scene {
 		return registerUniqueField(shader, shaders);
 	}
 
-	public int registerLight(Light light) {
-		return registerUniqueField(light, lights);
-	}
-
-	public int registerCamera(Camera camera) {
-		return registerUniqueField(camera, cameras);
+	public void setActiveCamera(CameraGameObject cam) {
+		this.activeCamera = cam;
 	}
 	
+	public void updateBuffers() {
+		buffHolder.updateBuffersLength();
+		buffHolder.updateBuffers();
+	}
 	
+	public void draw() {
+		activeCamera.update();
+		for(GameObject go : gameObjects) {
+			if(go instanceof MeshedGameObject) {
+				Renderer.draw((MeshedGameObject)go, defaultShader);
+			}
+		}
+	}
 }

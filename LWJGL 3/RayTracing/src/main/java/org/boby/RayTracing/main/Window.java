@@ -54,8 +54,8 @@ public class Window {
 		else
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will not be 
 		
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		// Create the window
@@ -93,8 +93,10 @@ public class Window {
 		nglDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_OTHER, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, false);
 		
 		// Enable v-sync
-		if (this.vsync)
+		if (vsync)
 			glfwSwapInterval(1);
+		else 
+			glfwSwapInterval(0);
 
 		// Make the window visible
 		glfwShowWindow(id);
