@@ -1,0 +1,55 @@
+
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 texCoord;
+layout (location = 3) in vec4 color;
+
+struct PointLight {
+	vec3 position;
+	vec3 color;
+	float intensity;
+};
+
+struct DirectionalLight {
+	vec3 direction;
+	vec3 color;
+	float intensity;
+};
+
+struct AmbientLight {
+ 	vec3 color;
+	float intensity;
+};
+
+struct Light {
+	mat4 transform;
+	vec3 color;
+	float intensity;
+	int type;
+};
+
+struct Material {
+	//sampler2D texture;
+	vec3 color;
+	bool use_texture;
+	
+	float diffuse_power;
+	float specular_power;
+	float specular_exponent;
+};
+
+layout(std140, binding=0) uniform Matrices {
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+	mat4 cameraWorldMatrix;
+};
+
+layout(std140, binding=0) buffer Materials {
+	Material materials[];
+};
+
+layout(std140, binding=1) buffer Lights{
+	Light lights[2];
+};
+
+uniform int material_index = 0;
