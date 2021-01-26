@@ -3,6 +3,8 @@ package org.cdnomlqko.jglutil.shader;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.cdnomlqko.jglutil.shader.data.*;
@@ -44,7 +46,19 @@ public class ShaderParser {
 		
 		try {
 			String line;
-			reader = new BufferedReader(new FileReader(file));
+			InputStream in = ShaderParser.class.getResourceAsStream(file);
+			//System.out.println("\"" + file + "\"");
+			
+			if(in == null) {
+				in = ShaderParser.class.getClassLoader().getResourceAsStream(file);
+			}
+			
+			if(in == null) {
+				System.err.println("[JGLUtil] Error: Cannot load shader file or include.");
+				return;
+			}
+			
+			reader = new BufferedReader(new InputStreamReader(in));
 			while((line = reader.readLine()) != null)
 			{
 				if(depth == 0) {
@@ -53,7 +67,7 @@ public class ShaderParser {
 				if(line.startsWith("#include ")) {
 					String fileToInclude = line.substring(10, line.length() - 1);
 					parsed.append("//").append(line).append("\n");
-					ParseRecursively(parsed, "./res/shaders/includes/" + fileToInclude, depth + 1, lines, libLines);
+					ParseRecursively(parsed, "/res/shaders/Includes/" + fileToInclude, depth + 1, lines, libLines);
 				}
 				else {
 					parsed.append(line).append("\n");
@@ -62,7 +76,7 @@ public class ShaderParser {
 					}
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

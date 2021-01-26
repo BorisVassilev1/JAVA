@@ -5,15 +5,12 @@ import org.joml.Vector2f;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
 
-import org.cdnomlqko.jglutil.Input;
-import org.cdnomlqko.jglutil.Renderer;
-import org.cdnomlqko.jglutil.Time;
-import org.cdnomlqko.jglutil.Window;
+import org.cdnomlqko.jglutil.*;
 import org.cdnomlqko.jglutil.data.Camera;
 import org.cdnomlqko.jglutil.data.Texture2D;
 import org.cdnomlqko.jglutil.data.Transformation;
 import org.cdnomlqko.jglutil.gameobject.ShadedGameObject;
-import org.cdnomlqko.jglutil.mesh.MeshGenerator;
+import org.cdnomlqko.jglutil.mesh.MeshUtils;
 import org.cdnomlqko.jglutil.shader.*;
 import org.cdnomlqko.jglutil.utils.*;
 
@@ -54,7 +51,7 @@ public class RayTracingExample extends ApplicationBase{
 		renderQuadShader = new VFShader("./res/shaders/verfrag_shaders/TextureOnScreenVertexShader.vs",
 				"./res/shaders/verfrag_shaders/TextureOnScreenFragmentShader.fs");
 		
-		renderingQuad = new ShadedGameObject(MeshGenerator.makeQuad(2f), renderQuadShader);
+		renderingQuad = new ShadedGameObject(MeshUtils.makeQuad(2f), renderQuadShader);
 		
 		renderTexture = new Texture2D(window.getWidth(), window.getHeight());
 
@@ -65,8 +62,8 @@ public class RayTracingExample extends ApplicationBase{
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, glbuff);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, new float[] { 
 						0.5f, 1.3f, 1.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f,
-						1.3f, 0.2f, 2.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.7f, 0.0f, 0.0f, 0.0f,
-						-0.4f, 0.5f, 1.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f
+						1.3f, 0.2f, 2.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.7f, 1.0f, 0.0f, 0.0f,
+						-0.4f, 0.5f, 1.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f, 2.0f, 0.0f, 0.0f
 						}, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
@@ -116,6 +113,7 @@ public class RayTracingExample extends ApplicationBase{
 			
 			// the shader will write to texture0. 
 			renderTexture.bind(GL_TEXTURE0);
+			renderTexture.bindImage(0);
 			Renderer.Compute(comp, renderTexture.getWidth(), renderTexture.getHeight(), 1, () -> {
 				comp.setUniform("cameraMatrix", cameraTransform.getWorldMatrix());
 				comp.setUniform("fov", camera.getFov());

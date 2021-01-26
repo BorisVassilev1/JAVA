@@ -82,7 +82,8 @@ public class Texture2D {
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,(ByteBuffer) null);
-    	glBindImageTexture(0, id, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
+    	glGenerateMipmap(GL_TEXTURE_2D);
+    	//glBindImageTexture(0, id, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
     	glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
@@ -152,7 +153,15 @@ public class Texture2D {
 	 */
 	public void unbind() {
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, id);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	
+	public void bindImage(int unit) {
+		glBindImageTexture(unit, id, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+	}
+	
+	public void unbindImage(int unit) {
+		glBindImageTexture(unit, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
 	}
 	
 	/**

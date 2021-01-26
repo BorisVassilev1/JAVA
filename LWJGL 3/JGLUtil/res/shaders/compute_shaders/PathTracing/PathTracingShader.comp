@@ -1,0 +1,132 @@
+#version 460
+
+#include <pathTracing.glincl>
+
+layout(local_size_x = 1, local_size_y = 1) in;
+
+layout(rgba32f, binding = 1) uniform image2D img_output;
+
+layout(std430, binding = 0) buffer spheres {
+	Sphere sphs[];
+};
+
+uniform bool end = true;
+
+uniform int max_depth;
+
+void write_sample(in ivec2 pixel_coords, in vec4 color) {
+	vec4 current = imageLoad(img_output, pixel_coords);
+	imageStore(img_output, pixel_coords, current + color);
+}
+
+int left(in int index) {
+	return 2 * index + 1;
+}
+
+int right(in int index) {
+	return 2 * index + 2;
+}
+
+int parent(in int index) {
+	return (index - 1) / 2;
+}
+
+int right_sibling(in int index) {
+	int result = index;
+	while(result % 2 == 0 && result != 0) {
+		result = parent(result);
+	}	
+	return result + 1 * int(result != 0);
+} 
+
+void main() {
+	vec4 pixel = vec4(1.0, 1.0, 1.0, 1.0);
+	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+	vec2 pixel_position = pixel_coords / resolution;
+	int ray_id = to1d(ivec2(gl_GlobalInvocationID.xy), ivec2(resolution));
+	Ray ray = rays[ray_id];
+	
+	if(!ray.is_active || ray.attenuation == vec3(0.001)) { 
+		return;
+	}
+	
+	RayHit hit;
+	
+	hit.dist = 1.0 / 0.0;
+	intersectGroundPlane(ray,-1.0,hit);
+	//for(int s = 4; s < sphs.length() ; s ++) {
+	//	intersectSphere(ray, sphs[s], hit);
+	//}
+	
+	//for(int i = 0; i < indices.length(); i +=3) {
+	//	Triangle t = get_triangle(i);
+	//	intersectTriangle(ray, t, hit);
+	//}
+	
+	//intersectSphere(ray, sphs[3], hit);
+	
+	int index = 0;
+	BVHNode node;
+	
+	RayHit hit2;
+	Triangle t;
+	
+	bool must_break = false;
+	int tris_count = 0;
+	
+	//for(int i = 0; !must_break && i < 1000; i ++) {
+	while(!must_break) {
+		node = nodes[index];	
+		bool res = intersectAABB(ray, node.box, hit2);
+		
+		if(res && node.obj_index != -1) {
+			t = get_triangle(node.obj_index);
+			bool a = intersectTriangle(ray, t, hit);
+			tris_count += int(a);
+		}
+		
+		index = mix(right_sibling(index), left(index), !((res && node.obj_index != -1) || !res));
+		
+		must_break = (index == 0);
+	}
+	
+	ray.attenuation *= 1.0 / (tris_count + 1);
+	
+	vec2 random_seed_full = pixel_position + vec2(random_seed);
+	
+	if(hit.dist != 1.0/0.0) {
+		if(end) {
+			pixel = vec4(vec3(0., 0., 0.), 1.0);
+			
+			write_sample(pixel_coords, pixel);
+		} else {
+			if(hit.mat.type == 1.0) {
+				ray = disperse_reflect(ray, hit, hit.mat.color.xyz, 0.1,  random_seed_full);
+			}
+			else if(hit.mat.type == 2.0) {
+				ray = disperse_refract(ray, hit, hit.mat.color.xyz, 1.0 / 1.7, random_seed_full);
+			}
+			else if(hit.mat.type == 3.0) {
+				ray.is_active = false;
+				pixel = vec4(hit.mat.color.xyz * ray.attenuation, 1.0);
+				write_sample(pixel_coords, pixel);
+			}
+			else {
+				ray = disperse_lambert(ray, hit, hit.mat.color.xyz * 0.6 , random_seed_full);
+			}
+			
+			rays[ray_id] = ray;
+		}
+		
+	} else {// hit the sky
+		pixel = vec4(get_sky_color(ray) * ray.attenuation, 1.0);
+		
+		write_sample(pixel_coords, pixel);
+		ray.is_active = false;
+		rays[ray_id] = ray;
+	}
+}
+
+
+
+

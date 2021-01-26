@@ -17,6 +17,15 @@
 	</properties>
 
 	<build>
+		
+		<resources>
+			<resource>
+				<targetPath>res</targetPath>
+				<directory>res</directory>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+		
 		<plugins>
 			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
@@ -38,13 +47,12 @@
 			        </execution>
 			    </executions>
 			</plugin>
-			<plugin>
+			<!-- <plugin>
 		        <artifactId>maven-resources-plugin</artifactId>
 		        <version>3.1.0</version>
 		        <executions>
 		          	<execution>
 		            	<id>copy-resources</id>
-		           		<!-- here the phase you need -->
 		            	<phase>validate</phase>
 		            	<goals>
 		              		<goal>copy-resources</goal>
@@ -54,13 +62,13 @@
 		              		<resources>          
 		                		<resource>
 		                  			<directory>res</directory>
-		                  			<filtering>true</filtering>
+		                  			<filtering>false</filtering>
 		                		</resource>
 		              		</resources>              
 		            	</configuration>            
 		        	</execution>
 		    	</executions>
-			</plugin>
+			</plugin>-->
 		</plugins>
 	</build>
 

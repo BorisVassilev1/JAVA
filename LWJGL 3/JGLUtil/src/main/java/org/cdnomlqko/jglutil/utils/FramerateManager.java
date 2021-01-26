@@ -2,6 +2,9 @@ package org.cdnomlqko.jglutil.utils;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.cdnomlqko.jglutil.Time;
 
 /** 
@@ -21,6 +24,10 @@ public class FramerateManager {
 	
 	private Time time;
 	
+	private Timer t;
+	private TimerTask tt;
+	private Thread fpsThread;
+	
 	@FunctionalInterface
 	public interface OneSecondPassedCallback {
 		public void apply (long frames_this_second);
@@ -31,6 +38,31 @@ public class FramerateManager {
 	public FramerateManager(Time time) {
 		this.time = time;
 		lastPrintTime = glfwGetTime();
+		
+		//fpsThread = new Thread(new Runnable() {
+		//	@Override
+		//	public void run() {
+				
+				t = new Timer();  
+				tt = new TimerTask() {  
+				    @Override  
+				    public void run() {  
+						double glfwTimeNow = glfwGetTime();
+						if(callback != null)
+							callback.apply(frames_last_second);
+						
+						frames_last_second = 0;
+						lastPrintTime = glfwTimeNow;
+				    };  
+				};  
+				t.scheduleAtFixedRate(tt,0,1000);
+				
+		//	}
+		//	
+		//});
+		
+		//fpsThread.setName("Framerate Manager");
+		//fpsThread.run();
 	}
 	
 	/**
@@ -40,15 +72,6 @@ public class FramerateManager {
 		nano_this_frame = calculateNanoThisFrame();
 		
 		frames_last_second ++;
-		
-		double glfwTimeNow = glfwGetTime();
-		if(glfwTimeNow - lastPrintTime > 1.0) {
-			if(callback != null)
-				callback.apply(frames_last_second);
-			
-			frames_last_second = 0;
-			lastPrintTime += 1;
-		}
 	}
 	/**
 	 * call this at the end of each iteration of the game loop. Preferably, use it only if vsync is off.
@@ -81,5 +104,12 @@ public class FramerateManager {
 	 */
 	public void setSecondPassedCallback(OneSecondPassedCallback func) {
 		this.callback = func;
+	}
+	
+	public void stop() {
+		//fpsThread.stop();
+		tt.cancel();
+		t.purge();
+		t.cancel();
 	}
 }

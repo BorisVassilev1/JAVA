@@ -3,11 +3,12 @@ package org.cdnomlqko.jglutil;
 import static org.lwjgl.opengl.GL46.*;
 
 import org.cdnomlqko.jglutil.data.Renderable;
+import org.cdnomlqko.jglutil.gameobject.GameObject;
+import org.cdnomlqko.jglutil.gameobject.LightGameObject;
 import org.cdnomlqko.jglutil.mesh.Mesh;
 import org.cdnomlqko.jglutil.shader.ComputeShader;
+import org.cdnomlqko.jglutil.shader.ShaderUtils;
 import org.cdnomlqko.jglutil.shader.VFShader;
-
-import com.sun.org.apache.xpath.internal.functions.Function;
 
 /**
  * A static class for rendering objects in the current OpenGL context.
@@ -28,11 +29,32 @@ public class Renderer {
 		
 		obj.getMesh().bind();
 		
-		glDrawElements(GL_TRIANGLES, obj.getMesh().getIndicesCount(), GL_UNSIGNED_INT, 0); 
+		glDrawElements(obj.getMesh().getDrawMode(), obj.getMesh().getIndicesCount(), GL_UNSIGNED_INT, 0); 
 		
 		obj.getMesh().unbind();
 		
 		sh.unbind();
+	}
+	
+	/**
+	 * Draws a {@link GameObject} using the given {@link Mesh}, {@link VFShader} and the {@link Runnable} that is called just after the shader is bound.
+	 * @param obj
+	 * @param mesh
+	 * @param shader
+	 * @param prepareForRender
+	 */
+	public static void draw(GameObject obj, Mesh mesh, VFShader shader, Runnable prepareForRender) {
+		shader.bind();
+		
+		prepareForRender.run();
+		
+		mesh.bind();
+		
+		glDrawElements(mesh.getDrawMode(), mesh.getIndicesCount(), GL_UNSIGNED_INT, 0);
+		
+		mesh.unbind();
+		
+		shader.unbind();
 	}
 	
 	/**
@@ -52,6 +74,13 @@ public class Renderer {
 		
 		mesh.unbind();
 		shader.unbind();
+	}
+	
+	public static void draw(LightGameObject obj) {
+		draw(obj, obj.getLight().getType().getDisplayMesh(), ShaderUtils.getUnlitShader(), () -> {
+			if(ShaderUtils.getUnlitShader().hasUniform("worldMatrix"))
+				ShaderUtils.getUnlitShader().setUniform("worldMatrix", obj.transform.getWorldMatrix());
+		});
 	}
 	
 	/**

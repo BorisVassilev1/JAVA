@@ -33,6 +33,32 @@ public class Bot extends ListenerAdapter {
 	
 	static ByteBuffer music;
 	
+	static double time = 0;
+	
+	static int sampleRate = 48000;
+	static double samplePeriod = 1.0/sampleRate;
+	
+	static double duration = 0.02;
+	static int durationInSamples = (int) Math.ceil(duration * sampleRate);
+	
+	static int frequency = 440;
+	
+	static int tone_counter = 0;
+	
+	static int letterToId(char a) {
+		switch(a) {
+		case 'a': return 0;
+		case 'b': return 2;
+		case 'c': return 3;
+		case 'd': return 5;
+		case 'e': return 7;
+		case 'f': return 8;
+		case 'g': return 10;
+		}
+		
+		return -1;
+	}
+	
 	public static void main(String[] args) throws LoginException {
 
 		BufferedReader reader;
@@ -52,12 +78,53 @@ public class Bot extends ListenerAdapter {
 		User user = api.getUsers().get(0);
 		userId = user.getIdLong();
 		
-		music = ByteBuffer.allocate(960);
-		for(int i = 0; i < 960; i++) {
-			byte b = (byte)( 255 * Math.sin(i * Math.PI / 48000 * 440) - 128);
-			music.put(b);
-		}
-		music.flip();
+		
+		
+		music = ByteBuffer.allocate(durationInSamples * 4);
+		
+		int array[] = {
+				letterToId('d'),
+				letterToId('d'),
+				letterToId('d') + 12,
+				-100,
+				letterToId('a'),
+				-100,
+				-100,
+				letterToId('g') + 1,
+				-100,
+				letterToId('g'),
+				-100,
+				letterToId('f'),
+				-100,
+				letterToId('d'),
+				letterToId('f'),
+				letterToId('g'),
+		};
+		
+		new java.util.Timer().scheduleAtFixedRate( 
+		        new java.util.TimerTask() {
+		            @Override
+		            public void run() {
+		                frequency = (int)(440.0 * Math.pow(2, array[tone_counter]/12.0));
+		                if(array[tone_counter] == -100) frequency = 0;
+		                tone_counter++;
+		                tone_counter %= array.length;
+		            }
+		        },
+		        0,
+		        125
+		);
+		
+		new java.util.Timer().scheduleAtFixedRate( 
+		        new java.util.TimerTask() {
+		            @Override
+		            public void run() {
+		                frequency = 0;
+		            }
+		        },
+		        100,
+		        125
+		);
 		
 	}
 
@@ -111,12 +178,35 @@ public class Bot extends ListenerAdapter {
 				
 				@Override
 				public ByteBuffer provide20MsAudio() {
+					//double time = 0;
+					for(int i = 0; i < durationInSamples; i ++) {
+						
+						if(frequency != 0) {
+						float val = (float) (Math.sin(2 * Math.PI * frequency * time) * 0.1);
+						
+						short bits = (short)(32768 * val * 0.5);
+						
+						music.put((byte)(bits >> 8));
+						music.put((byte)(bits & 0x0F));
+						music.put((byte)(bits >> 8));
+						music.put((byte)(bits & 0x0F));
+						}
+						else {
+							music.put((byte)0);
+							music.put((byte)0);
+							music.put((byte)0);
+							music.put((byte)0);
+						}
+						time += samplePeriod;
+					}
+					
+					music.flip();
 					return music;
 				}
 				
 				@Override
 				public boolean canProvide() {
-					return false;
+					return true;
 				}
 				
 				@Override
@@ -158,7 +248,7 @@ public class Bot extends ListenerAdapter {
 		}
 		else if(text.equals(prefix + "stop")) {
 			
-			MessageBuilder mb = new MessageBuilder("Adios, Amigos!! <:snek:742735318805119127>");
+			MessageBuilder mb = new MessageBuilder("Adios, Amigos!! <a:pop:782923200605847562>");
 			Message mess = mb.build();
 			
 			channel.sendMessage(mess).queue();
@@ -171,4 +261,5 @@ public class Bot extends ListenerAdapter {
 			System.exit(0);
 		}
 	}
+	
 }

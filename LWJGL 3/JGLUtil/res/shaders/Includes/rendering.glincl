@@ -49,7 +49,7 @@ layout(std140, binding=0) buffer Materials {
 };
 
 layout(std140, binding=1) buffer Lights{
-	Light lights[2];
+	Light lights[];
 };
 
 uniform int material_index = 0;

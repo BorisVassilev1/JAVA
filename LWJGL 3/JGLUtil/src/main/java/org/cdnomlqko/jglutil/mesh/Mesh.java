@@ -4,6 +4,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
+import org.cdnomlqko.jglutil.data.BoundingVolumeHierarchy;
+
 import static org.lwjgl.opengl.GL46.*;
 
 /**
@@ -39,17 +41,25 @@ public class Mesh {
 	
 	private int vao;
 	private int ibo;
-	private ArrayList<VBO> vbos;
+
+	protected ArrayList<VBO> vbos;
 	
 	private int indicesCount;
 	private int verticesCount;
 	
-	protected Mesh() {
+	private int drawMode = GL_TRIANGLES;
+	
+	/**
+	 * initializes the mesh.
+	 * @param drawMode - how the mesh will display. This must be one of GL_POINTS, GL_LINES, GL_LINE_STRIP, GL_TRIANGLES, etc...
+	 */
+	protected Mesh(int drawMode) {
 		vbos = new ArrayList<VBO>();
+		this.setDrawMode(drawMode);
 	}
 	
 	protected int createVBO(int attributeLocation, int coordSize, FloatBuffer data) {
-		verticesCount = data.capacity();
+		verticesCount = data.limit();
 		int bufferId = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, bufferId);
         glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_READ);
@@ -62,7 +72,7 @@ public class Mesh {
 	}
 	
 	protected int createIBO(IntBuffer data) {
-		indicesCount = data.capacity();
+		indicesCount = data.limit();
         int indicesBufferId = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesBufferId);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, data, GL_STATIC_READ);
@@ -137,5 +147,21 @@ public class Mesh {
 
 	public int getVerticesCount() {
 		return verticesCount;
+	}
+
+	public int getDrawMode() {
+		return drawMode;
+	}
+
+	public void setDrawMode(int drawMode) {
+		this.drawMode = drawMode;
+	}
+	
+	public int getVao() {
+		return vao;
+	}
+
+	public int getIbo() {
+		return ibo;
 	}
 }

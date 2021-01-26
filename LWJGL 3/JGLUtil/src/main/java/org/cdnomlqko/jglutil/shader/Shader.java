@@ -8,7 +8,9 @@ import java.util.HashMap;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.system.MemoryStack;
 
 /**
@@ -166,6 +168,10 @@ public class Shader {
 		return id;
 	}
 	
+	public void setUniform(String uniformName, boolean value) {
+		glUniform1i(getUniformLocation(uniformName), value ? 1 : 0);
+	}
+	
 	/**
 	 * Sets the specified uniform variable.
 	 * 
@@ -222,7 +228,11 @@ public class Shader {
 	public void setUniform(String uniformName, IntBuffer value) {
 		glUniform3iv(getUniformLocation(uniformName), value);
 	}
-
+	
+	public void setUniform(String uniformName, Vector4f value) {
+		glUniform4f(getUniformLocation(uniformName), value.x, value.y, value.z, value.w);
+	}
+	
 	/**
 	 * Sets the specified uniform variable.
 	 * 
@@ -248,7 +258,20 @@ public class Shader {
 	public void setUniform(String uniformName, Vector2f value) {
 		glUniform2f(getUniformLocation(uniformName), value.x, value.y);
 	}
-
+	
+	/**
+	 * Sets the specified uniform variable.
+	 * 
+	 * @param uniformName
+	 *            - name of an already created uniform variable.
+	 * @param value
+	 *            - the value for the uniform variable to be set to.
+	 * @throws RuntimeException just as {@link #getUniformLocation(String)}
+	 */
+	public void setUniform(String uniformName, Vector2i value) {
+		glUniform2i(getUniformLocation(uniformName), value.x, value.y);
+	}
+	
 	/**
 	 * Sets the specified uniform variable.
 	 * 

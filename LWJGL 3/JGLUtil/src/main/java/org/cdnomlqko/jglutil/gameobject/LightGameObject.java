@@ -5,8 +5,11 @@ import static org.lwjgl.opengl.GL46.*;
 import java.nio.ByteBuffer;
 
 import org.cdnomlqko.jglutil.data.Light;
+import org.cdnomlqko.jglutil.data.Renderable;
 import org.cdnomlqko.jglutil.data.Scene;
 import org.cdnomlqko.jglutil.data.Transformation;
+import org.cdnomlqko.jglutil.mesh.MeshUtils;
+import org.cdnomlqko.jglutil.shader.ShaderUtils;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 

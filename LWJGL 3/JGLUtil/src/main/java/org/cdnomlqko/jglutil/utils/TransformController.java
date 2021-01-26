@@ -17,6 +17,8 @@ public class TransformController {
 	private Input input;
 	private Transformation transform;
 	
+	private boolean changed = false;
+	
 	/**
 	 * movement speed
 	 */
@@ -37,8 +39,13 @@ public class TransformController {
 		if(!input.isActive()) {
 			return;
 		}
+		changed = false;
 		
 		Vector3f camRot = transform.getRotation();
+		
+		if(input.mouseD.x != 0f || input.mouseD.y != 0f) {
+			changed = true;
+		}
 		
 		camRot.x += input.mouseD.y / 500;
 		camRot.y += input.mouseD.x / 500;
@@ -56,27 +63,36 @@ public class TransformController {
 		sidewaysXZ.mul(speed);
 		
 		if(input.getKey(GLFW_KEY_SPACE) == GLFW_PRESS) {
-			camPos.y += 0.1;
+			camPos.y += speed;
+			changed = true;
 		}
 		if (input.getKey(GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-			camPos.y -= 0.1;
+			camPos.y -= speed;
+			changed = true;
 		}
 		if (input.getKey(GLFW_KEY_A) == GLFW_PRESS) {
 			camPos.sub(sidewaysXZ);
+			changed = true;
 		}
 		if (input.getKey(GLFW_KEY_D) == GLFW_PRESS) {
 			camPos.add(sidewaysXZ);
+			changed = true;
 		}
 		if (input.getKey(GLFW_KEY_W) == GLFW_PRESS) {
 			camPos.add(forwardXZ);
+			changed = true;
 		}
 		if (input.getKey(GLFW_KEY_S) == GLFW_PRESS) {
 			camPos.sub(forwardXZ);
+			changed = true;
 		}
 		
 		transform.setPosition(camPos);
 		transform.setRotation(camRot);
 		
 		transform.updateWorldMatrix();
+	}
+	public boolean hasChanged() {
+		return changed;
 	}
 }

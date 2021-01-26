@@ -24,7 +24,9 @@ public class Input {
 	public boolean lockMouse = false;
 	private boolean hideMouse = false;
 	
-	private boolean isActive = true;
+	private boolean isActive = false;
+	
+	private boolean shouldChangeOnFocus = true;
 	
 	/**
 	 * This class is bound to a window.
@@ -39,12 +41,15 @@ public class Input {
 			if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
 				glfwSetWindowShouldClose(windowId, true); // We will detect this in the rendering loop
 			if(key == GLFW_KEY_1 && action == GLFW_RELEASE) {
-				switchActive();
+				setActive(!isActive);
+				shouldChangeOnFocus = isActive;
 			}
 		});
 		
 		glfwSetWindowFocusCallback(window.getId(), (long _window, boolean focused) -> {
-			switchActive();
+			if(shouldChangeOnFocus) {
+				setActive(focused);
+			}
 		});
 		
 		mouse_x_pos = BufferUtils.createDoubleBuffer(1);
@@ -93,8 +98,8 @@ public class Input {
 		return glfwGetWindowAttrib(window.getId(), GLFW_FOCUSED) == GLFW_TRUE;
 	}
 	
-	private void switchActive() {
-		isActive = !isActive;
+	private void setActive(boolean active) {
+		isActive = active;
 		if(isActive) {
 			if(hideMouse)
 				hideMouse();

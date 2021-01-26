@@ -11,7 +11,7 @@ import org.joml.Vector3f;
 public class Transformation {
 	private Vector3f position;
 	private Vector3f rotation;
-	private float scale;
+	private Vector3f scale;
 	private Matrix4f worldMatrix;
 	
 	/**
@@ -21,7 +21,7 @@ public class Transformation {
 		this.position = new Vector3f();
 		this.rotation = new Vector3f();
 		this.worldMatrix = new Matrix4f();
-		this.scale = 1.0f;
+		this.scale = new Vector3f(1);
 		updateWorldMatrix();
 	}
 	
@@ -31,7 +31,7 @@ public class Transformation {
 	 * @param rotation
 	 * @param scale
 	 */
-	public Transformation(Vector3f position, Vector3f rotation, float scale) {
+	public Transformation(Vector3f position, Vector3f rotation, Vector3f scale) {
 		this.position = position;
 		this.rotation = rotation;
 		this.worldMatrix = new Matrix4f();
@@ -55,12 +55,20 @@ public class Transformation {
 		return this.rotation;
 	}
 	
-	public float getScale() {
+	public Vector3f getScale() {
 		return this.scale;
 	}
 	
-	public void setScale(float scale) {
+	public void setScale(Vector3f scale) {
 		this.scale = scale;
+	}
+	
+	public void setScale(float scale) {
+		this.scale.set(scale, scale, scale);
+	}
+	
+	public void setScale(float x, float y, float z) {
+		this.scale.set(x, y, z);
 	}
 	
 	public Matrix4f getWorldMatrix() {

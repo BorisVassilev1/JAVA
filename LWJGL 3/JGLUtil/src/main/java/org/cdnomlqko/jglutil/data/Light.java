@@ -2,6 +2,8 @@ package org.cdnomlqko.jglutil.data;
 
 import java.nio.ByteBuffer;
 
+import org.cdnomlqko.jglutil.mesh.Mesh;
+import org.cdnomlqko.jglutil.mesh.MeshUtils;
 import org.joml.Vector3f;
 
 /**
@@ -20,18 +22,24 @@ public class Light implements Bufferable{
 	 *
 	 */
 	public enum Type {
-		AMBIENT_LIGHT(0),
-		DIRECTIONAL_LIGHT(1),
-		POINT_LIGHT(2);
+		AMBIENT_LIGHT(0, MeshUtils.makeLineCube(1,1,1)),
+		DIRECTIONAL_LIGHT(1, MeshUtils.makeArrow()),
+		POINT_LIGHT(2, MeshUtils.makeLineOctahedron());
 		
 		private final int id;
+		private final Mesh displayMesh;
 		
-		private Type(int id) {
+		private Type(int id, Mesh mesh) {
 			this.id = id;
+			this.displayMesh = mesh;
 		}
 		
 		public int getId() {
 			return id;
+		}
+
+		public Mesh getDisplayMesh() {
+			return displayMesh;
 		}
 	}
 	

@@ -14,13 +14,6 @@ out vec3 mvVertexPos;
 //the current object rendered
 uniform mat4 worldMatrix;
 
-//the camera
-//layout (std140) uniform Matrices {
-//	mat4 projectionMatrix;
-//	mat4 viewMatrix;
-//	mat4 cameraWorldMatrix;
-//};
-
 void main() {
 	vec4 mvPos = worldMatrix * vec4(position, 1.0);
 	

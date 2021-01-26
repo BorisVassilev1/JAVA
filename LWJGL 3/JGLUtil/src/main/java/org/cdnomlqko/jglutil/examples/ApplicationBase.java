@@ -12,6 +12,7 @@ public abstract class ApplicationBase {
 	 * starts the program
 	 */
 	public void run() {
+		
 		System.out.println("LWJGL version: " + Version.getVersion());
 
 		init();

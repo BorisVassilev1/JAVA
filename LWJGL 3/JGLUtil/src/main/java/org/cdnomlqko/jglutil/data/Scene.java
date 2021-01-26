@@ -10,6 +10,7 @@ import org.cdnomlqko.jglutil.gameobject.LightGameObject;
 import org.cdnomlqko.jglutil.gameobject.MeshedGameObject;
 import org.cdnomlqko.jglutil.gameobject.ShadedGameObject;
 import org.cdnomlqko.jglutil.shader.Shader;
+import org.cdnomlqko.jglutil.shader.ShaderUtils;
 import org.cdnomlqko.jglutil.shader.VFShader;
 import org.lwjgl.BufferUtils;
 
@@ -20,7 +21,7 @@ public class Scene {
 	private ArrayList<GameObject> gameObjects;
 
 	private ArrayList<Material> materials;
-	private ArrayList<Shader> shaders; //  TODO: store the default shader so that buffers can be created
+	//private ArrayList<Shader> shaders; //  TODO: store the default shader so that buffers can be created
 	private CameraGameObject activeCamera;
 	
 	private SceneBuffersHolder buffHolder;
@@ -45,6 +46,10 @@ public class Scene {
 			materialsBuffer = glGenBuffers();
 			lightsBuffer = glGenBuffers();
 			
+			bindBuffersToSSBOs();
+		}
+		
+		public void bindBuffersToSSBOs() {
 			defaultShader.setSSBO("Materials", materialsBuffer);
 			defaultShader.setSSBO("Lights", lightsBuffer);
 		}
@@ -98,8 +103,11 @@ public class Scene {
 		this.gameObjects = new ArrayList<GameObject>();
 
 		this.materials = new ArrayList<Material>();
-		this.shaders = new ArrayList<Shader>();
+		//this.shaders = new ArrayList<Shader>();
 		this.activeCamera = null;
+		
+		if(defaultShader == null)
+			defaultShader = ShaderUtils.getLitShader();
 		
 		this.defaultShader = defaultShader;
 		this.buffHolder = new SceneBuffersHolder(this, defaultShader);
@@ -128,9 +136,9 @@ public class Scene {
 		return registerUniqueField(material, materials);
 	}
 
-	public int registerShader(Shader shader) {
-		return registerUniqueField(shader, shaders);
-	}
+	//public int registerShader(Shader shader) {
+	//	return registerUniqueField(shader, shaders);
+	//}
 
 	public void setActiveCamera(CameraGameObject cam) {
 		this.activeCamera = cam;
@@ -141,13 +149,18 @@ public class Scene {
 		buffHolder.updateBuffers();
 	}
 	
+	public void bindBuffersToSSBOs() {
+		buffHolder.bindBuffersToSSBOs();
+	}
+	
 	public void draw() {
 		activeCamera.update();
 		for(GameObject go : gameObjects) {
-			if(go instanceof MeshedGameObject) {
-				Renderer.draw((MeshedGameObject)go);
-			} else if(go instanceof ShadedGameObject) {
-				Renderer.draw((ShadedGameObject) go);
+			if(go instanceof Renderable) {
+				Renderer.draw((Renderable)go);
+			}
+			if(go instanceof LightGameObject) {
+				Renderer.draw((LightGameObject)go);
 			}
 		}
 	}
@@ -171,5 +184,4 @@ public class Scene {
 	public CameraGameObject getActiveCamera() {
 		return activeCamera;
 	}
-	
 }
