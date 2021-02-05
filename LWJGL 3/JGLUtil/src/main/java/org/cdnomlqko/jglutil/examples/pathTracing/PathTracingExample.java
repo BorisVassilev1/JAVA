@@ -65,7 +65,7 @@ public class PathTracingExample extends ApplicationBase{
 	long random_seed = 0;
 	Random rand = new Random(0);
 	
-	int max_depth = 7;
+	int max_depth = 4;
 	
 	float[] base_sph_arr = new float[] {
 			 0.2f, 1.3f, 0.2f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
@@ -148,7 +148,6 @@ public class PathTracingExample extends ApplicationBase{
 		glBufferData(GL_SHADER_STORAGE_BUFFER, BufferUtils.createByteBuffer(rays_buffer_size), GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		
-		generator.setSSBO("Rays", rays_buffer);
 		generator.bind();
 		generator.setUniform("resolution", new Vector2f(renderTexture.getWidth(), renderTexture.getHeight()));
 		generator.setUniform("fov", camera.getCamera().getFov());
@@ -160,8 +159,6 @@ public class PathTracingExample extends ApplicationBase{
 		spheres_buff = glGenBuffers();
 		fill_sph_buffer();
 		
-		tracer.setSSBO("spheres", spheres_buff);
-		tracer.setSSBO("Rays", rays_buffer);
 		tracer.bind();
 		//tracer.setUniform("rays_sent", rays_per_pixel);
 		tracer.setUniform("resolution", new Vector2f(renderTexture.getWidth(), renderTexture.getHeight()));
@@ -182,6 +179,8 @@ public class PathTracingExample extends ApplicationBase{
 		normalizer.setUniform("img_output", 0);
 		normalizer.unbind();
 		
+		set_ray_tracing_ssbos();
+		
 		ShaderUtils.init();
 		MeshUtils.init();
 //		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -189,7 +188,7 @@ public class PathTracingExample extends ApplicationBase{
 	
 	void set_ray_tracing_ssbos() {
 		generator.setSSBO("Rays", rays_buffer);
-		tracer.setSSBO("spheres", spheres_buff);
+		//tracer.setSSBO("spheres", spheres_buff);
 		tracer.setSSBO("Rays", rays_buffer);
 	}
 	
@@ -214,11 +213,11 @@ public class PathTracingExample extends ApplicationBase{
 		sc = new Scene(ShaderUtils.getLitShader());
 		sc.setActiveCamera(camera);
 		
-		BasicMesh dragonMesh = ModelLoader.load("./res/dragon.obj");
-		MeshedGameObject dragon = new MeshedGameObject(dragonMesh, new Material(new Vector3f(1.0f, 0.0f, 0.0f)), null);
-		//dragon.transform.setScale(5.f);
-		dragon.transform.updateWorldMatrix();
-		dragon.register(sc);
+		BasicMesh modelMesh = ModelLoader.load("./res/armadillo.obj");
+		MeshedGameObject model = new MeshedGameObject(modelMesh, new Material(new Vector3f(1.0f, 0.0f, 0.0f)), null);
+		model.transform.setScale(1.0f);
+		model.transform.updateWorldMatrix();
+		model.register(sc);
 		
 		LightGameObject light = new LightGameObject(Light.Type.DIRECTIONAL_LIGHT, new Vector3f(1.0f, 1.0f, 1.0f), 0.7f);
 	    light.transform.setPosition(new Vector3f(4, 5, 0));
@@ -229,12 +228,12 @@ public class PathTracingExample extends ApplicationBase{
 		
 		sc.updateBuffers();
 		
-		bvh = new BoundingVolumeHierarchy(dragonMesh);
+		bvh = new BoundingVolumeHierarchy(modelMesh);
 		System.out.println("Max depth: " + BoundingVolumeHierarchy.m_depth);
 		
-		int vertices = dragonMesh.getVertices().getBufferId();
-		int normals = dragonMesh.getNormals().getBufferId();
-		int indices = dragonMesh.getIbo();
+		int vertices = modelMesh.getVertices().getBufferId();
+		int normals = modelMesh.getNormals().getBufferId();
+		int indices = modelMesh.getIbo();
 		
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, indices);
 		int size[] = {-1};
@@ -271,7 +270,7 @@ public class PathTracingExample extends ApplicationBase{
 	public void init() {
 		//create a window, camera, initialize shaders, objects
 		window = new Window("nqkva glupost bate", 800, 600, false, true);
-		camera = new CameraGameObject(new Camera((float)Math.toRadians(70f), window.getWidth() / window.getHeight(), 0.01f, 1000f));
+		camera = new CameraGameObject(new Camera((float)Math.toRadians(70f), window.getWidth() / (float)window.getHeight(), 0.01f, 1000f));
 		//cameraTransform = new Transformation();
 		
 		camera.transform.setPosition(new Vector3f(-3.989e0f, 2.000e0f,  1.741e0f));
@@ -313,7 +312,6 @@ public class PathTracingExample extends ApplicationBase{
 			for(int i = 0; i < max_depth; i ++) {
 				final boolean is_end = i == max_depth - 1;
 				Renderer.Compute(tracer, renderTexture.getWidth(), renderTexture.getHeight(), 1, () -> {
-//					tracer.setUniform("rays_sent", rays_sent);
 					if(tracer.hasUniform("random_seed"))
 						tracer.setUniform("random_seed", rand.nextFloat());
 					if(tracer.hasUniform("end"))

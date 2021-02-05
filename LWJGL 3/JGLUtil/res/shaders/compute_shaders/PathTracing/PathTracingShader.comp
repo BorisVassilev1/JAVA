@@ -20,23 +20,21 @@ void write_sample(in ivec2 pixel_coords, in vec4 color) {
 }
 
 int left(in int index) {
-	return 2 * index + 1;
+	return 2 * index;
 }
 
 int right(in int index) {
-	return 2 * index + 2;
+	return 2 * index + 1;
 }
 
 int parent(in int index) {
-	return (index - 1) / 2;
+	return index / 2;
 }
 
 int right_sibling(in int index) {
-	int result = index;
-	while(result % 2 == 0 && result != 0) {
-		result = parent(result);
-	}	
-	return result + 1 * int(result != 0);
+	int zeros_mask = ~index;
+	int res = index >> (int(log2(zeros_mask ^ (zeros_mask & (zeros_mask - 1)))));
+	return res + int(res != 1);
 } 
 
 void main() {
@@ -46,7 +44,7 @@ void main() {
 	int ray_id = to1d(ivec2(gl_GlobalInvocationID.xy), ivec2(resolution));
 	Ray ray = rays[ray_id];
 	
-	if(!ray.is_active || ray.attenuation == vec3(0.001)) { 
+	if(!ray.is_active) { 
 		return;
 	}
 	
@@ -58,39 +56,29 @@ void main() {
 	//	intersectSphere(ray, sphs[s], hit);
 	//}
 	
-	//for(int i = 0; i < indices.length(); i +=3) {
-	//	Triangle t = get_triangle(i);
-	//	intersectTriangle(ray, t, hit);
-	//}
-	
 	//intersectSphere(ray, sphs[3], hit);
 	
-	int index = 0;
+	int index = 1;
 	BVHNode node;
 	
 	RayHit hit2;
 	Triangle t;
 	
 	bool must_break = false;
-	int tris_count = 0;
 	
-	//for(int i = 0; !must_break && i < 1000; i ++) {
 	while(!must_break) {
-		node = nodes[index];	
+		node = nodes[index - 1];	
 		bool res = intersectAABB(ray, node.box, hit2);
 		
 		if(res && node.obj_index != -1) {
 			t = get_triangle(node.obj_index);
-			bool a = intersectTriangle(ray, t, hit);
-			tris_count += int(a);
+			intersectTriangle(ray, t, hit);
 		}
 		
 		index = mix(right_sibling(index), left(index), !((res && node.obj_index != -1) || !res));
 		
-		must_break = (index == 0);
+		must_break = (index == 1);
 	}
-	
-	ray.attenuation *= 1.0 / (tris_count + 1);
 	
 	vec2 random_seed_full = pixel_position + vec2(random_seed);
 	

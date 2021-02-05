@@ -21,7 +21,7 @@ public class Transformation {
 		this.position = new Vector3f();
 		this.rotation = new Vector3f();
 		this.worldMatrix = new Matrix4f();
-		this.scale = new Vector3f(1);
+		this.scale = new Vector3f(1.f);
 		updateWorldMatrix();
 	}
 	
