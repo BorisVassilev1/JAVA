@@ -52,6 +52,8 @@ public class PathTracingExample extends ApplicationBase{
 	
 	Scene sc;
 	
+	float fov = (float) Math.toRadians(70f);
+	
 	boolean ray_tracing_enabled = false;
 	
 	int rays_per_pixel = 100000;
@@ -65,7 +67,7 @@ public class PathTracingExample extends ApplicationBase{
 	long random_seed = 0;
 	Random rand = new Random(0);
 	
-	int max_depth = 4;
+	int max_depth = 6;
 	
 	float[] base_sph_arr = new float[] {
 			 0.2f, 1.3f, 0.2f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
@@ -213,7 +215,7 @@ public class PathTracingExample extends ApplicationBase{
 		sc = new Scene(ShaderUtils.getLitShader());
 		sc.setActiveCamera(camera);
 		
-		BasicMesh modelMesh = ModelLoader.load("./res/armadillo.obj");
+		BasicMesh modelMesh = ModelLoader.load("./res/zergling_3.obj");
 		MeshedGameObject model = new MeshedGameObject(modelMesh, new Material(new Vector3f(1.0f, 0.0f, 0.0f)), null);
 		model.transform.setScale(1.0f);
 		model.transform.updateWorldMatrix();
@@ -270,7 +272,7 @@ public class PathTracingExample extends ApplicationBase{
 	public void init() {
 		//create a window, camera, initialize shaders, objects
 		window = new Window("nqkva glupost bate", 800, 600, false, true);
-		camera = new CameraGameObject(new Camera((float)Math.toRadians(70f), window.getWidth() / (float)window.getHeight(), 0.01f, 1000f));
+		camera = new CameraGameObject(new Camera(fov,(float) window.getWidth() / (float)window.getHeight(), 0.01f, 1000f));
 		//cameraTransform = new Transformation();
 		
 		camera.transform.setPosition(new Vector3f(-3.989e0f, 2.000e0f,  1.741e0f));

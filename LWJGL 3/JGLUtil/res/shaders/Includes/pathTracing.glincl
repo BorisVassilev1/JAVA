@@ -240,12 +240,13 @@ bool intersectTriangle(in Ray ray, in vec3 v0, in vec3 v1, in vec3 v2, in vec3 n
 	vec3 orig = ray.origin;
 	vec3 dir = ray.direction;
 	vec2 uv;
+	
 	float t = intersect(orig, dir, v0, v1, v2, uv);
 	
 	if(t > 0.0001 && t < hit.dist) {
 		hit.dist = t;
 		hit.pos = ray.origin + t * ray.direction;
-		//vec3 col = vec3((int(abs(hit.pos.x - 10.) * 10) + int(abs(hit.pos.y - 10.) * 10) + int(abs(hit.pos.z - 10.) * 10)) % 2);
+		//vec3 col = vec3((int(abs(hit.pos.x - 10.) * 10) + int(abs(hit.pos.y - 10.) * 10) + int(abs(hit.pos.z - 10.) * 10)) % 4 / 4.);
 		vec3 col = vec3(0.8, 0.8, 0.9);
 		hit.mat = Material(col, 0.0);
 		
