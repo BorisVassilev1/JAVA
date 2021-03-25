@@ -16,6 +16,7 @@ import org.cdnomlqko.jglutil.gameobject.MeshedGameObject;
 import org.cdnomlqko.jglutil.mesh.BasicMesh;
 import org.cdnomlqko.jglutil.mesh.MeshUtils;
 import org.cdnomlqko.jglutil.shader.ShaderUtils;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
@@ -25,11 +26,9 @@ public class BoundingVolumeHierarchy implements Bufferable {
 	
 	public static MeshedGameObject display_object = new MeshedGameObject(MeshUtils.makeLineCube(1,1,1), new Material(new Vector3f(1.0f)), ShaderUtils.getUnlitShader());
 	
-	public static int max_depth = 60;
-	
 	public static Random rand = new Random();
 	
-	public static int m_depth = 0;
+	public int max_depth = 0;
 	
 	public ArrayList<Boundable> objects;
 	
@@ -51,10 +50,10 @@ public class BoundingVolumeHierarchy implements Bufferable {
 			this.depth = 0;
 		}
 		
-		public Node(List<Pair<AABB, Integer>> objects, int depth) {
+		public Node(List<Pair<AABB, Integer>> objects, int depth, int[] max_depth) {
 
 			this.depth = depth;
-			if(depth > m_depth) m_depth = depth;
+			if(depth > max_depth[0]) max_depth[0] = depth;
 			
 			if(objects.size() == 1) {
 				this.box = objects.get(0).first;
@@ -71,8 +70,8 @@ public class BoundingVolumeHierarchy implements Bufferable {
 				}
 			});
 			
-			this.left = new Node(objects.subList(0, objects.size() / 2)				 , depth + 1);
-			this.right = new Node(objects.subList(objects.size() / 2, objects.size()), depth + 1);
+			this.left = new Node(objects.subList(0, objects.size() / 2)				 , depth + 1, max_depth);
+			this.right = new Node(objects.subList(objects.size() / 2, objects.size()), depth + 1, max_depth);
 			
 			this.box = AABB.union(left.box, right.box);
 		}
@@ -92,9 +91,9 @@ public class BoundingVolumeHierarchy implements Bufferable {
 		}
 		
 		public void draw() {
-			if(rand.nextFloat() > 0.99) {
+			//if(rand.nextFloat() > 0.99) {
 				box.draw();
-			}
+			//}
 			if(left != null)
 				left.draw();
 			if(right != null)
@@ -209,7 +208,7 @@ public class BoundingVolumeHierarchy implements Bufferable {
 		}
 	}
 	
-	public BoundingVolumeHierarchy(BasicMesh mesh) {
+	public BoundingVolumeHierarchy(BasicMesh mesh, Transformation transform) {
 		int indices_gl = mesh.getIbo();
 		int vertices_gl = mesh.getVertices().getBufferId();
 		
@@ -233,39 +232,48 @@ public class BoundingVolumeHierarchy implements Bufferable {
 			int i1 = indices.get() * 3;
 			int i2 = indices.get() * 3;
 			
-			Triangle t = new Triangle(
+			Vector3f 
+			v0 = new Vector3f(
 					vertices.get(i0    ),
 					vertices.get(i0 + 1),
-					vertices.get(i0 + 2),
+					vertices.get(i0 + 2)),
+			v1 = new Vector3f(
 					vertices.get(i1    ),
 					vertices.get(i1 + 1),
-					vertices.get(i1 + 2),
+					vertices.get(i1 + 2)),
+			v2 = new Vector3f(
 					vertices.get(i2    ),
 					vertices.get(i2 + 1),
-					vertices.get(i2 + 2)
-					);
+					vertices.get(i2 + 2));
+			
+			Matrix4f mat = transform.getWorldMatrix();
+			
+			v0.mulPosition(mat);
+			v1.mulPosition(mat);
+			v2.mulPosition(mat);
+			
+			Triangle t = new Triangle(v0, v1, v2);
 			
 			AABB box = t.getBoundingBox();
+			
+			float phi = 0.000001f;
+			
+			box.min.sub(phi, phi, phi);
+			box.max.add(phi, phi, phi);
 			boxes.add(new Pair<AABB, Integer>(box, i));
 			objects.add(t);
 			i ++;
 		}
 		System.out.println(boxes.size());
-		root = new Node(boxes, 0);
+		int[] m_depth = {0};
+		root = new Node(boxes, 0, m_depth);
+		max_depth = m_depth[0];
 		
 	}
 	
 	public void draw() {
 		root.draw();
 	}
-	
-//	public void merge(BoundingVolumeHierarchy other) {
-//		root.insert(other.root); TODO
-//	}
-	
-//	public void insert(Node node) {
-//		root.insert(node); TODO
-//	}
 
 	@Override
 	public void writeToBuffer(ByteBuffer buff, int offset) {

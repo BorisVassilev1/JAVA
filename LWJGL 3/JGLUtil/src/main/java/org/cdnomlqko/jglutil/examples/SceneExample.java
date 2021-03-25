@@ -83,7 +83,7 @@ public class SceneExample extends ApplicationBase{
 	    cube.transform.updateWorldMatrix();
 	    cube.register(sc);
 	    
-	    BasicMesh dragonMesh = ModelLoader.load("./res/dragon.obj"); 
+	    BasicMesh dragonMesh = ModelLoader.loadMesh("./res/dragon.obj"); 
 	    dragon1 = new MeshedGameObject(dragonMesh, mat1, null);
 	    dragon1.transform.setPosition(new Vector3f(0f, 3f, 0f));
 	    dragon1.transform.setScale(10);

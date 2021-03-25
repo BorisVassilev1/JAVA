@@ -14,6 +14,8 @@ uniform bool end = true;
 
 uniform int max_depth;
 
+uniform int max_bounces;
+
 void write_sample(in ivec2 pixel_coords, in vec4 color) {
 	vec4 current = imageLoad(img_output, pixel_coords);
 	imageStore(img_output, pixel_coords, current + color);
@@ -43,75 +45,78 @@ void main() {
 	vec2 pixel_position = pixel_coords / resolution;
 	int ray_id = to1d(ivec2(gl_GlobalInvocationID.xy), ivec2(resolution));
 	Ray ray = rays[ray_id];
-	
-	if(!ray.is_active) { 
-		return;
-	}
-	
-	RayHit hit;
-	
-	hit.dist = 1.0 / 0.0;
-	intersectGroundPlane(ray,-5.0,hit);
-	//for(int s = 4; s < sphs.length() ; s ++) {
-	//	intersectSphere(ray, sphs[s], hit);
-	//}
-	
-	//intersectSphere(ray, sphs[3], hit);
-	
-	int index = 1;
-	BVHNode node;
-	
-	RayHit hit2;
-	Triangle t;
-	
-	bool must_break = false;
-	
-	while(!must_break) {
-		node = nodes[index - 1];	
-		bool res = intersectAABB(ray, node.box, hit2);
+	bool end;
+	for(int i = 0; i < max_bounces; i ++) {
+		end = i == max_bounces - 1;
 		
-		if(res && node.obj_index != -1) {
-			t = get_triangle(node.obj_index);
-			intersectTriangle(ray, t, hit);
+		if(!ray.is_active) { 
+			return;
 		}
 		
-		index = mix(right_sibling(index), left(index), !((res && node.obj_index != -1) || !res));
+		RayHit hit;
 		
-		must_break = (index == 1);
-	}
-	
-	vec2 random_seed_full = pixel_position + vec2(random_seed);
-	
-	if(hit.dist != 1.0/0.0) {
-		if(end) {
-			pixel = vec4(vec3(0., 0., 0.), 1.0);
+		hit.dist = 1.0 / 0.0;
+		intersectGroundPlane(ray,-0.5,hit);
+		//for(int s = 0; s < sphs.length() ; s ++) {
+		//	intersectSphere(ray, sphs[s], hit);
+		//}
+		
+		//intersectSphere(ray, sphs[3], hit);
+		
+		int index = 1;
+		BVHNode node;
+		
+		RayHit hit2;
+		Triangle t;
+		
+		bool must_break = false;
+		
+		while(!must_break) {
+			node = nodes[index - 1];	
+			bool res = intersectAABB(ray, node.box, hit2);
+			
+			if(res && node.obj_index != -1) {
+				t = get_triangle(node.obj_index);
+				intersectTriangle(ray, t, hit);
+			}
+			index = mix(right_sibling(index), left(index), !((res && node.obj_index != -1) || !res));
+			
+			must_break = (index == 1);
+		}
+		
+		vec2 random_seed_full = pixel_position + vec2(random_seed);
+		
+		if(hit.dist != 1.0/0.0) {
+			if(end) {
+				pixel = vec4(vec3(0., 0., 0.), 1.0);
+				
+				write_sample(pixel_coords, pixel);
+			} else {
+				if(hit.mat.type == 1.0) {
+					ray = disperse_reflect(ray, hit, hit.mat.color.xyz, 0.2,  random_seed_full);
+				}
+				else if(hit.mat.type == 2.0) {
+					ray = disperse_refract(ray, hit, hit.mat.color.xyz, 1.0 / 1.7, random_seed_full);
+				}
+				else if(hit.mat.type == 3.0) {
+					ray.is_active = false;
+					pixel = vec4(hit.mat.color.xyz * ray.attenuation, 1.0);
+					write_sample(pixel_coords, pixel);
+				}
+				else {
+					ray = disperse_lambert(ray, hit, hit.mat.color.xyz * 0.6 , random_seed_full);
+				}
+				
+				rays[ray_id] = ray;
+			}
+			
+		} else {// hit the sky
+			pixel = vec4(get_sky_color(ray) * ray.attenuation, 1.0);
 			
 			write_sample(pixel_coords, pixel);
-		} else {
-			if(hit.mat.type == 1.0) {
-				ray = disperse_reflect(ray, hit, hit.mat.color.xyz, 0.1,  random_seed_full);
-			}
-			else if(hit.mat.type == 2.0) {
-				ray = disperse_refract(ray, hit, hit.mat.color.xyz, 1.0 / 1.7, random_seed_full);
-			}
-			else if(hit.mat.type == 3.0) {
-				ray.is_active = false;
-				pixel = vec4(hit.mat.color.xyz * ray.attenuation, 1.0);
-				write_sample(pixel_coords, pixel);
-			}
-			else {
-				ray = disperse_lambert(ray, hit, hit.mat.color.xyz * 0.6 , random_seed_full);
-			}
-			
+			ray.is_active = false;
 			rays[ray_id] = ray;
 		}
-		
-	} else {// hit the sky
-		pixel = vec4(get_sky_color(ray) * ray.attenuation, 1.0);
-		
-		write_sample(pixel_coords, pixel);
-		ray.is_active = false;
-		rays[ray_id] = ray;
 	}
 }
 

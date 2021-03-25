@@ -14,6 +14,8 @@ import java.util.Random;
 import org.cdnomlqko.jglutil.*;
 import org.cdnomlqko.jglutil.data.*;
 import org.cdnomlqko.jglutil.data.BoundingVolumeHierarchy.Node;
+import org.cdnomlqko.jglutil.data.textures.Texture2D;
+import org.cdnomlqko.jglutil.data.textures.TextureCubeMap;
 import org.cdnomlqko.jglutil.examples.ApplicationBase;
 import org.cdnomlqko.jglutil.gameobject.CameraGameObject;
 import org.cdnomlqko.jglutil.gameobject.LightGameObject;
@@ -35,10 +37,10 @@ public class PathTracingExample extends ApplicationBase{
 	ShadedGameObject renderingQuad;
 	Texture2D renderTexture;
 	Texture2D rawTexture;
-
+	TextureCubeMap envTexture;
+	
 	ComputeShader tracer;
 	ComputeShader generator;
-	ComputeShader filler;
 	ComputeShader normalizer;
 	
 	CameraGameObject camera;
@@ -139,6 +141,10 @@ public class PathTracingExample extends ApplicationBase{
 		rawTexture = new Texture2D(renderTexture.getWidth(), renderTexture.getHeight());
 		rawTexture.bindImage(1);
 		
+		envTexture = new TextureCubeMap("./res/skybox", ".jpg");
+		//envTexture.bind(GL_TEXTURE3);
+		//glBindTextureUnit(5, );
+		
 		int rays_count = renderTexture.getWidth() * renderTexture.getHeight();
 		
 		generator = new ComputeShader("./res/shaders/compute_shaders/PathTracing/RayGenerator.comp");
@@ -169,12 +175,6 @@ public class PathTracingExample extends ApplicationBase{
 		
 		Renderer.Compute(generator, renderTexture.getWidth(), renderTexture.getHeight(), 1);
 		
-		filler = new ComputeShader("./res/shaders/compute_shaders/FillTextureShader.comp");
-		filler.bind();
-		filler.setUniform("color", new Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
-		filler.setUniform("img_output", 1);
-		filler.unbind();
-		
 		normalizer = new ComputeShader("./res/shaders/compute_shaders/PathTracing/MultisampleNormalizer.comp");
 		normalizer.bind();
 		normalizer.setUniform("img_input", 1);
@@ -185,12 +185,12 @@ public class PathTracingExample extends ApplicationBase{
 		
 		ShaderUtils.init();
 		MeshUtils.init();
-//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 	
 	void set_ray_tracing_ssbos() {
 		generator.setSSBO("Rays", rays_buffer);
-		//tracer.setSSBO("spheres", spheres_buff);
+		tracer.setSSBO("spheres", spheres_buff);
 		tracer.setSSBO("Rays", rays_buffer);
 	}
 	
@@ -215,23 +215,33 @@ public class PathTracingExample extends ApplicationBase{
 		sc = new Scene(ShaderUtils.getLitShader());
 		sc.setActiveCamera(camera);
 		
-		BasicMesh modelMesh = ModelLoader.load("./res/zergling_3.obj");
+		//BasicMesh modelMesh = ModelLoader.loadMesh("./res/cube.obj");
+		//BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/3D_Maya/Modeling/scenes/firestorm.obj");
+		//BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/blender/Shardblade.obj");
+		BasicMesh modelMesh = ModelLoader.loadMesh("C:/Users/Boby/Documents/sumTest.obj");
+		
+		
 		MeshedGameObject model = new MeshedGameObject(modelMesh, new Material(new Vector3f(1.0f, 0.0f, 0.0f)), null);
-		model.transform.setScale(1.0f);
+		model.transform.setScale(0.1f);
+		model.transform.setRotation(new Vector3f(0, .0f, 0));
+		model.transform.setPosition(new Vector3f(-1.8f, 0f, 0.8f));
 		model.transform.updateWorldMatrix();
 		model.register(sc);
 		
 		LightGameObject light = new LightGameObject(Light.Type.DIRECTIONAL_LIGHT, new Vector3f(1.0f, 1.0f, 1.0f), 0.7f);
 	    light.transform.setPosition(new Vector3f(4, 5, 0));
 	    light.transform.setRotation(new Vector3f(1f, -.3f, 0f));
-	    light.transform.setScale(.5f);
+	    light.transform.setScale(0.5f);
 	    light.transform.updateWorldMatrix();
 	    light.register(sc);
+	    
+	    LightGameObject ambient = new LightGameObject(Light.Type.AMBIENT_LIGHT, new Vector3f(.1f), 1.f);
+	    ambient.register(sc);
 		
 		sc.updateBuffers();
 		
-		bvh = new BoundingVolumeHierarchy(modelMesh);
-		System.out.println("Max depth: " + BoundingVolumeHierarchy.m_depth);
+		bvh = new BoundingVolumeHierarchy(modelMesh, model.transform);
+		System.out.println("Max depth: " + bvh.max_depth);
 		
 		int vertices = modelMesh.getVertices().getBufferId();
 		int normals = modelMesh.getNormals().getBufferId();
@@ -250,7 +260,7 @@ public class PathTracingExample extends ApplicationBase{
 		tracer.setSSBO("Indices", indices);
 		
 		//int nodes_count = size[0] / 4 / 3 * 4; // 4 bytes * 3 floats 
-		int nodes_count = (int)Math.pow(2, bvh.m_depth + 1);
+		int nodes_count = (int)Math.pow(2, bvh.max_depth + 1);
 		int buff_size = nodes_count * Node.size;
 		ByteBuffer buff = BufferUtils.createByteBuffer(buff_size);
 		bvh.writeToBuffer(buff, 0);
@@ -264,26 +274,36 @@ public class PathTracingExample extends ApplicationBase{
 		tracer.setSSBO("BVH", BVH);
 		tracer.bind();
 		if(tracer.hasUniform("max_depth"))
-			tracer.setUniform("max_depth", BoundingVolumeHierarchy.m_depth);
+			tracer.setUniform("max_depth", bvh.max_depth);
+		if(tracer.hasUniform("max_bounces"))
+			tracer.setUniform("max_bounces", max_depth);
+		if(tracer.hasUniform("bvh_matrix"))
+			tracer.setUniform("bvh_matrix", model.transform.getWorldMatrix());
 		tracer.unbind();
 	}
 	
 	@Override
 	public void init() {
 		//create a window, camera, initialize shaders, objects
-		window = new Window("nqkva glupost bate", 800, 600, false, true);
+		window = new Window("nqkva glupost bate", 1000, 800, false, true);
 		camera = new CameraGameObject(new Camera(fov,(float) window.getWidth() / (float)window.getHeight(), 0.01f, 1000f));
 		//cameraTransform = new Transformation();
 		
 		camera.transform.setPosition(new Vector3f(-3.989e0f, 2.000e0f,  1.741e0f));
 		camera.transform.setRotation(new Vector3f( 3.520e-1f, 1.266e0f,  0.000e0f));
 		camera.transform.updateWorldMatrix();
-		
+		try {
 		init_shaders();
 		
 		init_mesh();
 		
 		init_utils();
+		} catch(Exception e) {
+			e.printStackTrace();
+			cleanup();
+			System.exit(1);
+		}
+		
 		
 		if(ray_tracing_enabled) {
 			set_ray_tracing_ssbos();
@@ -294,11 +314,14 @@ public class PathTracingExample extends ApplicationBase{
 	
 	void trace_rays() {
 		renderTexture.bind(GL_TEXTURE0);
+		//envTexture.bind(GL_TEXTURE5);
+		glBindTextureUnit(5,  envTexture.getID());
 		
 		// if there is a change in the camera's position/rotation
 		if(controller.hasChanged() || must_update_rays) {
 			// init render again
-			Renderer.Compute(filler, renderTexture.getWidth(), renderTexture.getHeight(), 1);
+			
+			glClearTexImage(rawTexture.getID(), 0, GL_RGBA, GL_FLOAT, new float[]{0f,0f,0f,0f});
 			rays_sent = 0;
 			must_update_rays = false;
 		}
@@ -311,21 +334,29 @@ public class PathTracingExample extends ApplicationBase{
 				float randf = rand.nextFloat();
 				generator.setUniform("random_seed", randf);
 			});
-			for(int i = 0; i < max_depth; i ++) {
-				final boolean is_end = i == max_depth - 1;
+			
+			// light bounces...
+			
+			//for(int i = 0; i < max_depth; i ++) {
+			//	final boolean is_end = i == max_depth - 1;
 				Renderer.Compute(tracer, renderTexture.getWidth(), renderTexture.getHeight(), 1, () -> {
 					if(tracer.hasUniform("random_seed"))
 						tracer.setUniform("random_seed", rand.nextFloat());
-					if(tracer.hasUniform("end"))
-						tracer.setUniform("end", is_end);
+					if(tracer.hasUniform("skybox")) 
+						tracer.setUniform("skybox", 5);
+						
+					//if(tracer.hasUniform("end"))
+					//	tracer.setUniform("end", 1);
 				});
-			}
+			//}
 			rays_sent ++;
 		}
 		else if(rays_sent == rays_per_pixel) {
 			System.out.println("image fiished!");
 			rays_sent ++;
 		}
+		
+		//envTexture.unbind(GL_TEXTURE5);
 		
 		Renderer.Compute(normalizer, renderTexture.getWidth(), renderTexture.getWidth(), 1, () -> {
 			normalizer.setUniform("samples", rays_sent);
@@ -335,6 +366,7 @@ public class PathTracingExample extends ApplicationBase{
 		//rawTexture.bind();
 		renderTexture.bind();
 		Renderer.draw(renderingQuad);
+		renderTexture.unbind(GL_TEXTURE0);
 	}
 	
 	@Override

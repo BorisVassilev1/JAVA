@@ -7,8 +7,8 @@ import static org.lwjgl.opengl.GL46.*;
 
 import org.cdnomlqko.jglutil.*;
 import org.cdnomlqko.jglutil.data.Camera;
-import org.cdnomlqko.jglutil.data.Texture2D;
 import org.cdnomlqko.jglutil.data.Transformation;
+import org.cdnomlqko.jglutil.data.textures.Texture2D;
 import org.cdnomlqko.jglutil.gameobject.ShadedGameObject;
 import org.cdnomlqko.jglutil.mesh.MeshUtils;
 import org.cdnomlqko.jglutil.shader.*;

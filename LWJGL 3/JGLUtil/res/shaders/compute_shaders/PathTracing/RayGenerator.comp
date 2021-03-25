@@ -41,7 +41,7 @@ void main() {
 	
 	vec2 ray_coords = vec2(pixel_position.x + (random(pixel_coords + random_seed)) / resolution.x, pixel_position.y + (random(pixel_coords + random_seed + 0.1)) / resolution.y);
 	
-	vec3 ray_dir =  normalize(lerp4vec(vv00, vv10, vv01, vv11, ray_coords.x, ray_coords.y) - ray_origin_offset);
+	vec3 ray_dir = normalize(lerp4vec(vv00, vv10, vv01, vv11, ray_coords.x, ray_coords.y) - ray_origin_offset);
 	
 	ray = Ray(cam_pos + ray_origin_offset, ray_dir, vec3(1.0), true);
 	rays[ray_id] = ray;

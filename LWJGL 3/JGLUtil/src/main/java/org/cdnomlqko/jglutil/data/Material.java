@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL46.*;
 
 import java.nio.ByteBuffer;
 
+import org.cdnomlqko.jglutil.data.textures.Texture2D;
 import org.cdnomlqko.jglutil.gameobject.GameObject;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
