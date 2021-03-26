@@ -1,0 +1,8 @@
+struct Agent {
+	vec2 pos;
+	float angle;
+};
+
+layout(std430, binding = 0) buffer Agents {
+	Agent[] agents;
+};

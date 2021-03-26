@@ -1,0 +1,58 @@
+#version 460
+
+#include "MoldSimulation.glincl"
+#include "random.glincl"
+
+layout(rgba32f, binding = 0) uniform image2D img_output;
+
+layout(local_size_x = 1, local_size_y = 1) in;
+
+float angle_variation = 0.1;
+
+float sense_angle_offset = PI / 6;
+float sense_distance = 12;
+float speed = 6;
+
+uniform ivec2 agents_dim;
+
+float sense(Agent agent, float angle_offset) {
+	vec2 pos = agent.pos + vec2(cos(agent.angle + angle_offset), sin(agent.angle + angle_offset)) * sense_distance;
+	vec4 res = imageLoad(img_output, ivec2(pos));
+	return res.x + res.y + res.z;
+}
+
+void main() {
+	int agent_id = int(gl_GlobalInvocationID.y * agents_dim.x  + gl_GlobalInvocationID.x);
+	Agent agent = agents[agent_id];
+	
+	vec2 velocity = vec2(cos(agent.angle), sin(agent.angle)) * speed;
+	agent.pos += velocity;
+	
+	
+	vec2 size = imageSize(img_output);
+	if(agent.pos.x < 0 || agent.pos.y < 0 || agent.pos.x > float(size.x) || agent.pos.y > float(size.y)) { 
+		agent.angle = random(agent.pos) * 2 * PI;
+		agent.pos = clamp(agent.pos, vec2(0), vec2(size.x, size.y));
+	}
+	
+	float left = sense(agent, -sense_angle_offset);
+	float forw = sense(agent, 0);
+	float right = sense(agent, sense_angle_offset);
+	
+	
+	if(left > forw && left > right) {
+		agent.angle -= sense_angle_offset / 2;
+	}
+	else if(right > forw && right > left) {
+		agent.angle += sense_angle_offset / 2;
+	}
+	//else if(forw < left || forw < right) {
+		agent.angle += (random(agent.pos) * 2. - 1.) * angle_variation;
+	//}
+	
+	agents[agent_id] = agent;
+	
+	ivec2 pixel_pos = ivec2(agent.pos);
+	
+	imageStore(img_output, pixel_pos, vec4(1.0)); 
+}

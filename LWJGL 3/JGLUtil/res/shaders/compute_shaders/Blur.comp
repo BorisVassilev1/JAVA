@@ -1,0 +1,21 @@
+#version 460
+
+#include <MoldSimulation.glincl>
+#include <random.glincl>
+
+layout(local_size_x = 1, local_size_y = 1) in;
+
+
+layout(rgba32f, binding = 0) uniform image2D image_in;
+layout(rgba32f, binding = 1) uniform image2D image_out;
+
+void main() {
+	ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+	
+	vec4 color1 = imageLoad(image_in, pixel + ivec2(1, 0));
+	vec4 color2 = imageLoad(image_in, pixel + ivec2(0, 1));
+	vec4 color3 = imageLoad(image_in, pixel + ivec2(-1, 0));
+	vec4 color4 = imageLoad(image_in, pixel + ivec2(0, -1));
+	vec4 color = (color1 + color2 + color3 + color4 ) / 4.;
+	imageStore(image_out, pixel, color);
+}

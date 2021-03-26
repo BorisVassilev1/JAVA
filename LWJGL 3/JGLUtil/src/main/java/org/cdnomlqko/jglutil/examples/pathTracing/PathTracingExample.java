@@ -58,7 +58,7 @@ public class PathTracingExample extends ApplicationBase{
 	
 	boolean ray_tracing_enabled = false;
 	
-	int rays_per_pixel = 100000;
+	int rays_per_pixel = 50;
 	
 	int ray_structure_size = 48;
 	int rays_buffer_size = -1;
@@ -215,10 +215,10 @@ public class PathTracingExample extends ApplicationBase{
 		sc = new Scene(ShaderUtils.getLitShader());
 		sc.setActiveCamera(camera);
 		
-		//BasicMesh modelMesh = ModelLoader.loadMesh("./res/cube.obj");
+		BasicMesh modelMesh = ModelLoader.loadMesh("./res/cube.obj");
 		//BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/3D_Maya/Modeling/scenes/firestorm.obj");
 		//BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/blender/Shardblade.obj");
-		BasicMesh modelMesh = ModelLoader.loadMesh("C:/Users/Boby/Documents/sumTest.obj");
+		//BasicMesh modelMesh = ModelLoader.loadMesh("C:/Users/Boby/Documents/sumTest.obj");
 		
 		
 		MeshedGameObject model = new MeshedGameObject(modelMesh, new Material(new Vector3f(1.0f, 0.0f, 0.0f)), null);
@@ -320,8 +320,7 @@ public class PathTracingExample extends ApplicationBase{
 		// if there is a change in the camera's position/rotation
 		if(controller.hasChanged() || must_update_rays) {
 			// init render again
-			
-			glClearTexImage(rawTexture.getID(), 0, GL_RGBA, GL_FLOAT, new float[]{0f,0f,0f,0f});
+			glClearTexImage(rawTexture.getID(), 0, GL_RGBA, GL_FLOAT, new float[] {0f,0f,0f,0f});
 			rays_sent = 0;
 			must_update_rays = false;
 		}
@@ -352,21 +351,21 @@ public class PathTracingExample extends ApplicationBase{
 			rays_sent ++;
 		}
 		else if(rays_sent == rays_per_pixel) {
-			System.out.println("image fiished!");
+			System.out.println("image finished!");
 			rays_sent ++;
 		}
 		
 		//envTexture.unbind(GL_TEXTURE5);
 		
 		Renderer.Compute(normalizer, renderTexture.getWidth(), renderTexture.getWidth(), 1, () -> {
-			normalizer.setUniform("samples", rays_sent);
+			normalizer.setUniform("samples", rays_per_pixel);
 		});
 		
 		//draw the quad on the screen. it will use texture0.
-		//rawTexture.bind();
-		renderTexture.bind();
+		
+		rawTexture.bind(GL_TEXTURE0);
 		Renderer.draw(renderingQuad);
-		renderTexture.unbind(GL_TEXTURE0);
+		rawTexture.unbind(GL_TEXTURE0);
 	}
 	
 	@Override

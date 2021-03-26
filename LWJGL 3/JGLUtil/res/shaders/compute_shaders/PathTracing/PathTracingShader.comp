@@ -57,9 +57,9 @@ void main() {
 		
 		hit.dist = 1.0 / 0.0;
 		intersectGroundPlane(ray,-0.5,hit);
-		//for(int s = 0; s < sphs.length() ; s ++) {
-		//	intersectSphere(ray, sphs[s], hit);
-		//}
+		for(int s = 0; s < sphs.length() ; s ++) {
+			intersectSphere(ray, sphs[s], hit);
+		}
 		
 		//intersectSphere(ray, sphs[3], hit);
 		

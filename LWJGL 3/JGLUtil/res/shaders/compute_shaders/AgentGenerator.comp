@@ -1,0 +1,18 @@
+#version 460
+
+#include <MoldSimulation.glincl>
+#include <random.glincl>
+
+layout(local_size_x = 1, local_size_y = 1) in;
+
+uniform ivec2 agents_dim;
+
+void main() {
+	vec2 invocation_pos = vec2(gl_GlobalInvocationID.xy) / vec2(agents_dim);
+	int agent_id = int(gl_GlobalInvocationID.y * agents_dim.x  + gl_GlobalInvocationID.x);
+	float a = random(invocation_pos.x + agent_id * 0.1) * 2 * PI;
+	float r = random(invocation_pos.y + agent_id * 0.1) * 400;
+	vec2 pos_offset = vec2(cos(a), sin(a)) * r;
+	agents[agent_id] = Agent(vec2(600, 450) + pos_offset, random(invocation_pos) * 2 * PI);
+
+}

@@ -1,0 +1,30 @@
+float PI = 3.14159;
+
+float random(float seed) {
+	return fract(sin(seed)*100000.0);
+}
+
+float random(vec2 co){
+	return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+float random(vec3 seed) {
+	return fract(sin(dot(seed, vec3(12.9898, 78.233, 45.7599))) * 43758.5453);
+}
+
+vec3 random_in_unit_sphere(vec2 seed) {
+	float r1 = random(seed);
+	float r2 = random(seed + .1);
+	float x = cos(2*PI*r1)*2*sqrt(r2*(1-r2));
+	float y = sin(2*PI*r1)*2*sqrt(r2*(1-r2));
+	float z = 1 - 2*r2 + 0.0000001;
+    return vec3(x,y,z);
+}
+
+vec3 random_in_unit_disk(vec2 seed) {
+	float r = random(seed);
+	float theta = random(seed + 0.5) * 2 * PI;
+	float x = sqrt(r) * cos(theta);
+	float y = sqrt(r) * sin(theta);
+	return vec3(x,y,0.0);
+}
