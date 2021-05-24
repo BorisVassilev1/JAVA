@@ -3,12 +3,7 @@ package org.cdnomlqko.jglutil.mesh;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import org.cdnomlqko.jglutil.data.BoundingVolumeHierarchy;
-import org.cdnomlqko.jglutil.data.BoundingVolumeHierarchy.AABB;
-import org.cdnomlqko.jglutil.data.BoundingVolumeHierarchy.Node;
-import org.cdnomlqko.jglutil.data.Triangle;
 import org.lwjgl.opengl.GL46;
-import org.omg.CORBA.portable.ValueOutputStream;
 
 /**
  * Contains the geometry of a 3d object. 
