@@ -13,6 +13,6 @@ void main() {
 	float a = random(invocation_pos.x + agent_id * 0.1) * 2 * PI;
 	float r = random(invocation_pos.y + agent_id * 0.1) * 400;
 	vec2 pos_offset = vec2(cos(a), sin(a)) * r;
-	agents[agent_id] = Agent(vec2(600, 450) + pos_offset, random(invocation_pos) * 2 * PI);
-
+	//agents[agent_id] = Agent(vec2(900, 500) + pos_offset, random(invocation_pos) * 2 * PI);
+	agents[agent_id] = Agent(vec2(900, 500) + pos_offset, a + PI / 2);
 }

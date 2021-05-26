@@ -106,8 +106,11 @@ public class Scene {
 		//this.shaders = new ArrayList<Shader>();
 		this.activeCamera = null;
 		
-		if(defaultShader == null)
+		if(defaultShader == null) {
+			if(!ShaderUtils.isActive())
+				ShaderUtils.init();
 			defaultShader = ShaderUtils.getLitShader();
+		}
 		
 		this.defaultShader = defaultShader;
 		this.buffHolder = new SceneBuffersHolder(this, defaultShader);

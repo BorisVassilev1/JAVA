@@ -9,9 +9,10 @@ layout(local_size_x = 1, local_size_y = 1) in;
 
 float angle_variation = 0.1;
 
-float sense_angle_offset = PI / 6;
-float sense_distance = 12;
-float speed = 6;
+float sense_angle_offset = PI / 3;
+float sense_distance = 10;
+float speed = 1;
+float turn_speed = 1.0;
 
 uniform ivec2 agents_dim;
 
@@ -41,10 +42,10 @@ void main() {
 	
 	
 	if(left > forw && left > right) {
-		agent.angle -= sense_angle_offset / 2;
+		agent.angle -= sense_angle_offset * turn_speed;
 	}
 	else if(right > forw && right > left) {
-		agent.angle += sense_angle_offset / 2;
+		agent.angle += sense_angle_offset * turn_speed;
 	}
 	//else if(forw < left || forw < right) {
 		agent.angle += (random(agent.pos) * 2. - 1.) * angle_variation;
@@ -54,5 +55,5 @@ void main() {
 	
 	ivec2 pixel_pos = ivec2(agent.pos);
 	
-	imageStore(img_output, pixel_pos, vec4(1.0)); 
+	imageStore(img_output, pixel_pos, vec4(0.8, 1.0, 1.2, 1.0)); 
 }

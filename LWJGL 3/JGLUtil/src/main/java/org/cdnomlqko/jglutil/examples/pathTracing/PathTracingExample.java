@@ -5,6 +5,8 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
+import imgui.ImGui;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
 
@@ -30,9 +32,8 @@ import org.cdnomlqko.jglutil.utils.FramerateManager;
 import org.cdnomlqko.jglutil.utils.ModelLoader;
 import org.cdnomlqko.jglutil.utils.TransformController;
 
-public class PathTracingExample extends ApplicationBase{
+public class PathTracingExample extends ApplicationBase {
 
-	public Window window;
 	VFShader renderQuadShader;
 	ShadedGameObject renderingQuad;
 	Texture2D renderTexture;
@@ -46,19 +47,15 @@ public class PathTracingExample extends ApplicationBase{
 	CameraGameObject camera;
 	//Transformation cameraTransform;
 	
-	Input input;
-	Time time;
-	FramerateManager frm;
-	
 	TransformController controller;
 	
 	Scene sc;
 	
-	float fov = (float) Math.toRadians(70f);
+	float[] fov = new float[] {(float) Math.toRadians(70f)};
 	
 	boolean ray_tracing_enabled = false;
 	
-	int rays_per_pixel = 50;
+	int rays_per_pixel = 100000;
 	
 	int ray_structure_size = 48;
 	int rays_buffer_size = -1;
@@ -69,7 +66,7 @@ public class PathTracingExample extends ApplicationBase{
 	long random_seed = 0;
 	Random rand = new Random(0);
 	
-	int max_depth = 6;
+	int[] max_depth = new int[]{6};
 	
 	float[] base_sph_arr = new float[] {
 			 0.2f, 1.3f, 0.2f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
@@ -89,6 +86,9 @@ public class PathTracingExample extends ApplicationBase{
 	boolean must_update_rays = true;
 	
 	public static BoundingVolumeHierarchy bvh;
+	
+	
+	int fps = -1;
 	
 	void fill_sph_arr() {
 
@@ -195,29 +195,21 @@ public class PathTracingExample extends ApplicationBase{
 	}
 	
 	void init_utils() {
-		//init input, time, framerate manager, controller
-		input = new Input(window);
 		input.lockMouse = true;
-		//input.hideMouse();
-		
-		time = new Time();
-		frm = new FramerateManager(time);
-		
-		frm.setSecondPassedCallback((framerate) -> {
-			System.out.println("Framerate: " + framerate);
-		});
-		
 		controller = new TransformController(input, camera.transform);
 		controller.speed /= 1.;
+		frm.setSecondPassedCallback( (fps) -> {
+			this.fps = (int)fps;
+		});
 	}
 	
 	void init_mesh() {
 		sc = new Scene(ShaderUtils.getLitShader());
 		sc.setActiveCamera(camera);
 		
-		BasicMesh modelMesh = ModelLoader.loadMesh("./res/cube.obj");
+		//BasicMesh modelMesh = ModelLoader.loadMesh("./res/cube.obj");
 		//BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/3D_Maya/Modeling/scenes/firestorm.obj");
-		//BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/blender/Shardblade.obj");
+		BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/blender/Shardblade.obj");
 		//BasicMesh modelMesh = ModelLoader.loadMesh("C:/Users/Boby/Documents/sumTest.obj");
 		
 		
@@ -276,7 +268,7 @@ public class PathTracingExample extends ApplicationBase{
 		if(tracer.hasUniform("max_depth"))
 			tracer.setUniform("max_depth", bvh.max_depth);
 		if(tracer.hasUniform("max_bounces"))
-			tracer.setUniform("max_bounces", max_depth);
+			tracer.setUniform("max_bounces", max_depth[0]);
 		if(tracer.hasUniform("bvh_matrix"))
 			tracer.setUniform("bvh_matrix", model.transform.getWorldMatrix());
 		tracer.unbind();
@@ -284,20 +276,18 @@ public class PathTracingExample extends ApplicationBase{
 	
 	@Override
 	public void init() {
-		//create a window, camera, initialize shaders, objects
-		window = new Window("nqkva glupost bate", 1000, 800, false, true);
-		camera = new CameraGameObject(new Camera(fov,(float) window.getWidth() / (float)window.getHeight(), 0.01f, 1000f));
+		camera = new CameraGameObject(new Camera(fov[0],(float) window.getWidth() / (float)window.getHeight(), 0.01f, 1000f));
 		//cameraTransform = new Transformation();
 		
 		camera.transform.setPosition(new Vector3f(-3.989e0f, 2.000e0f,  1.741e0f));
 		camera.transform.setRotation(new Vector3f( 3.520e-1f, 1.266e0f,  0.000e0f));
 		camera.transform.updateWorldMatrix();
 		try {
+		init_utils();
+		
 		init_shaders();
 		
 		init_mesh();
-		
-		init_utils();
 		} catch(Exception e) {
 			e.printStackTrace();
 			cleanup();
@@ -358,26 +348,18 @@ public class PathTracingExample extends ApplicationBase{
 		//envTexture.unbind(GL_TEXTURE5);
 		
 		Renderer.Compute(normalizer, renderTexture.getWidth(), renderTexture.getWidth(), 1, () -> {
-			normalizer.setUniform("samples", rays_per_pixel);
+			normalizer.setUniform("samples", rays_sent);
 		});
 		
 		//draw the quad on the screen. it will use texture0.
 		
-		rawTexture.bind(GL_TEXTURE0);
+		renderTexture.bind(GL_TEXTURE0);
 		Renderer.draw(renderingQuad);
-		rawTexture.unbind(GL_TEXTURE0);
+		renderTexture.unbind(GL_TEXTURE0);
 	}
 	
 	@Override
 	public void loop() {
-		// the game loop
-		while (!window.shouldClose()) {
-			time.updateTime();
-			
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glfwPollEvents();
-			
-			input.update();
 			controller.update();
 
 			// the shader will write to texture0. 
@@ -389,8 +371,7 @@ public class PathTracingExample extends ApplicationBase{
 				sc.draw();
 				//bvh.draw();
 			}
-			
-			window.swapBuffers();
+		
 			
 			// handle key presses
 			if (input.getKey(GLFW_KEY_2) == GLFW_PRESS) {
@@ -417,36 +398,47 @@ public class PathTracingExample extends ApplicationBase{
 				sc.bindBuffersToSSBOs();
 				System.out.println("asda");
 			}
-			
-			//if(input.getKey(GLFW_KEY_U) == GLFW_PRESS) {
-			//	max_depth ++;
-			//	System.out.println(max_depth);
-			//}
-			//if(input.getKey(GLFW_KEY_I) == GLFW_PRESS) {
-			//	max_depth --;
-			//	System.out.println(max_depth);
-			//}
-			
-			
-			frm.update();
-		}
 	}
 
 	@Override
 	public void cleanup() {
 		//delete everything
-		window.delete();
 		renderingQuad.getMesh().delete();
 		renderQuadShader.delete();
 		generator.delete();
 		tracer.delete();
 		renderTexture.delete();
-		frm.stop();
 	}
 	
 	// the main method will start the application
 	public static void main(String[] args) {
-		new PathTracingExample().run();
+		new PathTracingExample().run(new Window("nqkva glupost bate", 1000, 800, false, true));
+	}
+
+	@Override
+	public void gui() {
+		ImGui.begin("Settings");
+		
+		ImGui.text("FPS: " + fps);
+		
+		if(ImGui.sliderInt("maximul light bounces", max_depth, 0, 8)) {
+			tracer.bind();
+			if(tracer.hasUniform("max_bounces"))
+				tracer.setUniform("max_bounces", max_depth[0]);
+			tracer.unbind();
+			must_update_rays = true;
+		}
+		
+		if(ImGui.sliderAngle("FOV", fov, 0, 180)) {
+			generator.bind();
+			if(generator.hasUniform("fov"))
+				generator.setUniform("fov", fov[0]);
+			generator.unbind();
+			camera.getCamera().setFov(fov[0]);
+			must_update_rays = true;
+		}
+		
+		ImGui.end();
 	}
 
 }

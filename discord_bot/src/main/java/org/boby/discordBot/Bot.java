@@ -153,6 +153,14 @@ public class Bot extends ListenerAdapter {
 						response.editMessageFormat("Pong: %d ms", System.currentTimeMillis() - time).queue();
 					});
 		}
+		else if(text.equals(prefix + "asdf")) {
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		else if(text.equals(prefix + "join")) {
 			
 			VoiceChannel v_channel = event.getMember().getVoiceState().getChannel();

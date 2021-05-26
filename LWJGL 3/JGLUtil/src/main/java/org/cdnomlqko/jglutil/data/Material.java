@@ -52,7 +52,17 @@ public class Material implements Bufferable{
 		this.specularPower = 1.0f;
 		this.specularExponent = 20.0f;
 	}
-
+	
+	/**
+	 * Creates a solid-color material. This is a three-component version of {@link #Material(Vector3f)}
+	 * @param r - red component of the color
+	 * @param g - green component of the color
+	 * @param b - blue component of the color
+	 */
+	public Material(float r, float g, float b) {
+		this(new Vector3f(r, g, b));
+	}
+	
 	@Override
 	public void writeToBuffer(ByteBuffer buff, int offset) {
 		buff.putFloat(offset,  color.x);

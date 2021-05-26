@@ -72,6 +72,10 @@
 		</plugins>
 	</build>
 
+	<repositories>
+		
+	</repositories>
+
 	<dependencies>
 		<dependency>
     		<groupId>org.lwjgl</groupId>
@@ -461,5 +465,12 @@
 			<version>${lwjgl.version}</version>
 			<classifier>${lwjgl.natives}</classifier>
 		</dependency>
+		
+		<dependency>
+			<groupId>io.github.spair</groupId>
+			<artifactId>imgui-java-app</artifactId>
+			<version>1.82.2</version>
+		</dependency>
+		
 	</dependencies>
 </project>
