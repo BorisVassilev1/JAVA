@@ -19,9 +19,9 @@ JGLUtil allows quick and easy window, shader and mesh creation. Here is a list o
 
 
 ### Ray Tracing
-![ray-traced spheres and geometry](https://github.com/BorisVassilev1/JAVA/tree/master/LWJGL%203/JGLUtil/res/image_20.png?raw=true) 
-![ray-traced spheres](https://github.com/BorisVassilev1/JAVA/tree/master/LWJGL%203/JGLUtil/res/image_7.png?raw=true)
-![ray-traced sword](https://github.com/BorisVassilev1/JAVA/tree/master/LWJGL%203/JGLUtil/res/image_23.png?raw=true) 
+![ray-traced spheres and geometry](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_20.png) 
+![ray-traced spheres](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_7.png)
+![ray-traced sword](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_23.png) 
 
 
 ## Getting Started
