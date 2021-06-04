@@ -15,7 +15,7 @@ JGLUtil allows quick and easy window, shader and mesh creation. Here is a list o
 
 ### Rasterization pipeline
 
-![stanford dragons render with colored lighting](https://github.com/BorisVassilev1/JAVA/tree/master/LWJGL%203/JGLUtil/res/image_24.png?raw=true) 
+![stanford dragons render with colored lighting](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_24.png) 
 
 
 ### Ray Tracing
