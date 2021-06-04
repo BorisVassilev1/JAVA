@@ -11,18 +11,22 @@ JGLUtil allows quick and easy window, shader and mesh creation. Here is a list o
 * Currently the project has vertex, fragment and compute shaders. Shader creation is almost automatic as long as the program types and source codes are present.
 * The ray tracing pipeline is currently under development as an example, but will probably be integrated into the the library.
 
+## Libraries
+* [LWJGL](https://www.lwjgl.org/)
+* [imgui-java](https://github.com/SpaiR/imgui-java)
+* Assimp (lwjgl bindings)
+
 ## Screenshots
 
 ### Rasterization pipeline
 
 ![stanford dragons render with colored lighting](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_24.png) 
 
-
 ### Ray Tracing
+
 ![ray-traced spheres and geometry](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_20.png) 
 ![ray-traced spheres](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_7.png)
 ![ray-traced sword](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_23.png) 
-
 
 ## Getting Started
 
