@@ -69,6 +69,8 @@ public class Window {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+		//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1); // TODO: this has to be a setting
+		
 		// Create the window
 		id = glfwCreateWindow(width, height, name, NULL, NULL);
 		if (id == NULL)
@@ -115,7 +117,7 @@ public class Window {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glClearColor(0f, 0f, 0f, 1f);
+		glClearColor(0f, 0f, 0f, 0f);
 	}
 
 	/**

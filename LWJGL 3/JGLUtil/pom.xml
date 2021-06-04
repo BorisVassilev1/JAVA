@@ -1,23 +1,49 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.cdnomlqko</groupId>
-  <artifactId>jglutil</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>JGLUtil</name>
-  <description>a pseudo game engine using LWJGL3</description>
-  
-  	<properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.cdnomlqko</groupId>
+	<artifactId>jglutil</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>JGLUtil</name>
+	<description>a pseudo game engine using LWJGL3</description>
+
+	<properties>
 		<lwjgl.version>3.2.3</lwjgl.version>
-		<lwjgl.natives>natives-windows</lwjgl.natives>
 		<maven.compiler.source>1.8</maven.compiler.source>
-    	<maven.compiler.target>1.8</maven.compiler.target>
-    	<downloadSources>true</downloadSources>
-  		<downloadJavadocs>true</downloadJavadocs>
-  		<joml.version>1.9.6</joml.version>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<downloadSources>true</downloadSources>
+		<downloadJavadocs>true</downloadJavadocs>
+		<joml.version>1.9.6</joml.version>
 	</properties>
 
+	<profiles>
+		<profile>
+			<id>platform-windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<lwjgl.natives>natives-windows</lwjgl.natives>
+			</properties>
+		</profile>
+		<profile>
+			<id>platform-linux</id>
+			<activation>
+				<os>
+					<family>linux</family>
+				</os>
+			</activation>
+			<properties>
+				<lwjgl.natives>natives-linux</lwjgl.natives>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
-	
+
 		<resources>
 			<resource>
 				<targetPath>res</targetPath>
@@ -25,75 +51,54 @@
 				<filtering>false</filtering>
 			</resource>
 		</resources>
-		
+
 		<plugins>
 			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-shade-plugin</artifactId>
-			    <executions>
-			        <execution>
-			            <goals>
-			                <goal>shade</goal>
-			            </goals>
-			            <configuration>
-			                <shadedArtifactAttached>true</shadedArtifactAttached>
-			                <transformers>
-			                    <transformer implementation=
-			                      "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-			                        <mainClass>org.cdnomlqko.jglutil.examples.SceneExample</mainClass>
-			                </transformer>
-			            </transformers>
-			        </configuration>
-			        </execution>
-			    </executions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<shadedArtifactAttached>true</shadedArtifactAttached>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>org.cdnomlqko.jglutil.examples.SceneExample</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
-			<!-- <plugin>
-		        <artifactId>maven-resources-plugin</artifactId>
-		        <version>3.1.0</version>
-		        <executions>
-		          	<execution>
-		            	<id>copy-resources</id>
-		            	<phase>validate</phase>
-		            	<goals>
-		              		<goal>copy-resources</goal>
-		            	</goals>
-		            	<configuration>
-		              		<outputDirectory>${basedir}/target/res</outputDirectory>
-		              		<resources>          
-		                		<resource>
-		                  			<directory>res</directory>
-		                  			<filtering>false</filtering>
-		                		</resource>
-		              		</resources>              
-		            	</configuration>            
-		        	</execution>
-		    	</executions>
-			</plugin>-->
+			<!-- <plugin> <artifactId>maven-resources-plugin</artifactId> <version>3.1.0</version> 
+				<executions> <execution> <id>copy-resources</id> <phase>validate</phase> 
+				<goals> <goal>copy-resources</goal> </goals> <configuration> <outputDirectory>${basedir}/target/res</outputDirectory> 
+				<resources> <resource> <directory>res</directory> <filtering>false</filtering> 
+				</resource> </resources> </configuration> </execution> </executions> </plugin> -->
 		</plugins>
 	</build>
 
 	<repositories>
-		
+
 	</repositories>
 
 	<dependencies>
 		<dependency>
-    		<groupId>org.lwjgl</groupId>
-    		<artifactId>lwjgl-stb</artifactId>
-    		<version>${lwjgl.version}</version>
+			<groupId>org.lwjgl</groupId>
+			<artifactId>lwjgl-stb</artifactId>
+			<version>${lwjgl.version}</version>
 		</dependency>
-		<!--<dependency>
-    		<groupId>org.lwjgl</groupId>
-    		<artifactId>lwjgl-stb</artifactId>
-    		<version>${lwjgl.version}</version>
-    		<classifier>${native.target}</classifier>
-    		<scope>runtime</scope>
-		</dependency>-->
+		<!--<dependency> <groupId>org.lwjgl</groupId> <artifactId>lwjgl-stb</artifactId> 
+			<version>${lwjgl.version}</version> <classifier>${native.target}</classifier> 
+			<scope>runtime</scope> </dependency> -->
 		<dependency>
-            <groupId>org.joml</groupId>
-            <artifactId>joml</artifactId>
-            <version>${joml.version}</version>
-        </dependency>
+			<groupId>org.joml</groupId>
+			<artifactId>joml</artifactId>
+			<version>${joml.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.lwjgl</groupId>
 			<artifactId>lwjgl</artifactId>
@@ -465,12 +470,12 @@
 			<version>${lwjgl.version}</version>
 			<classifier>${lwjgl.natives}</classifier>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.github.spair</groupId>
 			<artifactId>imgui-java-app</artifactId>
 			<version>1.82.2</version>
 		</dependency>
-		
+
 	</dependencies>
 </project>
