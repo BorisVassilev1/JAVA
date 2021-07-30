@@ -6,10 +6,13 @@ import static org.lwjgl.stb.STBImage.*;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.channels.FileChannel;
 
 import javax.imageio.ImageIO;
 
@@ -72,6 +75,10 @@ public class Texture2D implements Texture {
 	 * @param height
 	 */
 	public Texture2D(int width, int height) {
+		this(width, height, GL_RGBA32F, GL_RGBA);
+	}
+	
+	public Texture2D(int width, int height, int internalFormat, int format) {
 		this.width = width;
 		this.height = height;
 		this.id = glGenTextures();
@@ -81,7 +88,7 @@ public class Texture2D implements Texture {
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,(ByteBuffer) null);
+    	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE,(ByteBuffer) null);
     	glGenerateMipmap(GL_TEXTURE_2D);
     	//glBindImageTexture(0, id, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
     	glBindTexture(GL_TEXTURE_2D, 0);
@@ -98,7 +105,7 @@ public class Texture2D implements Texture {
 		glBindTexture(GL_TEXTURE_2D, id);
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, buff);
 		glBindTexture(GL_TEXTURE_2D, 0);
-				
+		
 		BufferedImage img = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_ARGB);
 		
 		int[] pixels = new int[width * height];
@@ -109,9 +116,9 @@ public class Texture2D implements Texture {
 			int A = (int)(buff.get(i * 4 + 3) * 255);
 			try {
 				pixels[i] = new Color(R, G, B, A).getRGB();
-				img.setRGB(i % width, i / width, pixels[i]);
+				img.setRGB(i % width, height - i / width - 1, pixels[i]);
 			} catch(Exception e) {
-				System.out.println("Error on pixel: " +  (i % width ) + " " + (i / width) + ": " + R + " " + G + " " + B + " " + A);
+				//System.out.println("Error on pixel: " +  (i % width ) + " " + (i / width) + ": " + R + " " + G + " " + B + " " + A);
 			}
 		}
 		
@@ -119,6 +126,31 @@ public class Texture2D implements Texture {
 			File of = new File(fileName);
 			ImageIO.write(img, "png", of);
 		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Saves the data from the texure in a file by dumping all the pixel data.
+	 * @param fileName - path to the file with extension
+	 */
+	public void saveBin(String fileName) {
+		ByteBuffer buff;
+		buff = BufferUtils.createByteBuffer(width * height * 4);
+		glBindTexture(GL_TEXTURE_2D, id);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, buff);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(fileName);
+			FileChannel channel = fos.getChannel();
+
+			channel.write(buff);
+
+			fos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -171,7 +203,15 @@ public class Texture2D implements Texture {
 		return width;
 	}
 	
+	public void setWidth(int width) {
+		this.width = width;
+	}
+	
 	public int getHeight() {
 		return height;
+	}
+	
+	public void setHeight(int height) {
+		this.height = height;
 	}
 }

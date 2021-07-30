@@ -26,7 +26,6 @@ public class FramerateManager {
 	
 	private Timer t;
 	private TimerTask tt;
-	private Thread fpsThread;
 	
 	@FunctionalInterface
 	public interface OneSecondPassedCallback {
@@ -38,31 +37,20 @@ public class FramerateManager {
 	public FramerateManager(Time time) {
 		this.time = time;
 		lastPrintTime = glfwGetTime();
-		
-		//fpsThread = new Thread(new Runnable() {
-		//	@Override
-		//	public void run() {
 				
-				t = new Timer();  
-				tt = new TimerTask() {  
-				    @Override  
-				    public void run() {  
-						double glfwTimeNow = glfwGetTime();
-						if(callback != null)
-							callback.apply(frames_last_second);
-						
-						frames_last_second = 0;
-						lastPrintTime = glfwTimeNow;
-				    };  
-				};  
-				t.scheduleAtFixedRate(tt,0,1000);
-				
-		//	}
-		//	
-		//});
-		
-		//fpsThread.setName("Framerate Manager");
-		//fpsThread.run();
+		t = new Timer();
+		tt = new TimerTask() {
+			@Override
+			public void run() {
+				double glfwTimeNow = glfwGetTime();
+				if (callback != null)
+					callback.apply(frames_last_second);
+
+				frames_last_second = 0;
+				lastPrintTime = glfwTimeNow;
+			};
+		};
+		t.scheduleAtFixedRate(tt, 0, 1000);
 	}
 	
 	/**

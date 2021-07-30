@@ -8,7 +8,7 @@ import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
 /**
- * This class contains static methods for {@link Mesh} creation.
+ * This class contains static methods for {@link MultiBufferedMesh} creation.
  * 
  * @author CDnoMlqko
  */

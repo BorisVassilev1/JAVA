@@ -2,19 +2,19 @@ package org.cdnomlqko.jglutil.data;
 
 import org.cdnomlqko.jglutil.Renderer;
 import org.cdnomlqko.jglutil.gameobject.GameObject;
-import org.cdnomlqko.jglutil.mesh.Mesh;
+import org.cdnomlqko.jglutil.mesh.MultiBufferedMesh;
 import org.cdnomlqko.jglutil.shader.VFShader;
 
 /**
- * An object that can be rendered by the {@link Renderer}. It contains a {@link VFShader} and a {@link Mesh}
+ * An object that can be rendered by the {@link Renderer}. It contains a {@link VFShader} and a {@link MultiBufferedMesh}
  * @author CDnoMlqko
  *
  */
 public abstract class Renderable extends GameObject{
 	protected VFShader shader;
-	protected Mesh mesh;
+	protected MultiBufferedMesh mesh;
 	
-	public Renderable(Mesh mesh, VFShader shader) {
+	public Renderable(MultiBufferedMesh mesh, VFShader shader) {
 		this.mesh = mesh;
 		this.shader = shader;
 	}
@@ -31,11 +31,11 @@ public abstract class Renderable extends GameObject{
 		this.shader = shader;
 	}
 
-	public Mesh getMesh() {
+	public MultiBufferedMesh getMesh() {
 		return mesh;
 	}
 
-	public void setMesh(Mesh mesh) {
+	public void setMesh(MultiBufferedMesh mesh) {
 		this.mesh = mesh;
 	}
 }

@@ -1,7 +1,7 @@
 package org.cdnomlqko.jglutil.gameobject;
 
 import org.cdnomlqko.jglutil.data.Renderable;
-import org.cdnomlqko.jglutil.mesh.Mesh;
+import org.cdnomlqko.jglutil.mesh.MultiBufferedMesh;
 import org.cdnomlqko.jglutil.shader.VFShader;
 
 /**
@@ -11,7 +11,7 @@ import org.cdnomlqko.jglutil.shader.VFShader;
  */
 public class ShadedGameObject extends Renderable{
 	
-	public ShadedGameObject(Mesh mesh, VFShader shader) {
+	public ShadedGameObject(MultiBufferedMesh mesh, VFShader shader) {
 		super(mesh, shader);
 	}
 	

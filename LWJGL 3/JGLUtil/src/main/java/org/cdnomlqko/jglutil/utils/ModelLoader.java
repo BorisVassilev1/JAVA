@@ -25,13 +25,14 @@ import org.lwjgl.system.MemoryUtil;
  */
 public class ModelLoader {
 	
-	static int default_flags = 
-			aiProcess_JoinIdenticalVertices |
-			aiProcess_Triangulate |
-			aiProcess_FixInfacingNormals | 
-			aiProcess_PreTransformVertices |
-			aiProcess_OptimizeGraph |
-			aiProcess_OptimizeMeshes;
+	public static int default_flags = 
+			//aiProcess_JoinIdenticalVertices |
+			//aiProcess_Triangulate |
+			//aiProcess_FixInfacingNormals | 
+			//aiProcess_PreTransformVertices |
+			//aiProcess_OptimizeGraph |
+			//aiProcess_OptimizeMeshes | 
+			aiProcess_GenNormals;
 	
 	public static BasicMesh loadMesh(String fileName) {
 		return loadMesh(fileName, 0, default_flags);
@@ -114,7 +115,7 @@ public class ModelLoader {
 				normals.put(aiNormal.z());
 			}
 			normals.flip();
-		}
+		} else System.out.println("no normals found for model!");
 		
 		
 		
@@ -127,7 +128,7 @@ public class ModelLoader {
 				texCoords.put(aitexCoord.y());
 			}
 			texCoords.flip();
-		}
+		} else System.out.println("no texcoords found for model!");
 		
 		FloatBuffer colors = MemoryUtil.memCallocFloat(vertices_count * 4);
 		AIColor4D.Buffer aiColors = aiMesh.mColors(0);

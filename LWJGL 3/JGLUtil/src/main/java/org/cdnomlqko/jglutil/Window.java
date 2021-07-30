@@ -43,7 +43,7 @@ public class Window {
 	 * @param resizable - whether or not the window will be resizable
 	 * @param vsync - should it use VSync
 	 */
-	public Window(String name, int width, int height, boolean resizable, boolean vsync) {
+	public Window(String name, int width, int height, boolean resizable, boolean vsync, boolean show) {
 		this.width = width;
 		this.height = height;
 		this.name = name;
@@ -112,12 +112,17 @@ public class Window {
 			glfwSwapInterval(0);
 
 		// Make the window visible
-		glfwShowWindow(id);
+		if(show)
+			glfwShowWindow(id);
 		
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glClearColor(0f, 0f, 0f, 0f);
+	}
+	
+	public Window(String name, int width, int height, boolean resizable, boolean vsync) {
+		this(name, width, height, resizable, vsync, true);
 	}
 
 	/**

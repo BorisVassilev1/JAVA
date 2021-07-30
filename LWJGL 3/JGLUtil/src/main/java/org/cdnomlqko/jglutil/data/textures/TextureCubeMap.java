@@ -52,8 +52,8 @@ public class TextureCubeMap implements Texture {
 				int width = w.get(0);
 				int height = h.get(0);
 				
-				System.out.println(width + " " + height + " " + i);
-				System.out.println(buff.capacity());
+				//System.out.println(width + " " + height + " " + i);
+				//System.out.println(buff.capacity());
 				
 				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buff);
 				

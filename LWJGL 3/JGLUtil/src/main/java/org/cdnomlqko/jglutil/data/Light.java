@@ -2,7 +2,7 @@ package org.cdnomlqko.jglutil.data;
 
 import java.nio.ByteBuffer;
 
-import org.cdnomlqko.jglutil.mesh.Mesh;
+import org.cdnomlqko.jglutil.mesh.MultiBufferedMesh;
 import org.cdnomlqko.jglutil.mesh.MeshUtils;
 import org.joml.Vector3f;
 
@@ -27,9 +27,9 @@ public class Light implements Bufferable{
 		POINT_LIGHT(2, MeshUtils.makeLineOctahedron());
 		
 		private final int id;
-		private final Mesh displayMesh;
+		private final MultiBufferedMesh displayMesh;
 		
-		private Type(int id, Mesh mesh) {
+		private Type(int id, MultiBufferedMesh mesh) {
 			this.id = id;
 			this.displayMesh = mesh;
 		}
@@ -38,7 +38,7 @@ public class Light implements Bufferable{
 			return id;
 		}
 
-		public Mesh getDisplayMesh() {
+		public MultiBufferedMesh getDisplayMesh() {
 			return displayMesh;
 		}
 	}

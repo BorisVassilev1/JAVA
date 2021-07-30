@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL46;
  * @author CDnoMlqko
  *
  */
-public class BasicMesh extends Mesh {
+public class BasicMesh extends MultiBufferedMesh {
 	
 	/**
 	 * Constructor

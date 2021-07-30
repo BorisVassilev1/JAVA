@@ -79,7 +79,7 @@ public class RayTracingExample extends ApplicationBase {
 
 		// handle key presses
 		if (input.getKey(GLFW_KEY_2) == GLFW_PRESS)
-			renderTexture.save("./res/image.png");
+			renderTexture.save("./res/images/image.png");
 
 		if (input.getKey(GLFW_KEY_9) == GLFW_PRESS)
 			camera.setFov(camera.getFov() + 0.01f);

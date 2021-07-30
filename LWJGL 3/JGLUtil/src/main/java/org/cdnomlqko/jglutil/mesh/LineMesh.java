@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL46;
  * @author CDnoMlqko
  *
  */
-public class LineMesh extends Mesh {
+public class LineMesh extends MultiBufferedMesh {
 
 	protected LineMesh(FloatBuffer vertices, IntBuffer indices, FloatBuffer colors) {
 		super(GL46.GL_LINES);
@@ -20,5 +20,12 @@ public class LineMesh extends Mesh {
 		super.createVBO(3, 4, colors);
 		super.unbindVAO();
 	}
-
+	
+	public VBO getVertices() {
+		return vbos.get(0);
+	}
+	
+	public VBO getColors() {
+		return vbos.get(1);
+	}
 }

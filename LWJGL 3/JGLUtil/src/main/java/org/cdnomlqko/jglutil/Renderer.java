@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL46.*;
 import org.cdnomlqko.jglutil.data.Renderable;
 import org.cdnomlqko.jglutil.gameobject.GameObject;
 import org.cdnomlqko.jglutil.gameobject.LightGameObject;
-import org.cdnomlqko.jglutil.mesh.Mesh;
+import org.cdnomlqko.jglutil.mesh.MultiBufferedMesh;
 import org.cdnomlqko.jglutil.shader.ComputeShader;
 import org.cdnomlqko.jglutil.shader.ShaderUtils;
 import org.cdnomlqko.jglutil.shader.VFShader;
@@ -37,13 +37,13 @@ public class Renderer {
 	}
 	
 	/**
-	 * Draws a {@link GameObject} using the given {@link Mesh}, {@link VFShader} and the {@link Runnable} that is called just after the shader is bound.
+	 * Draws a {@link GameObject} using the given {@link MultiBufferedMesh}, {@link VFShader} and the {@link Runnable} that is called just after the shader is bound.
 	 * @param obj
 	 * @param mesh
 	 * @param shader
 	 * @param prepareForRender
 	 */
-	public static void draw(GameObject obj, Mesh mesh, VFShader shader, Runnable prepareForRender) {
+	public static void draw(GameObject obj, MultiBufferedMesh mesh, VFShader shader, Runnable prepareForRender) {
 		shader.bind();
 		
 		prepareForRender.run();
@@ -63,7 +63,7 @@ public class Renderer {
 	 * @param mesh
 	 * @param shader
 	 */
-	public static void drawInstanced(Iterable<Renderable> objects, Mesh mesh, VFShader shader) {
+	public static void drawInstanced(Iterable<Renderable> objects, MultiBufferedMesh mesh, VFShader shader) {
 		mesh.bind();
 		shader.bind();
 		

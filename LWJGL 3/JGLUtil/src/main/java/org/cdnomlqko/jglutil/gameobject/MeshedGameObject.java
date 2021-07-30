@@ -3,7 +3,7 @@ package org.cdnomlqko.jglutil.gameobject;
 import org.cdnomlqko.jglutil.data.Material;
 import org.cdnomlqko.jglutil.data.Renderable;
 import org.cdnomlqko.jglutil.data.Scene;
-import org.cdnomlqko.jglutil.mesh.Mesh;
+import org.cdnomlqko.jglutil.mesh.MultiBufferedMesh;
 import org.cdnomlqko.jglutil.shader.VFShader;
 
 /**
@@ -33,7 +33,7 @@ public class MeshedGameObject extends  Renderable{
 		this.material = material;
 	}
 	
-	public MeshedGameObject(Mesh mesh, Material material, VFShader shader) {
+	public MeshedGameObject(MultiBufferedMesh mesh, Material material, VFShader shader) {
 		super(mesh, shader);
 		this.material = material;
 	}

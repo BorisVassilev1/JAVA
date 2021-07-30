@@ -34,63 +34,62 @@ import org.cdnomlqko.jglutil.utils.TransformController;
 
 public class PathTracingExample extends ApplicationBase {
 
-	VFShader renderQuadShader;
-	ShadedGameObject renderingQuad;
-	Texture2D renderTexture;
-	Texture2D rawTexture;
-	TextureCubeMap envTexture;
+	private VFShader renderQuadShader;
+	private ShadedGameObject renderingQuad;
+	private Texture2D renderTexture;
+	private Texture2D rawTexture;
+	private TextureCubeMap envTexture;
 	
-	ComputeShader tracer;
-	ComputeShader generator;
-	ComputeShader normalizer;
+	private ComputeShader tracer;
+	private ComputeShader generator;
+	private ComputeShader normalizer;
 	
-	CameraGameObject camera;
+	private CameraGameObject camera;
 	//Transformation cameraTransform;
 	
-	TransformController controller;
+	private TransformController controller;
 	
-	Scene sc;
+	private Scene sc;
 	
-	float[] fov = new float[] {(float) Math.toRadians(70f)};
+	private float[] fov = new float[] {(float) Math.toRadians(70f)};
 	
-	boolean ray_tracing_enabled = false;
+	private boolean ray_tracing_enabled = false;
 	
-	int rays_per_pixel = 100000;
+	private int rays_per_pixel = 100000;
 	
-	int ray_structure_size = 48;
-	int rays_buffer_size = -1;
-	int rays_buffer = -1;
+	private int ray_structure_size = 48;
+	private int rays_buffer_size = -1;
+	private int rays_buffer = -1;
 	
-	int rays_sent = 0;
+	private int rays_sent = 0;
 	
-	long random_seed = 0;
-	Random rand = new Random(0);
+	private long random_seed = 0;
+	private Random rand = new Random(random_seed);
 	
-	int[] max_depth = new int[]{6};
+	private int[] max_depth = new int[]{6};
 	
-	float[] base_sph_arr = new float[] {
+	private float[] base_sph_arr = new float[] {
 			 0.2f, 1.3f, 0.2f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
 			 1.0f, 0.2f, 0.7f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.7f, 0.0f, 0.0f, 0.0f,
 			-0.7f, 0.5f, 0.2f, 0.0f, 0.9f, 0.9f, 1.0f, 1.0f, 0.5f, 2.0f, 0.0f, 0.0f,
 			-0.1f, 1.3f, 1.7f, 0.0f, 10.0f, 10.0f, 10.0f, 1.0f, 0.4f, 3.0f, 0.0f, 0.0f
 			};
 	
-	float[] small_sph_arr;
+	private float[] small_sph_arr;
 	
-	int sph_count = 60;
-	float sph_spawn_range = 3;
-	int sph_size = 12;
-	int spheres_buff = -1;
-	float sph_spread = 2.f;
+	private int sph_count = 60;
+	private float sph_spawn_range = 3;
+	private int sph_size = 12;
+	private int spheres_buff = -1;
+	private float sph_spread = 2.f;
 	
-	boolean must_update_rays = true;
+	private boolean must_update_rays = true;
 	
-	public static BoundingVolumeHierarchy bvh;
+	private static BoundingVolumeHierarchy bvh;
 	
+	private int fps = -1;
 	
-	int fps = -1;
-	
-	void fill_sph_arr() {
+	private void fill_sph_arr() {
 
 		sph_count = (int)sph_spawn_range * (int)sph_spawn_range;
 		small_sph_arr = new float[sph_count * sph_size];
@@ -120,7 +119,7 @@ public class PathTracingExample extends ApplicationBase {
 		}
 	}
 	
-	void fill_sph_buffer() {
+	private void fill_sph_buffer() {
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, spheres_buff);
 		fill_sph_arr();
 		int sph_buff_size = sph_size * (sph_count + 4);
@@ -131,7 +130,7 @@ public class PathTracingExample extends ApplicationBase {
 		must_update_rays = true;
 	}
 	
-	void init_shaders() {
+	private void init_shaders() {
 		renderQuadShader = new VFShader("./res/shaders/verfrag_shaders/TextureOnScreenVertexShader.vs",
 				"./res/shaders/verfrag_shaders/TextureOnScreenFragmentShader.fs");
 		renderingQuad = new ShadedGameObject(MeshUtils.makeQuad(2f), renderQuadShader);
@@ -188,13 +187,13 @@ public class PathTracingExample extends ApplicationBase {
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 	
-	void set_ray_tracing_ssbos() {
+	private void set_ray_tracing_ssbos() {
 		generator.setSSBO("Rays", rays_buffer);
 		tracer.setSSBO("spheres", spheres_buff);
 		tracer.setSSBO("Rays", rays_buffer);
 	}
 	
-	void init_utils() {
+	private void init_utils() {
 		input.lockMouse = true;
 		controller = new TransformController(input, camera.transform);
 		controller.speed /= 1.;
@@ -203,14 +202,15 @@ public class PathTracingExample extends ApplicationBase {
 		});
 	}
 	
-	void init_mesh() {
+	private void init_mesh() {
 		sc = new Scene(ShaderUtils.getLitShader());
 		sc.setActiveCamera(camera);
 		
-		//BasicMesh modelMesh = ModelLoader.loadMesh("./res/cube.obj");
-		//BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/3D_Maya/Modeling/scenes/firestorm.obj");
-		BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/blender/Shardblade.obj");
-		//BasicMesh modelMesh = ModelLoader.loadMesh("C:/Users/Boby/Documents/sumTest.obj");
+		BasicMesh modelMesh = ModelLoader.loadMesh("./res/models/armadillo.obj");
+//		BasicMesh modelMesh = ModelLoader.loadMesh("/home/boby/C/Boby/myx/data/twins/1/scene.glb");
+//		BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/3D_Maya/Modeling/scenes/firestorm.obj");
+//		BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/blender/Shardblade.obj");
+//		BasicMesh modelMesh = ModelLoader.loadMesh("C:/Users/Boby/Documents/sumTest.obj");
 		
 		
 		MeshedGameObject model = new MeshedGameObject(modelMesh, new Material(new Vector3f(1.0f, 0.0f, 0.0f)), null);
@@ -302,7 +302,8 @@ public class PathTracingExample extends ApplicationBase {
 		}
 	}
 	
-	void trace_rays() {
+	
+	private void trace_rays() {
 		renderTexture.bind(GL_TEXTURE0);
 		//envTexture.bind(GL_TEXTURE5);
 		glBindTextureUnit(5,  envTexture.getID());
@@ -440,5 +441,4 @@ public class PathTracingExample extends ApplicationBase {
 		
 		ImGui.end();
 	}
-
 }
