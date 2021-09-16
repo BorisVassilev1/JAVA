@@ -45,7 +45,6 @@ public class PathTracingExample extends ApplicationBase {
 	private ComputeShader normalizer;
 	
 	private CameraGameObject camera;
-	//Transformation cameraTransform;
 	
 	private TransformController controller;
 	
@@ -66,7 +65,7 @@ public class PathTracingExample extends ApplicationBase {
 	private long random_seed = 0;
 	private Random rand = new Random(random_seed);
 	
-	private int[] max_depth = new int[]{6};
+	private int[] max_depth = new int[]{10};
 	
 	private float[] base_sph_arr = new float[] {
 			 0.2f, 1.3f, 0.2f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
@@ -206,7 +205,7 @@ public class PathTracingExample extends ApplicationBase {
 		sc = new Scene(ShaderUtils.getLitShader());
 		sc.setActiveCamera(camera);
 		
-		BasicMesh modelMesh = ModelLoader.loadMesh("./res/models/armadillo.obj");
+		BasicMesh modelMesh = ModelLoader.loadMesh("./res/models/cube.obj");
 //		BasicMesh modelMesh = ModelLoader.loadMesh("/home/boby/C/Boby/myx/data/twins/1/scene.glb");
 //		BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/3D_Maya/Modeling/scenes/firestorm.obj");
 //		BasicMesh modelMesh = ModelLoader.loadMesh("D:/Boby/blender/Shardblade.obj");
@@ -214,7 +213,7 @@ public class PathTracingExample extends ApplicationBase {
 		
 		
 		MeshedGameObject model = new MeshedGameObject(modelMesh, new Material(new Vector3f(1.0f, 0.0f, 0.0f)), null);
-		model.transform.setScale(0.1f);
+		model.transform.setScale(0.4f);
 		model.transform.setRotation(new Vector3f(0, .0f, 0));
 		model.transform.setPosition(new Vector3f(-1.8f, 0f, 0.8f));
 		model.transform.updateWorldMatrix();
@@ -245,7 +244,7 @@ public class PathTracingExample extends ApplicationBase {
 		System.out.println(size[0]);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
-		System.out.println(vertices + " " + normals + " " + indices);
+		//System.out.println(vertices + " " + normals + " " + indices);
 		
 		tracer.setSSBO("Vertices", vertices);
 		tracer.setSSBO("Normals", normals);
@@ -316,29 +315,22 @@ public class PathTracingExample extends ApplicationBase {
 			must_update_rays = false;
 		}
 		
-		// continue next iteration
+		// continue with next sample
 		if(rays_sent < rays_per_pixel) {
+			float randf = rays_sent == 0 ? 0 : rand.nextFloat();
 			Renderer.Compute(generator, renderTexture.getWidth(), renderTexture.getHeight(), 1, () -> {
 				generator.setUniform("cameraMatrix", camera.transform.getWorldMatrix());
 				generator.setUniform("fov", camera.getCamera().getFov());
-				float randf = rand.nextFloat();
 				generator.setUniform("random_seed", randf);
 			});
 			
-			// light bounces...
-			
-			//for(int i = 0; i < max_depth; i ++) {
-			//	final boolean is_end = i == max_depth - 1;
-				Renderer.Compute(tracer, renderTexture.getWidth(), renderTexture.getHeight(), 1, () -> {
-					if(tracer.hasUniform("random_seed"))
-						tracer.setUniform("random_seed", rand.nextFloat());
-					if(tracer.hasUniform("skybox")) 
-						tracer.setUniform("skybox", 5);
-						
-					//if(tracer.hasUniform("end"))
-					//	tracer.setUniform("end", 1);
-				});
-			//}
+			Renderer.Compute(tracer, renderTexture.getWidth(), renderTexture.getHeight(), 1, () -> {
+				if(tracer.hasUniform("random_seed"))
+					tracer.setUniform("random_seed", randf);
+				if(tracer.hasUniform("skybox")) 
+					tracer.setUniform("skybox", 5);
+					
+			});
 			rays_sent ++;
 		}
 		else if(rays_sent == rays_per_pixel) {
@@ -395,9 +387,9 @@ public class PathTracingExample extends ApplicationBase {
 			if(input.getKey(GLFW_KEY_Y) == GLFW_PRESS && ray_tracing_enabled) {
 				ray_tracing_enabled = false;
 				//sc.updateBuffers();
-				System.out.println("asdfsa");
+				//System.out.println("asdfsa");
 				sc.bindBuffersToSSBOs();
-				System.out.println("asda");
+				//System.out.println("asda");
 			}
 	}
 
@@ -413,7 +405,7 @@ public class PathTracingExample extends ApplicationBase {
 	
 	// the main method will start the application
 	public static void main(String[] args) {
-		new PathTracingExample().run(new Window("nqkva glupost bate", 1000, 800, false, true));
+		new PathTracingExample().run(new Window("nqkva glupost bate", 640, 480, false, true));
 	}
 
 	@Override
@@ -422,7 +414,7 @@ public class PathTracingExample extends ApplicationBase {
 		
 		ImGui.text("FPS: " + fps);
 		
-		if(ImGui.sliderInt("maximul light bounces", max_depth, 0, 8)) {
+		if(ImGui.sliderInt("maximul light bounces", max_depth, 0, 10)) {
 			tracer.bind();
 			if(tracer.hasUniform("max_bounces"))
 				tracer.setUniform("max_bounces", max_depth[0]);

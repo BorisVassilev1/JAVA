@@ -110,15 +110,15 @@ public class Texture2D implements Texture {
 		
 		int[] pixels = new int[width * height];
 		for(int i = 0; i < width * height; ++ i) {
-			int R = (int)(buff.get(i * 4 + 0) * 255);
-			int G = (int)(buff.get(i * 4 + 1) * 255);
-			int B = (int)(buff.get(i * 4 + 2) * 255);
-			int A = (int)(buff.get(i * 4 + 3) * 255);
+			int R = (int)(Math.min(buff.get(i * 4 + 0), 1.f) * 255);
+			int G = (int)(Math.min(buff.get(i * 4 + 1), 1.f) * 255);
+			int B = (int)(Math.min(buff.get(i * 4 + 2), 1.f) * 255);
+			int A = (int)(Math.min(buff.get(i * 4 + 3), 1.f) * 255);
 			try {
 				pixels[i] = new Color(R, G, B, A).getRGB();
-				img.setRGB(i % width, height - i / width - 1, pixels[i]);
+				img.setRGB(i % width, i / width, pixels[i]);
 			} catch(Exception e) {
-				//System.out.println("Error on pixel: " +  (i % width ) + " " + (i / width) + ": " + R + " " + G + " " + B + " " + A);
+				System.out.println("Error on pixel: " +  (i % width ) + " " + (i / width) + ": " + R + " " + G + " " + B + " " + A);
 			}
 		}
 		

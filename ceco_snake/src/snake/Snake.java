@@ -164,6 +164,7 @@ public class Snake implements KeyListener{
 		canvas.ig.setFont(font);
 		canvas.ig.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		// clear the screen and write the text
+		canvas.ig.setBackground(Color.black);
 		canvas.ig.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		canvas.ig.setColor(Color.red);
 		canvas.ig.drawString("Game Over", 50, 210);

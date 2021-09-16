@@ -1,13 +1,36 @@
 package snake;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Enumeration;
+
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 /**
  * The main class
@@ -38,11 +61,13 @@ public class Main {
 	/**
 	 * The font that will be used for labels
 	 */
-	public final Font labelFont = new Font("Dialog", Font.BOLD, 30);
+	public final Font labelFont = new Font(Font.DIALOG, Font.BOLD, 30);
 	/**
 	 * Path to the icon file
 	 */
 	public final String iconPath = "./res/icon.png";
+	
+	public static boolean isHighScoresWindowOpened = false;
 	
 	/**
 	 * Launch the game.
@@ -83,7 +108,7 @@ public class Main {
 		frame.setTitle(windowName);
 		frame.setResizable(false);
 		frame.setIconImage(icon);
-		frame.setBounds(400, 400, snake.getCanvas().getWidth() + 200, snake.getCanvas().getHeight() + 37);
+		frame.setBounds(400, 200, snake.getCanvas().getWidth() + 200, snake.getCanvas().getHeight() + 37);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -98,15 +123,34 @@ public class Main {
 		lblScoreNum.setBounds(snake.getCanvas().getWidth() + 10, 40, 150, 30);
 		snake.setLblScore(lblScoreNum); // The snake will write to it whenever the score has to be updated
 		
+		JButton btnHighscores = new JButton("Highscores");
+		btnHighscores.setBounds(snake.getCanvas().getWidth() + 10, 200, 170, 30);
+		btnHighscores.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(isHighScoresWindowOpened) return;
+				isHighScoresWindowOpened = true;
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						new HighscoreDisplay().start(snake);
+					}
+				});
+			}
+		});
+		btnHighscores.setFocusable(false);
+		
 		// Add everything to the frame
 		frame.getContentPane().add(lblScoreText);
 		frame.getContentPane().add(lblScoreNum);
+		frame.getContentPane().add(btnHighscores);
 		frame.getContentPane().add(snake.getCanvas());
-		// Show the frame
-		frame.setVisible(true);
 		
 		// The snake requires input from the window
 		frame.addKeyListener(snake);
+		
+		// Show the frame
+		frame.setVisible(true);
 		
 		// Start the game
 		snake.start();
