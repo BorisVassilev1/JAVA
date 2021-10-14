@@ -58,10 +58,10 @@ public abstract class ApplicationBase {
 		
 		ImGui.createContext();
 		ImGuiIO io = ImGui.getIO();
-		io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
+		//io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
 		
 		imGuiGlfw.init(window.getId(), true);
-		imGuilGL3.init("#version 460");
+		imGuilGL3.init("#version 430");
 		
 		init();
 		

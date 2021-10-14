@@ -5,9 +5,6 @@ import static org.lwjgl.assimp.Assimp.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import org.cdnomlqko.jglutil.data.Scene;
-import org.cdnomlqko.jglutil.examples.pathTracing.PathTracingExample;
-import org.cdnomlqko.jglutil.gameobject.MeshedGameObject;
 import org.cdnomlqko.jglutil.mesh.BasicMesh;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIColor4D;
@@ -26,12 +23,12 @@ import org.lwjgl.system.MemoryUtil;
 public class ModelLoader {
 	
 	public static int default_flags = 
-			//aiProcess_JoinIdenticalVertices |
-			//aiProcess_Triangulate |
-			//aiProcess_FixInfacingNormals | 
-			//aiProcess_PreTransformVertices |
-			//aiProcess_OptimizeGraph |
-			//aiProcess_OptimizeMeshes | 
+//			aiProcess_JoinIdenticalVertices |
+//			aiProcess_Triangulate |
+//			aiProcess_FixInfacingNormals | 
+//			aiProcess_PreTransformVertices |
+//			aiProcess_OptimizeGraph |
+//			aiProcess_OptimizeMeshes | 
 			aiProcess_GenNormals;
 	
 	public static BasicMesh loadMesh(String fileName) {

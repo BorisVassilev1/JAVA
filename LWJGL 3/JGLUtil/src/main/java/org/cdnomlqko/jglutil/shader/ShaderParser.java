@@ -1,6 +1,8 @@
 package org.cdnomlqko.jglutil.shader;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,15 +48,26 @@ public class ShaderParser {
 		
 		try {
 			String line;
-			InputStream in = ShaderParser.class.getResourceAsStream(file);
+			InputStream in = null;
+			in = ShaderParser.class.getResourceAsStream(file);
 			//System.out.println("\"" + file + "\"");
 			
 			if(in == null) {
 				in = ShaderParser.class.getClassLoader().getResourceAsStream(file);
 			}
 			
+			// TODO: for some reason this works?? But paths must not begin with a ".", but texture loading still works for some bizzare reason
+			
+//			if(in == null) {
+//				in = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
+//			}
+			
+//			if(in == null) {
+//				in = new FileInputStream(new File(file));
+//			}
+			
 			if(in == null) {
-				System.err.println("[JGLUtil] Error: Cannot load shader file or include.");
+				System.err.println("[JGLUtil] Error: Cannot load shader file or include: \n" + file);
 				return;
 			}
 			

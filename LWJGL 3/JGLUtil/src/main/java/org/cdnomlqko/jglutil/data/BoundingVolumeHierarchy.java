@@ -264,7 +264,7 @@ public class BoundingVolumeHierarchy implements Bufferable {
 			objects.add(t);
 			i ++;
 		}
-		System.out.println(boxes.size());
+		System.out.println("bounding boxes in BVH: " + boxes.size());
 		int[] m_depth = {0};
 		root = new Node(boxes, 0, m_depth);
 		max_depth = m_depth[0];

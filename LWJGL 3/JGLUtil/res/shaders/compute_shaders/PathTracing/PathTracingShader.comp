@@ -6,8 +6,10 @@ layout(local_size_x = 1, local_size_y = 1) in;
 
 layout(rgba32f, binding = 1) uniform image2D img_output;
 
-layout(std430, binding = 0) buffer spheres {
-	Sphere sphs[];
+uniform int spheres_count = 0;
+
+layout(binding = 0) buffer spheres {
+	Sphere sphs[50];
 };
 
 // whether or not to account triangle geometry when tracing.
@@ -58,11 +60,11 @@ void trace_geometry(in Ray ray, inout RayHit hit) {
 		res = intersectAABB(ray, node.box); // check for intersection with the AABB
 		
 		if(res && node.obj_index != -1) { // if a node that contains an object (triangle) is hit
-			t = get_triangle(node.obj_index); // this is inefficient because the triangle normal is never needed if there is no intersection
+			t = get_triangle(node.obj_index); // this is inefficient because the triangle normal is never needed if there is no intersectionq
 			intersectTriangle(ray, t, hit);
 		}
 		// don't ask me what is this. It has no if-s and works.
-		index = mix(right_sibling(index), left(index), !((res && node.obj_index != -1) || !res));
+		index = int(mix(right_sibling(index), left(index), !((res && node.obj_index != -1) || !res)));
 		
 		// if index points to the
 		must_break = (index == 1);
@@ -71,26 +73,73 @@ void trace_geometry(in Ray ray, inout RayHit hit) {
 
 // test for intersections with everything in the scene
 void intersect_scene(in Ray ray, inout RayHit hit) {
-	intersectGroundPlane(ray,-0.5,hit);
+	// intersectGroundPlane(ray,-0.5,hit);
 	
-	//for(int s = 0; s < 3 ; s ++) {
-	//	intersectSphere(ray, sphs[s], hit);
-	//}
+	for(int s = 0; s < spheres_count ; s ++) {
+		intersectSphere(ray, sphs[s], hit);
+	}
 	
+	// for(int s = 0; s < 3 ; s ++) {
+	// 	intersectSphere(ray, sphs[s], hit);
+	// }
+
 	//intersectSphere(ray, sphs[2], hit);
+	
+	//intersectSphere(ray, Sphere(vec4(-1.8, 0, 0.8, 1.0), vec4(10., 10., 0., 1.0), 0.2, 0), hit);
 	
 	if(do_trace_geometry) {
 		trace_geometry(ray, hit);
 	}
 }
 
+vec3 lerp4vec(vec3 v00, vec3 v10, vec3 v01, vec3 v11, float x, float y) {
+	return mix(
+	mix(v00,v01,x),
+	mix(v10,v11,x),
+	y
+	);
+}
+
+vec3 v00 = vec3(-1.0, 1.0 * aspect, -1/tan(fov/2));
+vec3 v01 = vec3( 1.0, 1.0 * aspect, -1/tan(fov/2));
+vec3 v10 = vec3(-1.0,-1.0 * aspect, -1/tan(fov/2));
+vec3 v11 = vec3( 1.0,-1.0 * aspect, -1/tan(fov/2));
+
+uniform float aperture = 0.0;
+uniform float focus_dist = 3.1;
+
+vec3 cam_pos = (cameraMatrix * vec4(0.0,0.0,0.0,1.0)).xyz;
+
+void get_ray(inout Ray ray, in vec3 cam_pos, in ivec2 pixel_coords, in vec2 pixel_position) {
+	vec3 vv00 = (vec4(v00,0.0) * cameraMatrix).xyz * focus_dist;
+	vec3 vv10 = (vec4(v10,0.0) * cameraMatrix).xyz * focus_dist;
+	vec3 vv01 = (vec4(v01,0.0) * cameraMatrix).xyz * focus_dist;
+	vec3 vv11 = (vec4(v11,0.0) * cameraMatrix).xyz * focus_dist;
+	
+	vec3 ray_origin_offset = random_in_unit_disk(pixel_coords + random_seed - 0.1) * aperture / 2;
+	
+	ray_origin_offset = (vec4(ray_origin_offset, 0.0) * cameraMatrix).xyz;
+	
+	vec2 ray_coords = vec2(pixel_position.x + (random(pixel_coords + random_seed)) / resolution.x, pixel_position.y + (random(pixel_coords + random_seed + 0.1)) / resolution.y);
+	
+	vec3 ray_dir = normalize(lerp4vec(vv00, vv10, vv01, vv11, ray_coords.x, ray_coords.y) - ray_origin_offset);
+	
+	ray = Ray(cam_pos + ray_origin_offset, ray_dir, vec3(1.0), true);
+}
+
+
+uniform float disperse_reflect_fuzz = 0.2;
+uniform float disperse_refract_eta = 1.0 / 1.7;
+uniform float disperse_lambert_reflectivity = 0.6;
 
 void main() {
 	vec4 pixel = vec4(1.0, 1.0, 1.0, 1.0); // the pixel value
 	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy); // the pixel position of the current 'fragment'
 	vec2 pixel_position = pixel_coords / resolution; // pixel position mapped to [0, 1)
-	int ray_id = to1d(pixel_coords, ivec2(resolution)); // position of the current ray in the ssbo
-	Ray ray = rays[ray_id]; // the current ray being traced
+
+	//int ray_id = to1d(pixel_coords, ivec2(resolution)); // position of the current ray in the ssbo
+	Ray ray; // the current ray being traced
+	get_ray(ray, cam_pos, pixel_coords, pixel_position);
 	bool end; // if it is the last iteration
 	
 	for(int i = 0; i < max_bounces; i ++) {
@@ -119,10 +168,10 @@ void main() {
 				write_sample(pixel_coords, pixel);
 			} else {
 				if(hit.mat.type == 1.0) { // metal-like
-					ray = disperse_reflect(ray, hit, hit.mat.color.xyz, 0.2,  random_seed_full);
+					ray = disperse_reflect(ray, hit, hit.mat.color.xyz, disperse_reflect_fuzz,  random_seed_full);
 				}
 				else if(hit.mat.type == 2.0) { // transparent glass
-					ray = disperse_refract(ray, hit, hit.mat.color.xyz, 1.0 / 1.7, random_seed_full);
+					ray = disperse_refract(ray, hit, hit.mat.color.xyz, disperse_refract_eta, random_seed_full);
 				}
 				else if(hit.mat.type == 3.0) { // a light object
 					ray.is_active = false;
@@ -130,11 +179,8 @@ void main() {
 					write_sample(pixel_coords, pixel);
 				}
 				else { // lambertarian
-					ray = disperse_lambert(ray, hit, hit.mat.color.xyz * 0.6 , random_seed_full);
+					ray = disperse_lambert(ray, hit, hit.mat.color.xyz * disperse_lambert_reflectivity , random_seed_full);
 				}
-				
-				// update the new ray in the SSBO
-				rays[ray_id] = ray;
 			}
 			
 		} else { // if the ray hit nothing, write the sky color and deactivate the ray
@@ -143,8 +189,6 @@ void main() {
 			write_sample(pixel_coords, pixel);
 			ray.is_active = false;
 		}
-		// sync the activity of the local ray and that in the SSBO
-		rays[ray_id].is_active = ray.is_active;
 	}
 }
 
