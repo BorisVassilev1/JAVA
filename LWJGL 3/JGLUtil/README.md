@@ -20,13 +20,13 @@ JGLUtil allows quick and easy window, shader and mesh creation. Here is a list o
 
 ### Rasterization pipeline
 
-![stanford dragons render with colored lighting](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_24.png) 
+![stanford dragons render with colored lighting](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/images/image_24.png) 
 
 ### Ray Tracing
 
-![ray-traced spheres and geometry](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_20.png) 
-![ray-traced spheres](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_7.png)
-![ray-traced sword](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/image_23.png) 
+![ray-traced spheres and geometry](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/images/image_20.png) 
+![ray-traced spheres](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/images/image_7.png)
+![ray-traced sword](https://raw.githubusercontent.com/BorisVassilev1/JAVA/master/LWJGL%203/JGLUtil/res/images/image_23.png) 
 
 ## Getting Started
 
